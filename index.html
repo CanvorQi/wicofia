@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Wicofia</title>
-<meta name="description" content="Yapay zekânın nasıl öğrendiğini iki küçük karakterle, kendi elinle gör.">
+<meta name="description" content="Yapay zekânın nasıl öğrendiğini üç küçük karakterle, kendi elinle gör.">
 <meta name="theme-color" content="#f9f9f7">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="icon.svg" type="image/svg+xml">
@@ -29,6 +29,7 @@
   --heat-lo: #fbdccb; --heat-hi: #a8321a;
   --warn-bg: #fff3d6; --warn-ink: #5e4300;
   --pink: #c92f7e; --pink-ink: #ffffff; --pink-body: #f48fbf; --pink-deep: #d9558f; --pink-soft: 214, 63, 140;
+  --green: #17794e; --green-ink: #ffffff;
 }
 :root[data-theme="dark"] {
   color-scheme: dark;
@@ -40,8 +41,10 @@
   --heat-lo: #43271c; --heat-hi: #ff9a6e;
   --warn-bg: #3d2f0c; --warn-ink: #fbd98a;
   --pink: #f08cbf; --pink-ink: #0b0b0b; --pink-body: #ee84b6; --pink-deep: #d9558f; --pink-soft: 240, 140, 191;
+  --green: #5cc48a; --green-ink: #0b0b0b;
 }
 body[data-who="serino"] { --accent: var(--pink); --accent-ink: var(--pink-ink); }
+body[data-who="eroson"] { --accent: var(--green); --accent-ink: var(--green-ink); }
 * { box-sizing: border-box; }
 [hidden] { display: none !important; }
 body {
@@ -119,10 +122,11 @@ a.btn { color: inherit; text-decoration: none; display: inline-block; }
 /* Home */
 .home { max-width: 920px; margin: 0 auto; padding: 16px 16px 40px; }
 .home-lead { font-size: 22px; line-height: 1.3; font-weight: 650; letter-spacing: -.01em; max-width: 620px; }
-.who-cards { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; margin-top: 20px; }
+.who-cards { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; margin-top: 20px; }
 .who-card { display: flex; flex-direction: column; gap: 8px; padding: 20px; color: inherit; text-decoration: none; transition: border-color .15s, transform .15s; }
 .who-card:hover { border-color: var(--accent); transform: translateY(-2px); }
 .who-card.pink { --accent: var(--pink); --accent-ink: var(--pink-ink); }
+.who-card.green { --accent: var(--green); --accent-ink: var(--green-ink); }
 .who-card .face { width: 136px; height: 136px; margin: 0 auto 4px; }
 .who-card .face svg { display: block; width: 100%; height: 100%; }
 .who-card h2 { font-size: 22px; }
@@ -130,7 +134,7 @@ a.btn { color: inherit; text-decoration: none; display: inline-block; }
 .who-card .now { margin-top: auto; padding-top: 4px; font-size: 13px; color: var(--ink); font-variant-numeric: tabular-nums; }
 .who-card .btn { text-align: center; margin-top: 6px; }
 @media (prefers-reduced-motion: reduce) { .who-card { transition: none; } .who-card:hover { transform: none; } }
-@media (max-width: 620px) { .who-cards { grid-template-columns: minmax(0, 1fr); } }
+@media (max-width: 760px) { .who-cards { grid-template-columns: minmax(0, 1fr); } }
 #serino { width: 170px; height: 170px; display: block; margin: 12px auto 0; }
 #serino .s-body { fill: var(--pink-body); }
 #serino .s-cheek { fill: var(--pink-deep); opacity: .45; }
@@ -143,6 +147,21 @@ a.btn { color: inherit; text-decoration: none; display: inline-block; }
 #serino.busy .s-bow { animation: pulse .7s ease-in-out infinite alternate; }
 #sEyes { animation: blink 6s infinite; transform-origin: 100px 104px; }
 @media (prefers-reduced-motion: reduce) { #sEyes, #serino.busy .s-bow { animation: none; } }
+
+/* Eroson */
+#eroson { width: 170px; height: 170px; display: block; margin: 12px auto 0; }
+#eroson .e-body { fill: #5cc48a; }
+#eroson .e-hat { fill: #1f7a52; }
+#eroson .e-brim { fill: #14573a; }
+#eroson .feature { stroke: #0f3b28; stroke-width: 5; fill: none; stroke-linecap: round; stroke-linejoin: round; }
+#eroson.mouth-fill #eMouth { fill: #0f3b28; }
+#eroson.busy .e-brim { animation: pulse .7s ease-in-out infinite alternate; }
+@media (prefers-reduced-motion: reduce) { #eroson.busy .e-brim { animation: none; } }
+#eGame { width: 100%; max-width: 460px; aspect-ratio: 1; display: block; margin: 12px auto 0; }
+#eChart { width: 100%; height: 230px; display: block; margin-top: 12px; }
+#eMapCv { width: 100%; max-width: 460px; aspect-ratio: 1; display: block; margin: 12px auto 0; touch-action: none; cursor: crosshair; }
+.e-row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; justify-content: space-between; margin-top: 12px; }
+.e-rules { margin: 8px 0 0; padding-left: 18px; font-size: 13px; color: var(--ink-2); }
 
 /* Serino */
 .side textarea, .write input[type="text"] {
@@ -253,6 +272,14 @@ tr:last-child td { border-bottom: 0; }
 
 .net { display: grid; grid-template-columns: 1fr 1fr auto; gap: 8px; margin-top: 12px; align-items: end; }
 .net label { display: grid; gap: 2px; font-size: 13px; color: var(--ink-2); }
+.drop { display: block; width: 100%; margin-top: 8px; padding: 14px 10px; border: 1.5px dashed var(--axis); border-radius: 8px; background: none; color: var(--ink-2); font-size: 13px; text-align: center; }
+.drop b { color: var(--ink); }
+.drop:hover, .drop.over { border-color: var(--pink); background: var(--surface-2); }
+.docs { list-style: none; margin: 8px 0 0; padding: 0; font-size: 13px; }
+.docs li { display: flex; align-items: center; gap: 8px; padding: 4px 0; border-bottom: 1px solid var(--grid); }
+.docs .name { flex: 1; min-width: 0; overflow-wrap: anywhere; }
+.docs .size { color: var(--muted); white-space: nowrap; }
+.docs button { border: 0; background: none; padding: 2px 6px; color: var(--ink-2); }
 .mem-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 12px; }
 .mem-row .btn { padding: 8px 6px; }
 .term {
@@ -276,6 +303,7 @@ tr:last-child td { border-bottom: 0; }
   width: 100vw; height: 100dvh; overflow: hidden;
 }
 #bookDlg[data-who="serino"] { --b-accent: #b5266f; --cover: #a3246b; --cover-2: #6f1548; --gold: #ffdcea; }
+#bookDlg[data-who="eroson"] { --b-accent: #17794e; --cover: #1f7a52; --cover-2: #14573a; --gold: #d8f2c8; }
 #bookDlg::backdrop { background: rgba(16, 12, 34, .78); }
 .stage { height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; padding: 12px 16px; }
 .book {
@@ -418,10 +446,14 @@ tr:last-child td { border-bottom: 0; }
     <button class="btn primary" id="sAuto" type="button">Okumaya başlat</button>
     <button class="btn" id="sReset" type="button">Sıfırla</button>
   </div>
+  <div class="ctl" id="erosonCtl" hidden>
+    <button class="btn primary" id="eAuto" type="button">Eğitimi başlat</button>
+    <button class="btn" id="eReset" type="button">Sıfırla</button>
+  </div>
 </header>
 
 <main class="home" id="homeMode">
-  <p class="home-lead">Yapay zekânın nasıl öğrendiğini iki küçük karakterle, kendi elinle gör.</p>
+  <p class="home-lead">Yapay zekânın nasıl öğrendiğini üç küçük karakterle, kendi elinle gör.</p>
   <div class="who-cards">
     <a class="card who-card" href="#phyou">
       <div class="face" id="homeFaceP"></div>
@@ -436,6 +468,13 @@ tr:last-child td { border-bottom: 0; }
       <p>Metin okuyarak yazmayı öğrenir. Küçük bir dil modelinin içini, dikkati ve bloklarını gösterir.</p>
       <p class="now" id="homeNowS"></p>
       <span class="btn primary">Serino'ya git</span>
+    </a>
+    <a class="card who-card green" href="#eroson">
+      <div class="face" id="homeFaceE"></div>
+      <h2>Eroson</h2>
+      <p>Labirentte deneyerek yol bulmayı öğrenir. Ödülü, keşfi ve hiç görmediği yerde sınavı gösterir.</p>
+      <p class="now" id="homeNowE"></p>
+      <span class="btn primary">Eroson'a git</span>
     </a>
   </div>
 </main>
@@ -572,11 +611,26 @@ tr:last-child td { border-bottom: 0; }
 
     <section class="card">
       <h2>Okuyacağı metin</h2>
-      <p class="sub">Serino harf harf okur. Kendi metnini yapıştırırsan onun tarzına benzemeye çalışır. Yeni metin için baştan başlar.</p>
+      <label class="check"><input id="sSampleOn" type="checkbox" checked> Örnek metin ve sorularla eğit</label>
+      <p class="sub">Serino harf harf okur. Kendi metnini yapıştırır ya da dosyanı gösterirsen onun tarzına benzemeye çalışır. Yeni metin için baştan başlar.</p>
       <textarea id="sText" aria-label="Serino'nun okuyacağı metin" placeholder="Metnini buraya yapıştır"></textarea>
+      <button class="drop" id="sDrop" type="button"><b>Dosya seç</b> ya da buraya bırak<br>txt, md, csv, html, docx</button>
+      <input id="sDocFile" type="file" multiple accept=".txt,.text,.md,.markdown,.csv,.tsv,.log,.srt,.htm,.html,.docx,text/*" hidden>
+      <ul class="docs" id="sDocList"></ul>
+      <p class="note" id="sDocNote" aria-live="polite"></p>
       <label class="check"><input id="sUseDefault" type="checkbox" checked> Hazır metni de oku</label>
       <button class="btn wide" id="sTextApply" type="button">Bu metni okut</button>
       <p class="note" id="sTextNote" aria-live="polite"></p>
+    </section>
+
+    <section class="card">
+      <h2>Soru-cevap öğret</h2>
+      <p class="sub">Soru-cevap dosyanı göster, Serino yalnızca onları çalışsın. Sorular karışır, %10'u sınava ayrılır. Yeni dersler için baştan başlar.</p>
+      <button class="drop" id="sQaDrop" type="button"><b>Dosya seç</b> ya da buraya bırak<br>"Soru: / Cevap:" satırları, iki sütunlu csv, json, docx</button>
+      <input id="sQaFile" type="file" multiple accept=".txt,.text,.md,.csv,.tsv,.json,.jsonl,.docx" hidden>
+      <ul class="docs" id="sQaList"></ul>
+      <p class="note" id="sQaNote" aria-live="polite"></p>
+      <button class="btn wide" id="sQaApply" type="button">Bu soruları öğret</button>
     </section>
 
     <section class="card">
@@ -613,15 +667,24 @@ tr:last-child td { border-bottom: 0; }
     </section>
 
     <section class="card">
-      <h2>Bana yazdır</h2>
-      <p class="sub">Bir başlangıç yaz, Serino harf harf sürdürsün. <button type="button" class="term" data-term="sicaklik">Sıcaklık</button> arttıkça daha cesur, daha hatalı yazar.</p>
+      <h2 id="sWriteTitle">Bana yazdır</h2>
+      <p class="sub" id="sWriteSub">Bir başlangıç yaz, Serino harf harf sürdürsün. <button type="button" class="term" data-term="sicaklik">Sıcaklık</button> arttıkça daha cesur, daha hatalı yazar.</p>
+      <p class="sub" id="sAskSub" hidden>Bir soru yaz, Serino cevabı harf harf üretsin. § soru başı, → cevap başı. Bitiş işaretini yazınca durur.</p>
       <form class="write" id="sWriteForm" autocomplete="off" novalidate>
         <input id="sPrompt" type="text" maxlength="200" value="bugün küçük" aria-label="Başlangıç metni">
         <label class="temp">Sıcaklık <input id="sTemp" type="range" min="1" max="15" step="1" value="8"> <span id="sTempShow"></span></label>
-        <button class="btn primary" type="submit">Yaz</button>
+        <button class="btn primary" id="sWriteBtn" type="submit">Yaz</button>
       </form>
       <div class="typed" id="sOut" aria-live="polite"></div>
       <p class="note" id="sWriteNote" aria-live="polite"></p>
+    </section>
+
+    <section class="card" id="sExamCard" hidden>
+      <h2>Soru sınavı</h2>
+      <p class="sub">Serino'ya çalıştığı sorular ve hiç görmediği sınav soruları sorulur, yalnızca tam aynı cevap doğru sayılır. Eğitim durur, ağırlıklar değişmez.</p>
+      <button class="btn wide" id="sExamRun" type="button">Sınavı başlat</button>
+      <p class="note" id="sExamNote" aria-live="polite"></p>
+      <div class="snaps" id="sExamList"></div>
     </section>
 
     <section class="card">
@@ -659,7 +722,514 @@ tr:last-child td { border-bottom: 0; }
     </section>
   </main>
 </div>
+<div class="layout" id="erosonMode" hidden>
+  <aside class="side">
+    <section class="card phyou-card" aria-label="Eroson">
+      <div class="bubble" id="eSpeech" aria-live="polite"></div>
+      <svg id="eroson" viewBox="0 0 200 200" role="img" aria-labelledby="eMoodText">
+        <path class="e-body" d="M100 44 C152 44 176 76 176 120 C176 162 146 184 100 184 C54 184 24 162 24 120 C24 76 48 44 100 44Z"/>
+        <path class="e-hat" d="M36 88 C42 46 72 30 100 30 C128 30 158 46 164 88 Z"/>
+        <path class="e-brim" d="M22 84 H178 q10 0 10 9 q0 9 -10 9 H22 q-10 0 -10 -9 q0 -9 10 -9Z"/>
+        <circle cx="74" cy="124" r="15" fill="#fff"/><circle cx="126" cy="124" r="15" fill="#fff"/>
+        <circle cx="78" cy="127" r="7" fill="#0f3b28"/><circle cx="130" cy="127" r="7" fill="#0f3b28"/>
+        <path class="feature" id="eMouth" d="M84 146 q16 10 32 0"/>
+      </svg>
+      <p class="mood" id="eMoodText"></p>
+      <button class="btn book-open" id="eBookBtn" type="button">Eroson'un kitabını oku</button>
+    </section>
+
+    <section class="card">
+      <h2>Labirent</h2>
+      <p class="sub">Değiştirince Eroson baştan başlar. Başlangıç rastgele, çıkış başlangıca en uzak kare.</p>
+      <div class="seg" id="eSizes" role="group" aria-label="Labirent boyutu">
+        <button type="button" data-n="5">5 × 5</button>
+        <button type="button" data-n="7">7 × 7</button>
+        <button type="button" data-n="9">9 × 9</button>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>Oyunun kuralı</h2>
+      <p class="sub">Kimse ona yolu söylemez, yalnızca ödül alır.</p>
+      <ul class="e-rules">
+        <li>Çıkışı bulursa +1</li>
+        <li>Her adım −0,01</li>
+        <li>Gittiği yere yine giderse −0,01 daha</li>
+      </ul>
+    </section>
+  </aside>
+
+  <main class="main">
+    <section class="card stats" aria-label="Genel durum">
+      <div class="stat"><div class="label">Oynadığı oyun</div><div class="value" id="eGames">0</div></div>
+      <div class="stat"><div class="label">Çalıştığı labirentleri çözme</div><div class="value" id="eStudyWon">%0</div></div>
+      <div class="stat"><div class="label">Hiç görmediklerini çözme</div><div class="value" id="eExamWon">%0</div></div>
+    </section>
+
+    <section class="card">
+      <h2>Oyun</h2>
+      <p class="sub">Yeşil kareler ayak izi, koyulaştıkça oraya daha çok gitmiş. Boş kare başlangıç, bayrak çıkış.</p>
+      <canvas id="eGame" aria-label="Labirent ve Eroson'un konumu. Sonuçlar karnede."></canvas>
+      <div class="e-row">
+        <div class="seg" id="eSpeeds" role="group" aria-label="Eğitim hızı">
+          <button type="button" data-fast="0" aria-pressed="false">Adım adım</button>
+          <button type="button" data-fast="1" aria-pressed="true">Hızlı</button>
+        </div>
+        <button class="btn" id="eWatch" type="button">Sınav labirentinde izle</button>
+      </div>
+      <p class="note" id="eGameNote" aria-live="polite"></p>
+    </section>
+
+    <section class="card">
+      <h2>Kendi haritan</h2>
+      <p class="sub">Bir fırça seç, kareye tıkla ya da sürükle. Başlangıç ve çıkış arasında yol kalmalı.</p>
+      <div class="seg" id="eTools" role="group" aria-label="Harita fırçası">
+        <button type="button" data-tool="wall" aria-pressed="true">Engel</button>
+        <button type="button" data-tool="erase" aria-pressed="false">Silgi</button>
+        <button type="button" data-tool="start" aria-pressed="false">Başlangıç</button>
+        <button type="button" data-tool="exit" aria-pressed="false">Çıkış</button>
+      </div>
+      <canvas id="eMapCv" aria-label="Harita çizim alanı. Yalnızca fare ya da dokunmayla çizilir."></canvas>
+      <div class="e-row">
+        <button class="btn" id="eMapWatch" type="button">Haritada izle</button>
+        <button class="btn" id="eMapStudy" type="button">Bu haritada çalıştır</button>
+        <button class="btn" id="eMapClear" type="button">Temizle</button>
+      </div>
+      <p class="note" id="eMapNote" aria-live="polite"></p>
+    </section>
+
+    <section class="card">
+      <h2>Şu an neye karar veriyor?</h2>
+      <p class="sub">Durduğu karede dört yönün gerçek <button type="button" class="term" data-term="qdeger">puanı</button>. En yükseğine gider, eğitimde bazen zar atar.</p>
+      <div class="bars" id="eBars"></div>
+    </section>
+
+    <section class="card">
+      <h2>Başarı grafiği</h2>
+      <p class="sub">Yatayda hamle sayısı, dikeyde çözülen labirent oranı.</p>
+      <canvas id="eChart" aria-label="Çalışma ve sınav labirentlerindeki başarının zamanla değişimi. Güncel değerler karnede."></canvas>
+    </section>
+
+    <section class="card">
+      <h2>Karne</h2>
+      <p class="ticker" id="eTicker">Eroson oyuna başlamayı bekliyor.</p>
+      <table>
+        <thead><tr><th scope="col">Oyuncu</th><th scope="col">Çözdüğü</th><th scope="col">En kısa yola göre</th></tr></thead>
+        <tbody>
+          <tr><td>Eroson, çalıştığı labirentler</td><td id="eRSW"></td><td id="eRSR"></td></tr>
+          <tr><td>Eroson, hiç görmediği labirentler</td><td id="eREW"></td><td id="eRER"></td></tr>
+          <tr><td>Sağ el kuralı, aynı sınav</td><td id="eRHW"></td><td id="eRHR"></td></tr>
+          <tr><td>Rastgele yürüyüş, aynı sınav</td><td id="eRBW"></td><td id="eRBR"></td></tr>
+        </tbody>
+      </table>
+    </section>
+  </main>
+</div>
+<!-- Copies of samples/*.md, since a page opened as a file cannot fetch them. Keep them identical. -->
+<script type="text/plain" id="sampleText">
+Küçük bir köyde, denize bakan bir tepenin üstünde yaşlı bir kütüphane vardı. Kütüphanenin kapısı her sabah erkenden açılır, içeri önce güneş, sonra kediler girerdi. Köyün çocukları okuldan çıkınca buraya koşar, en sevdikleri kitabı raftan alır, pencerenin önüne otururdu.
+
+Kütüphaneyi Nermin Hanım işletirdi. Nermin Hanım çok konuşmazdı ama her kitabın yerini bilirdi. Bir çocuk ne okuyacağını bilemeyince ona bakar, sonra elini bir rafa uzatır ve şöyle derdi: bugün bunu oku, yarın bana anlat. Çocuklar da okur, ertesi gün gelip anlatırdı. Kimi hikâyeyi yarım anlatır, kimi sonunu kendisi uydururdu. Nermin Hanım hepsini dinler, gülümser, yeni bir kitap verirdi.
+
+Bir gün köye yağmur yağmaya başladı. Yağmur üç gün sürdü, yollar çamur oldu, balıkçılar denize açılamadı. Herkes evine kapandı ama kütüphanenin ışığı yanmaya devam etti. Çocuklar çizmelerini giyip tepeye tırmandı. İçeride soba yanıyor, çayın kokusu rafların arasında dolaşıyordu. O gün kimse eve dönmek istemedi.
+
+Çocuklardan biri olan Deniz, rafların en arkasında tozlu bir defter buldu. Defterin üzerinde hiçbir yazı yoktu. Sayfalarını çevirince harflerin küçük küçük dizildiğini gördü. Her satırda bir soru, altında da bir cevap yazıyordu. Bir kitap gibi değil, iki kişinin konuşması gibiydi. Deniz defteri Nermin Hanım'a götürdü.
+
+Nermin Hanım defteri görünce uzun uzun baktı. Bunu dedem yazmış, dedi. Dedem denize açılmadan önce köyün çocuklarına sorular sorar, cevaplarını buraya yazarmış. Yıllarca kayıp sanmıştık. Deniz sordu: peki neden yazmış? Nermin Hanım gülerek cevap verdi: çünkü soru sormak, cevabı bilmekten daha zordur.
+
+Ertesi sabah yağmur durdu. Gökyüzü temizlenmiş, deniz maviye dönmüştü. Çocuklar defteri alıp bahçeye çıktı. Birbirlerine defterdeki soruları sordular. Bilemeyenler güldü, bilenler sevindi. Sonra Deniz yeni bir fikir buldu: biz de yeni sorular yazalım, dedi. Her çocuk defterin boş bir sayfasına kendi sorusunu yazdı. Kimi denizin neden tuzlu olduğunu sordu, kimi kuşların nereye gittiğini, kimi de ayın neden peşimizden geldiğini.
+
+Cevapları bulmak kolay olmadı. Çocuklar balıkçılara gitti, öğretmene sordu, kitapları karıştırdı. Yaşlı balıkçı Hasan Amca, denizin tuzunu nehirlerin taşıdığını anlattı. Öğretmen, kuşların kışın sıcak yerlere gittiğini söyledi. Ayın neden peşimizden geldiğini ise kimse tam anlatamadı. Deniz o soruyu defterde boş bıraktı ve altına şunu yazdı: bunu büyüyünce bulacağım.
+
+Yaz geldiğinde köyün meydanında küçük bir şenlik yapıldı. Çocuklar defteri getirdi, herkesin önünde sorular sordular. Bakkal Ali Bey soruların hiçbirini bilemedi ama en çok o güldü. Fırıncı sıcak ekmek dağıttı, Nermin Hanım da kütüphanenin kapısına yeni bir tahta astı. Tahtada şöyle yazıyordu: burada her soru hoş karşılanır.
+
+Yıllar geçti. Çocuklar büyüdü, bazıları köyden ayrıldı, bazıları kaldı. Deniz denizi aşıp uzak bir şehre gitti ve gökyüzünü inceleyen bir bilim insanı oldu. Bir yaz köye döndüğünde önce tepeye çıktı. Kütüphanenin kapısı yine açıktı, içeride yine bir çocuk pencerenin önünde kitap okuyordu. Deniz rafların arkasına gitti, eski defteri buldu ve boş bıraktığı satırın altına cevabı yazdı. Sonra defteri kapattı, yerine koydu ve o çocuğa döndü. Sen ne okuyorsun, diye sordu. Çocuk başını kaldırdı, gülümsedi ve yeni bir soru sordu.
+
+Akşam olunca rüzgâr denizden tepeye doğru esti. Kediler sobanın yanına kıvrıldı, son ışıklar rafların üstünde dolaştı. Nermin Hanım'ın yerini artık genç bir kız almıştı ama kapı hâlâ her sabah erkenden açılıyordu. İçeri önce güneş, sonra kediler giriyordu. Köyün çocukları hâlâ okuldan çıkınca tepeye koşuyordu. Çünkü bazı yerler değişmez, yalnızca soruları yenilenir.
+</script>
+<script type="text/plain" id="sampleQa">
+# Serino için örnek soru-cevaplar
+
+Soru: türkiye'nin başkenti
+Cevap: ankara
+
+Soru: fransa'nın başkenti
+Cevap: paris
+
+Soru: italya'nın başkenti
+Cevap: roma
+
+Soru: almanya'nın başkenti
+Cevap: berlin
+
+Soru: ispanya'nın başkenti
+Cevap: madrid
+
+Soru: japonya'nın başkenti
+Cevap: tokyo
+
+Soru: rusya'nın başkenti
+Cevap: moskova
+
+Soru: yunanistan'ın başkenti
+Cevap: atina
+
+Soru: mısır'ın başkenti
+Cevap: kahire
+
+Soru: ingiltere'nin başkenti
+Cevap: londra
+
+Soru: pazartesiden sonra
+Cevap: salı
+
+Soru: salıdan sonra
+Cevap: çarşamba
+
+Soru: çarşambadan sonra
+Cevap: perşembe
+
+Soru: perşembeden sonra
+Cevap: cuma
+
+Soru: cumadan sonra
+Cevap: cumartesi
+
+Soru: cumartesiden sonra
+Cevap: pazar
+
+Soru: pazardan sonra
+Cevap: pazartesi
+
+Soru: ocaktan sonra
+Cevap: şubat
+
+Soru: şubattan sonra
+Cevap: mart
+
+Soru: marttan sonra
+Cevap: nisan
+
+Soru: nisandan sonra
+Cevap: mayıs
+
+Soru: mayıstan sonra
+Cevap: haziran
+
+Soru: hazirandan sonra
+Cevap: temmuz
+
+Soru: temmuzdan sonra
+Cevap: ağustos
+
+Soru: ağustostan sonra
+Cevap: eylül
+
+Soru: eylülden sonra
+Cevap: ekim
+
+Soru: ekimden sonra
+Cevap: kasım
+
+Soru: kasımdan sonra
+Cevap: aralık
+
+Soru: ilkbahardan sonra
+Cevap: yaz
+
+Soru: yazdan sonra
+Cevap: sonbahar
+
+Soru: sonbahardan sonra
+Cevap: kış
+
+Soru: kıştan sonra
+Cevap: ilkbahar
+
+Soru: sıcağın zıttı
+Cevap: soğuk
+
+Soru: büyüğün zıttı
+Cevap: küçük
+
+Soru: uzunun zıttı
+Cevap: kısa
+
+Soru: hızlının zıttı
+Cevap: yavaş
+
+Soru: iyinin zıttı
+Cevap: kötü
+
+Soru: gecenin zıttı
+Cevap: gündüz
+
+Soru: yeninin zıttı
+Cevap: eski
+
+Soru: açığın zıttı
+Cevap: kapalı
+
+Soru: dolunun zıttı
+Cevap: boş
+
+Soru: ağırın zıttı
+Cevap: hafif
+
+Soru: kalının zıttı
+Cevap: ince
+
+Soru: temizin zıttı
+Cevap: kirli
+
+Soru: yukarının zıttı
+Cevap: aşağı
+
+Soru: sağın zıttı
+Cevap: sol
+
+Soru: içerinin zıttı
+Cevap: dışarı
+
+Soru: zenginin zıttı
+Cevap: fakir
+
+Soru: kedi ne der
+Cevap: miyav
+
+Soru: köpek ne der
+Cevap: hav hav
+
+Soru: inek ne der
+Cevap: möö
+
+Soru: koyun ne der
+Cevap: mee
+
+Soru: horoz ne der
+Cevap: ü ürü üü
+
+Soru: kurbağa ne der
+Cevap: vırak
+
+Soru: arı ne der
+Cevap: vızz
+
+Soru: civciv ne der
+Cevap: cik cik
+
+Soru: inek ne verir
+Cevap: süt
+
+Soru: tavuk ne verir
+Cevap: yumurta
+
+Soru: arı ne verir
+Cevap: bal
+
+Soru: koyun ne verir
+Cevap: yün
+
+Soru: tavşan ne yer
+Cevap: havuç
+
+Soru: maymun ne yer
+Cevap: muz
+
+Soru: kedi ne yer
+Cevap: balık
+
+Soru: sincap ne yer
+Cevap: fındık
+
+Soru: ayı ne sever
+Cevap: bal
+
+Soru: limon ne renk
+Cevap: sarı
+
+Soru: domates ne renk
+Cevap: kırmızı
+
+Soru: çimen ne renk
+Cevap: yeşil
+
+Soru: deniz ne renk
+Cevap: mavi
+
+Soru: kömür ne renk
+Cevap: siyah
+
+Soru: kar ne renk
+Cevap: beyaz
+
+Soru: patlıcan ne renk
+Cevap: mor
+
+Soru: portakal ne renk
+Cevap: turuncu
+
+Soru: pembe nasıl olur
+Cevap: kırmızı beyaz
+
+Soru: yeşil nasıl olur
+Cevap: mavi sarı
+
+Soru: mor nasıl olur
+Cevap: kırmızı mavi
+
+Soru: turuncu nasıl olur
+Cevap: kırmızı sarı
+
+Soru: bir artı bir
+Cevap: iki
+
+Soru: iki artı bir
+Cevap: üç
+
+Soru: iki artı iki
+Cevap: dört
+
+Soru: üç artı iki
+Cevap: beş
+
+Soru: üç artı üç
+Cevap: altı
+
+Soru: dört artı üç
+Cevap: yedi
+
+Soru: dört artı dört
+Cevap: sekiz
+
+Soru: beş artı dört
+Cevap: dokuz
+
+Soru: beş artı beş
+Cevap: on
+
+Soru: üçten sonra
+Cevap: dört
+
+Soru: beşten sonra
+Cevap: altı
+
+Soru: yediden sonra
+Cevap: sekiz
+
+Soru: dokuzdan sonra
+Cevap: on
+
+Soru: bir yılda kaç ay
+Cevap: on iki
+
+Soru: bir haftada kaç gün
+Cevap: yedi
+
+Soru: bir günde kaç saat
+Cevap: yirmi dört
+
+Soru: bir saatte kaç dakika
+Cevap: altmış
+
+Soru: bir yılda kaç mevsim
+Cevap: dört
+
+Soru: üçgenin kaç kenarı var
+Cevap: üç
+
+Soru: karenin kaç kenarı var
+Cevap: dört
+
+Soru: elimizde kaç parmak
+Cevap: beş
+
+Soru: arabanın kaç tekeri
+Cevap: dört
+
+Soru: bisikletin kaç tekeri
+Cevap: iki
+
+Soru: kuşun kaç ayağı var
+Cevap: iki
+
+Soru: kedinin kaç ayağı var
+Cevap: dört
+
+Soru: örümceğin kaç ayağı
+Cevap: sekiz
+
+Soru: kütüphanede ne var
+Cevap: kitap
+
+Soru: fırında ne var
+Cevap: ekmek
+
+Soru: okulda kim var
+Cevap: öğretmen
+
+Soru: hastanede kim var
+Cevap: doktor
+
+Soru: denizde kim var
+Cevap: balıkçı
+
+Soru: gökyüzünde ne var
+Cevap: bulut
+
+Soru: geceleri ne parlar
+Cevap: yıldız
+
+Soru: gündüzleri ne parlar
+Cevap: güneş
+
+Soru: su kaçta kaynar
+Cevap: yüz derece
+
+Soru: su kaçta donar
+Cevap: sıfır derece
+
+Soru: en büyük gezegen
+Cevap: jüpiter
+
+Soru: yaşadığımız gezegen
+Cevap: dünya
+
+Soru: dünyanın uydusu
+Cevap: ay
+
+Soru: en büyük okyanus
+Cevap: pasifik
+
+Soru: en uzun nehir
+Cevap: nil
+
+Soru: en yüksek dağ
+Cevap: everest
+
+Soru: türkiye'nin en yüksek dağı
+Cevap: ağrı
+
+Soru: en büyük hayvan
+Cevap: mavi balina
+
+Soru: en hızlı kara hayvanı
+Cevap: çita
+
+Soru: en uzun boylu hayvan
+Cevap: zürafa
+
+Soru: adın ne
+Cevap: serino
+
+Soru: ne yaparsın
+Cevap: harf harf yazarım
+
+Soru: arkadaşların kim
+Cevap: phyou, eroson
+</script>
 <div id="tip"></div>
+
 <div id="termPop" role="status"></div>
 
 <dialog id="bookDlg" aria-label="Phyou'nun Kitabı">
@@ -942,6 +1512,100 @@ const validLLM = c => !!c && Object.keys(LLM_LIMITS).every(k =>
 
 const cleanText = raw => raw.toLocaleLowerCase('tr').replace(/\s+/g, ' ').trim();
 
+// Files bring invisible and typographic characters that would only widen the vocabulary.
+const tidyText = raw => raw.normalize('NFC')
+  .replace(/[\u0000-\u0008\u000E-\u001F\u007F­​-‍⁠﻿]/g, '')
+  .replace(/[“”„«»]/g, '"').replace(/[‘’‚]/g, "'").replace(/[–—―−]/g, '-').replace(/…/g, '...');
+
+// Keeps the most frequent characters when the text has more kinds than the model can hold.
+function fitVocab(text, limit = LLM_MAX_VOCAB, always = '') {
+  const seen = new Map();
+  for (const ch of text) seen.set(ch, (seen.get(ch) || 0) + 1);
+  if (seen.size <= limit) return { text, dropped: 0 };
+  const rank = ch => (always.includes(ch) ? Infinity : seen.get(ch));
+  const keep = new Set([...seen.keys()].sort((a, b) => rank(b) - rank(a)).slice(0, limit));
+  return { text: cleanText(Array.from(text).filter(ch => keep.has(ch)).join('')), dropped: seen.size - limit };
+}
+
+/* ---------- question and answer text ---------- */
+// Each pair is written as §question→answer¶, so the model learns where an answer starts and ends.
+const QA_MARKS = '§→¶';
+const qaText = pairs => pairs.map(p => `§${p.q}→${p.a}¶`).join('');
+// Reads the format back from the text alone, so a memory file needs no extra field.
+function qaPairs(text) {
+  if (!text.endsWith('¶')) return null;
+  const pairs = [];
+  for (const part of text.slice(0, -1).split('¶')) {
+    const m = part.match(/^§([^§→]+)→([^§→]+)$/);
+    if (!m) return null;
+    pairs.push({ q: m[1], a: m[2] });
+  }
+  return pairs;
+}
+function labelPairs(raw) {
+  const Q = /^\s*(?:\d+[.)]\s*)?(?:soru|question|s|q)(?:\s*\d+)?\s*:\s*(.*)$/i;
+  const A = /^\s*(?:\d+[.)]\s*)?(?:cevap|yanıt|yanit|answer|c|y|a)(?:\s*\d+)?\s*:\s*(.*)$/i;
+  const out = [];
+  let cur = null, side = 'q';
+  for (const line of raw.split(/\r\n?|\n/)) {
+    let m;
+    if ((m = line.match(Q))) { cur = { q: m[1], a: '' }; out.push(cur); side = 'q'; }
+    else if (cur && (m = line.match(A))) { cur.a = m[1]; side = 'a'; }
+    else if (cur) cur[side] += ' ' + line;
+  }
+  return out;
+}
+function tablePairs(raw) {
+  const head = raw.split(/\r\n?|\n/)[0], cut = head.includes('\t') ? '\t' : head.includes(';') ? ';' : ',';
+  const rows = [];
+  let row = [], cell = '', quoted = false;
+  const endCell = () => { row.push(cell); cell = ''; };
+  const endRow = () => { endCell(); rows.push(row); row = []; };
+  for (let i = 0; i < raw.length; i++) {
+    const ch = raw[i];
+    if (quoted) {
+      if (ch !== '"') cell += ch;
+      else if (raw[i + 1] === '"') { cell += '"'; i++; }
+      else quoted = false;
+    } else if (ch === '"' && !cell) quoted = true;
+    else if (ch === cut) endCell();
+    else if (ch === '\n') endRow();
+    else if (ch !== '\r') cell += ch;
+  }
+  endRow();
+  const good = rows.filter(r => r.length === 2);
+  if (good.length && /^\s*(soru|question|q)\s*$/i.test(good[0][0])) good.shift();
+  return good.map(([q, a]) => ({ q, a }));
+}
+function jsonPairs(raw) {
+  let data;
+  try { data = JSON.parse(raw); } catch {
+    try { data = raw.split(/\r\n?|\n/).filter(l => l.trim()).map(l => JSON.parse(l)); } catch { return []; }
+  }
+  if (!Array.isArray(data)) data = Object.values(data || {}).find(Array.isArray) || [];
+  const pick = (item, keys) => {
+    const key = Object.keys(item).find(k => keys.includes(k.toLocaleLowerCase('tr')));
+    return key === undefined ? '' : String(item[key]);
+  };
+  return data.filter(x => x && typeof x === 'object').map(x => (Array.isArray(x)
+    ? { q: String(x[0] ?? ''), a: String(x[1] ?? '') }
+    : { q: pick(x, ['soru', 'question', 'q', 'prompt', 'instruction']), a: pick(x, ['cevap', 'yanıt', 'answer', 'a', 'response', 'output', 'completion']) }));
+}
+// Takes JSON, "Soru:/Cevap:" lines or a two-column table; repeated questions keep their first answer.
+function parseQA(raw) {
+  const text = raw.trim();
+  let found = /^[[{]/.test(text) ? jsonPairs(text) : [];
+  if (!found.length) found = labelPairs(text);
+  if (!found.length) found = tablePairs(text);
+  const clean = s => cleanText(tidyText(s).replace(/[§→¶]/g, ' '));
+  const seen = new Set(), pairs = [];
+  for (const p of found) {
+    const q = clean(p.q), a = clean(p.a);
+    if (q && a && !seen.has(q)) { seen.add(q); pairs.push({ q, a }); }
+  }
+  return { pairs, skipped: found.length - pairs.length };
+}
+
 // Writes the ready text from sentence patterns; the seed keeps it the same on every visit.
 function defaultText(size = 30000) {
   let seed = 20261106;
@@ -972,7 +1636,14 @@ function buildCorpus(text) {
   const letters = Array.from(text), chars = [...new Set(letters)].sort();
   const stoi = new Map(chars.map((ch, i) => [ch, i]));
   const ids = Int32Array.from(letters, ch => stoi.get(ch));
-  return { text, chars, stoi, ids, split: Math.floor(ids.length * (1 - LLM_EXAM)) };
+  // Plain text may come first; the pairs always close the text.
+  const at = text.indexOf('§'), pairs = at < 0 ? null : qaPairs(text.slice(at));
+  if (!pairs) return { text, chars, stoi, ids, split: Math.floor(ids.length * (1 - LLM_EXAM)), qa: null };
+  // Whole questions go to the exam, so no study window sees the start of an exam question.
+  const examN = Math.max(1, Math.round(pairs.length * LLM_EXAM));
+  const study = pairs.slice(0, -examN), exam = pairs.slice(-examN);
+  const split = Array.from(text.slice(0, at)).length + Array.from(qaText(study)).length;
+  return { text, chars, stoi, ids, split, qa: { study, exam } };
 }
 const corpusFits = (c, context) => c.split >= context + 2 && c.ids.length - c.split >= context + 2;
 const llmMinText = context => Math.ceil((context + 2) / LLM_EXAM);
@@ -1288,17 +1959,22 @@ class SerinoModel {
     const use = ids.slice(-this.cfg.context), probs = this.gpt.nextProbs(use);
     return { use, probs, attention: this.gpt.lastAttention(use.length) };
   }
-  write(ids, count, temp) {
+  write(ids, count, temp, stops = '') {
     const { chars } = this.corpus, out = ids.length ? ids.slice() : [this.corpus.ids[0]];
     let text = '';
     for (let n = 0; n < count; n++) {
       const probs = this.gpt.nextProbs(out.slice(-this.cfg.context), temp);
       let r = this.rand(), v = 0;
       while (v < probs.length - 1 && (r -= probs[v]) > 0) v++;
+      if (stops.includes(chars[v])) break;
       out.push(v);
       text += chars[v];
     }
     return text;
+  }
+  // Almost always takes the likeliest letter, so an exam shows what it knows and not its luck.
+  answer(question, temp = 0.1) {
+    return this.write(this.encode(`§${question}→`).ids, 200, temp, QA_MARKS).trim();
   }
 
   toMemory() {
@@ -1823,6 +2499,217 @@ reset();
 setTheme(document.documentElement.dataset.theme);
 </script>
 
+<!-- Eroson's maze world and his learner, built on Phyou's Brain. No DOM access. -->
+<script id="maze">
+'use strict';
+const MAZE_SIZES = [5, 7, 9], MAZE_DEFAULT = 7;
+const MAZE_STUDY = 300, MAZE_EXAM = 20;
+const MAZE_F = 8;             // numbers Eroson sees for each of the four directions
+const RL_HIDDEN = 24, RL_GAMMA = 0.98, RL_LR = 0.001, RL_LR_HALFLIFE = 20000, RL_BATCH = 16, RL_EVERY = 4;
+const RL_MEMORY = 20000, RL_SYNC = 1000, RL_WARM = 500;
+const RL_EPS_START = 1, RL_EPS_END = 0.05, RL_EPS_STEPS = 40000;
+const REWARD = { exit: 1, step: -0.01, again: -0.01 };
+const DIRS = [[0, -1], [1, 0], [0, 1], [-1, 0]]; // up, right, down, left
+const mazeLimit = n => 3 * n * n;
+
+function mazeDistances(n, open, start) {
+  const dist = new Int32Array(n * n).fill(-1), queue = [start];
+  dist[start] = 0;
+  for (const c of queue) {
+    DIRS.forEach(([dx, dy], d) => {
+      const to = c + dy * n + dx;
+      if (open[c] >> d & 1 && dist[to] < 0) { dist[to] = dist[c] + 1; queue.push(to); }
+    });
+  }
+  return { dist, queue };
+}
+
+// A map drawn by the user: a move is open when neither cell is blocked. Null means no way to the exit.
+function customMaze(n, blocked, start, exit) {
+  const open = new Uint8Array(n * n);
+  for (let c = 0; c < n * n; c++) {
+    if (blocked[c]) continue;
+    const x = c % n, y = (c - x) / n;
+    DIRS.forEach(([dx, dy], d) => {
+      const nx = x + dx, ny = y + dy;
+      if (nx >= 0 && ny >= 0 && nx < n && ny < n && !blocked[ny * n + nx]) open[c] |= 1 << d;
+    });
+  }
+  const best = mazeDistances(n, open, start).dist[exit];
+  return best > 0 ? { n, open, start, exit, best, blocked: blocked.slice(), key: open.join('') + '/' + start } : null;
+}
+
+// A depth-first walk carves the maze, so exactly one path joins any two cells.
+function makeMaze(n, seed) {
+  let s = seed >>> 0;
+  const pick = k => { s = (s * 1664525 + 1013904223) % 4294967296; return Math.floor(s / 4294967296 * k); };
+  const open = new Uint8Array(n * n), seen = new Uint8Array(n * n), stack = [0];
+  seen[0] = 1;
+  while (stack.length) {
+    const c = stack[stack.length - 1], x = c % n, y = (c - x) / n, next = [];
+    DIRS.forEach(([dx, dy], d) => {
+      const nx = x + dx, ny = y + dy;
+      if (nx >= 0 && ny >= 0 && nx < n && ny < n && !seen[ny * n + nx]) next.push(d);
+    });
+    if (!next.length) { stack.pop(); continue; }
+    const d = next[pick(next.length)], to = c + DIRS[d][1] * n + DIRS[d][0];
+    open[c] |= 1 << d; open[to] |= 1 << ((d + 2) % 4);
+    seen[to] = 1; stack.push(to);
+  }
+  // The exit is the cell farthest from a random start, so no fixed direction can solve every maze.
+  const start = pick(n * n), { dist, queue } = mazeDistances(n, open, start);
+  const exit = queue[queue.length - 1];
+  return { n, open, start, exit, best: dist[exit], key: open.join('') + '/' + start };
+}
+
+// Exam mazes are set aside first, and a study maze equal to one of them is thrown away.
+function mazeSets(n) {
+  const exam = [], study = [], keys = new Set();
+  for (let seed = 500000; exam.length < MAZE_EXAM; seed += 7) {
+    const m = makeMaze(n, seed);
+    if (!keys.has(m.key)) { keys.add(m.key); exam.push(m); }
+  }
+  for (let seed = 1; study.length < MAZE_STUDY; seed += 3) {
+    const m = makeMaze(n, seed);
+    if (!keys.has(m.key)) { keys.add(m.key); study.push(m); }
+  }
+  return { study, exam };
+}
+
+class MazeRun {
+  constructor(maze) {
+    this.maze = maze; this.at = maze.start; this.steps = 0; this.last = -1; this.done = false; this.won = false;
+    this.seen = new Uint16Array(maze.n * maze.n);
+    this.seen[maze.start] = 1;
+  }
+  // Only what a player standing here could know: walls beside him, his own footprints, the exit's direction.
+  sense(d, out, o = 0) {
+    const { n, open, exit } = this.maze, c = this.at, x = c % n, y = (c - x) / n, [dx, dy] = DIRS[d];
+    const ex = exit % n, ey = (exit - ex) / n;
+    const free = open[c] >> d & 1, to = c + dy * n + dx;
+    let fresh = 0;
+    for (let k = 0; k < 4; k++) if (open[c] >> k & 1 && !this.seen[c + DIRS[k][1] * n + DIRS[k][0]]) fresh++;
+    out[o] = free;
+    out[o + 1] = free && !this.seen[to] ? 1 : 0;
+    out[o + 2] = free ? Math.min(this.seen[to], 4) / 4 : 0;
+    out[o + 3] = dx * Math.sign(ex - x) + dy * Math.sign(ey - y);
+    out[o + 4] = this.last >= 0 && d === (this.last + 2) % 4 ? 1 : 0;
+    out[o + 5] = free && to === exit ? 1 : 0;
+    out[o + 6] = Math.min(this.seen[c], 4) / 4;
+    out[o + 7] = fresh / 3;
+  }
+  // Walls cannot be walked into, so a greedy player can never stand still forever.
+  ways() { return [0, 1, 2, 3].filter(d => this.maze.open[this.at] >> d & 1); }
+  move(d) {
+    const { n, exit } = this.maze;
+    let r = REWARD.step;
+    this.steps++;
+    this.at += DIRS[d][1] * n + DIRS[d][0];
+    this.last = d;
+    if (this.seen[this.at]) r += REWARD.again;
+    this.seen[this.at]++;
+    if (this.at === exit) { r += REWARD.exit; this.done = this.won = true; }
+    if (this.steps >= mazeLimit(n)) this.done = true;
+    return r;
+  }
+}
+
+// Yardsticks for the report card: a blind walker and the classic hand-on-the-wall rule.
+const randomWalker = run => { const w = run.ways(); return w[Math.floor(Math.random() * w.length)]; };
+const rightHand = run => {
+  const w = run.ways();
+  return run.last < 0 ? w[0] : [1, 0, 3, 2].map(k => (run.last + k) % 4).find(d => w.includes(d));
+};
+
+class ErosonAgent {
+  constructor(n, rand) {
+    this.n = n; this.rand = rand;
+    this.sets = mazeSets(n);
+    const sizes = [MAZE_F, RL_HIDDEN, RL_HIDDEN, 1];
+    this.brain = new Brain(sizes, rand);
+    this.goal = new Brain(sizes, rand);   // the target network, copied now and then
+    this.goal.p.set(this.brain.p);
+    this.steps = 0; this.games = 0; this.wins = 0; this.loss = 0;
+    const row = 6 * MAZE_F + 2;
+    this.row = row;
+    this.mem = new Float64Array(RL_MEMORY * row);
+    this.memN = 0; this.memAt = 0;
+    this.x = new Float64Array(MAZE_F); this.y = new Float64Array(4 * MAZE_F);
+    this.run = null;
+    this.custom = null;   // the user's map, played in half of the games once it is chosen
+    this.newGame();
+  }
+  get eps() { return Math.max(RL_EPS_END, RL_EPS_START - (RL_EPS_START - RL_EPS_END) * this.steps / RL_EPS_STEPS); }
+  newGame() {
+    const own = this.custom && this.rand() < 0.5;
+    this.run = new MazeRun(own ? this.custom : this.sets.study[Math.floor(this.rand() * MAZE_STUDY)]);
+  }
+  values(run, net = this.brain) {
+    const q = [0, 0, 0, 0];
+    for (let d = 0; d < 4; d++) { run.sense(d, this.x); q[d] = net.forward(this.x); }
+    return q;
+  }
+  choose(run) {
+    const q = this.values(run), ways = run.ways();
+    return ways.reduce((best, d) => (q[d] > q[best] ? d : best), ways[0]);
+  }
+  // One move in a study maze, stored and followed by one batch of learning.
+  study() {
+    const run = this.run, { mem, row } = this;
+    const ways = run.ways();
+    const d = this.rand() < this.eps ? ways[Math.floor(this.rand() * ways.length)] : this.choose(run);
+    const o = this.memAt * row;
+    run.sense(d, mem, o);
+    const r = run.move(d);
+    for (let k = 0; k < 4; k++) run.sense(k, mem, o + (k + 1) * MAZE_F);
+    mem[o + 5 * MAZE_F] = r;
+    mem[o + 5 * MAZE_F + 1] = run.won ? 1 : 0;
+    this.memAt = (this.memAt + 1) % RL_MEMORY;
+    this.memN = Math.min(this.memN + 1, RL_MEMORY);
+    this.steps++;
+    if (this.memN >= RL_WARM && this.steps % RL_EVERY === 0) this.learn();
+    if (this.steps % RL_SYNC === 0) this.goal.p.set(this.brain.p);
+    if (run.done) { this.games++; if (run.won) this.wins++; this.newGame(); }
+  }
+  learn() {
+    const { mem, row, brain, goal, x, rand } = this;
+    let sum = 0;
+    for (let b = 0; b < RL_BATCH; b++) {
+      const o = Math.floor(rand() * this.memN) * row, r = mem[o + 5 * MAZE_F], end = mem[o + 5 * MAZE_F + 1];
+      let top = -Infinity;
+      if (!end) for (let k = 1; k <= 4; k++) {
+        if (!mem[o + k * MAZE_F]) continue; // a wall is not a move
+        for (let i = 0; i < MAZE_F; i++) x[i] = mem[o + k * MAZE_F + i];
+        top = Math.max(top, goal.forward(x));
+      }
+      const target = end ? r : r + RL_GAMMA * top;
+      for (let i = 0; i < MAZE_F; i++) x[i] = mem[o + i];
+      const miss = brain.accumulate(x, target) - target;
+      sum += miss * miss;
+    }
+    brain.step(RL_LR / (1 + this.steps / RL_LR_HALFLIFE));
+    this.loss = sum / RL_BATCH;
+  }
+  play(maze, chooser = run => this.choose(run)) {
+    const run = new MazeRun(maze);
+    while (!run.done) run.move(chooser(run));
+    return run;
+  }
+  score(list, chooser) {
+    let won = 0, ratio = 0;
+    for (const m of list) {
+      const run = this.play(m, chooser);
+      if (run.won) { won++; ratio += run.steps / m.best; }
+    }
+    return { won: won / list.length, ratio: won ? ratio / won : 0 };
+  }
+  // Plays only; nothing here reaches the memory or the weights.
+  evaluate() {
+    return { study: this.score(this.sets.study.slice(0, MAZE_EXAM)), exam: this.score(this.sets.exam) };
+  }
+}
+</script>
+
 <!-- Serino's screen: training loop, writing, attention view, charts. -->
 <script id="serino-ui">
 'use strict';
@@ -1843,6 +2730,8 @@ const SMOODS = {
 const SERINO_SAMPLE = 'bugün ';
 let serino = null, sStats = null, sHist = [], sSnaps = [], sRun = false, sGap = 0;
 let sDrawn = 0, sNextSnap = 0, sRate = 0, sRateT = 0, sRateN = 0, sSayHold = 0, whoNow = 'home';
+let sDocs = [], sQaDocs = [];
+const QA_EXAM_MAX = 30; // questions per side; every answer is written letter by letter on the main thread
 
 const tr3 = v => v.toLocaleString('tr-TR', { minimumFractionDigits: 3, maximumFractionDigits: 3 });
 const tr2 = v => v.toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
@@ -1850,26 +2739,42 @@ const sNote = (id, text, warn) => { $(id).textContent = text; $(id).classList.to
 const sCount = n => n.toLocaleString('tr-TR');
 const stepsToNext = s => (s < 20 ? 20 : s * 2);
 
+// The fixed seed keeps the order, so the same exam comes back and a memory file is recognised.
+function sampleCorpus() {
+  const { pairs } = parseQA($('sampleQa').textContent);
+  let seed = 20261106;
+  for (let i = pairs.length - 1; i > 0; i--) {
+    seed = (seed * 1664525 + 1013904223) % 4294967296;
+    const j = Math.floor(seed / 4294967296 * (i + 1));
+    [pairs[i], pairs[j]] = [pairs[j], pairs[i]];
+  }
+  return cleanText(tidyText($('sampleText').textContent)) + qaText(pairs);
+}
+
 /* ---------- switching characters ---------- */
 const WHO = {
-  home: { title: 'Wicofia', sub: 'İki küçük karakterle yapay zekâ nasıl öğrenir?' },
+  home: { title: 'Wicofia', sub: 'Üç küçük karakterle yapay zekâ nasıl öğrenir?' },
   phyou: { title: 'Phyou · Wicofia', sub: 'Phyou: dört işlemi senden öğrenen küçük bir sinir ağı' },
   serino: { title: 'Serino · Wicofia', sub: 'Serino: metin okuyarak yazmayı öğrenen küçük bir dil modeli' },
+  eroson: { title: 'Eroson · Wicofia', sub: 'Eroson: labirentte deneyerek yol bulan küçük bir oyuncu' },
 };
 function setWho(who) {
-  const isP = who === 'phyou', isS = who === 'serino', isH = who === 'home';
+  const isP = who === 'phyou', isS = who === 'serino', isE = who === 'eroson', isH = who === 'home';
   whoNow = who;
   document.body.dataset.who = who;
   if (!isP) setRunning(false);
   if (!isS) sSetRun(false);
-  if (isS && !serino) serinoReset(new SerinoModel(cleanText(defaultText()), LLM_DEFAULT, Math.random));
+  if (!isE) { eSetRun(false); eStopDemo(); }
+  if (isS && !serino) serinoReset(new SerinoModel(sampleCorpus(), LLM_DEFAULT, Math.random));
   $('homeMode').hidden = !isH; $('homeBtn').hidden = isH;
   $('phyouMode').hidden = !isP; $('phyouCtl').hidden = !isP;
   $('serinoMode').hidden = !isS; $('serinoCtl').hidden = !isS;
+  $('erosonMode').hidden = !isE; $('erosonCtl').hidden = !isE;
   $('brandSub').textContent = WHO[who].sub;
   document.title = WHO[who].title;
   window.scrollTo(0, 0);
-  if (isS) sRefresh(); else if (isP) refresh(); else showHome();
+  if (isE && !eroson) erosonReset(MAZE_DEFAULT);
+  if (isS) sRefresh(); else if (isP) refresh(); else if (isE) eRefresh(); else showHome();
 }
 // The cards report real progress, so coming back home shows what each character has learned.
 function showHome() {
@@ -1877,24 +2782,43 @@ function showHome() {
     ? `${big(student.seen)} soru çözdü, sınav başarısı ${pct(stats.test.meanAcc)}` : 'Henüz ders almadı.';
   $('homeNowS').textContent = serino && serino.steps
     ? `${sCount(serino.steps)} güncelleme yaptı, sınav kaybı ${tr2(sStats.exam.loss)}` : 'Henüz okumaya başlamadı.';
+  $('homeNowE').textContent = eroson && eroson.steps
+    ? `${big(eroson.games)} oyun oynadı, sınav başarısı ${pct(eStats.exam.won)}` : 'Henüz labirente girmedi.';
 }
-const route = () => { const h = location.hash.slice(1); return h === 'phyou' || h === 'serino' ? h : 'home'; };
+const route = () => { const h = location.hash.slice(1); return h === 'phyou' || h === 'serino' || h === 'eroson' ? h : 'home'; };
 window.addEventListener('hashchange', () => { if (route() !== whoNow) setWho(route()); });
 
 /* ---------- state ---------- */
 function serinoReset(next, past = [], notes = []) {
   sSetRun(false);
+  const wasQa = !!(serino && serino.corpus.qa);
   serino = next; sHist = past; sSnaps = notes; sGap = 0; sSayHold = 0; sStats = null;
   sNextSnap = sSnaps.length ? stepsToNext(sSnaps[sSnaps.length - 1].steps) : 0;
   sShowNet();
+  sShowMode(wasQa);
+  $('sSampleOn').checked = serino.corpus.text === sampleCorpus();
   sNote('sTextNote', sTextLine());
   $('sOut').textContent = '';
   sNote('sWriteNote', '');
   $('sTicker').textContent = serino.steps ? 'Serino durdu.' : 'Serino okumayı bekliyor.';
   sRefresh();
 }
+function sShowMode(wasQa) {
+  const { qa } = serino.corpus;
+  $('sWriteTitle').textContent = qa ? "Serino'ya sor" : 'Bana yazdır';
+  $('sWriteBtn').textContent = qa ? 'Sor' : 'Yaz';
+  $('sPrompt').setAttribute('aria-label', qa ? 'Soru' : 'Başlangıç metni');
+  $('sWriteSub').hidden = !!qa; $('sAskSub').hidden = !qa; $('sExamCard').hidden = !qa;
+  if (qa) $('sPrompt').value = qa.study[0].q.slice(0, 200);
+  else if (wasQa) $('sPrompt').value = 'bugün küçük';
+  sNote('sExamNote', '');
+  $('sExamList').replaceChildren();
+}
+const sPromptText = () => (serino.corpus.qa ? `§${cleanText($('sPrompt').value)}→` : $('sPrompt').value);
+const sSample = () => (serino.corpus.qa ? `§${serino.corpus.qa.study[0].q}→` : SERINO_SAMPLE);
 function sTextLine() {
   const c = serino.corpus;
+  if (c.qa) return `Dersler: ${sCount(c.qa.study.length)} çalışma, ${sCount(c.qa.exam.length)} sınav sorusu. ${sCount(c.ids.length)} harf, ${c.chars.length} farklı karakter.`;
   return `Metin: ${sCount(c.ids.length)} harf, ${c.chars.length} farklı karakter. Son ${sCount(c.ids.length - c.split)} harf sınav için ayrıldı.`;
 }
 function sSetRun(on) {
@@ -1934,7 +2858,7 @@ function sRefresh() {
     }
   }
   if (serino.steps >= sNextSnap) {
-    sSnaps.push({ steps: serino.steps, exam: exam.loss, text: serino.write(serino.encode(SERINO_SAMPLE).ids, 90, 0.8) });
+    sSnaps.push({ steps: serino.steps, exam: exam.loss, head: sSample(), text: serino.write(serino.encode(sSample()).ids, 90, 0.8, serino.corpus.qa ? QA_MARKS : '') });
     sNextSnap = stepsToNext(serino.steps);
   }
   $('sReadN').textContent = big(serino.seen);
@@ -2024,14 +2948,14 @@ function sDrawSnaps() {
     const row = document.createElement('div'), when = document.createElement('div'), txt = document.createElement('div');
     row.className = 'snap'; when.className = 'when'; txt.className = 'txt';
     when.textContent = `${sCount(s.steps)} güncelleme`;
-    txt.textContent = SERINO_SAMPLE + s.text;
+    txt.textContent = (s.head || SERINO_SAMPLE) + s.text;
     row.append(when, txt);
     return row;
   }));
 }
 // Shows the real attention and next-letter probabilities for the text on screen.
 function sDrawLook() {
-  const { ids } = serino.encode(($('sOut').textContent || $('sPrompt').value));
+  const { ids } = serino.encode($('sOut').textContent || sPromptText());
   const box = $('sLetters'), bars = $('sBars');
   if (!ids.length) { box.textContent = 'Yazacak harf yok.'; bars.textContent = ''; return; }
   const { use, probs, attention } = serino.look(ids), chars = serino.corpus.chars;
@@ -2059,8 +2983,9 @@ function sDrawLook() {
 
 /* ---------- writing ---------- */
 function sWrite() {
-  const raw = $('sPrompt').value, { ids, dropped } = serino.encode(raw), temp = +$('sTemp').value / 10;
-  const shown = ids.map(i => serino.corpus.chars[i]).join(''), text = serino.write(ids, 200, temp);
+  const { ids, dropped } = serino.encode(sPromptText()), temp = +$('sTemp').value / 10;
+  const shown = ids.map(i => serino.corpus.chars[i]).join('');
+  const text = serino.write(ids, 200, temp, serino.corpus.qa ? QA_MARKS : '');
   const head = document.createElement('b');
   head.textContent = shown;
   $('sOut').replaceChildren(head, text);
@@ -2074,8 +2999,14 @@ function sShowNet() {
   $('sDim').value = cfg.dim; $('sHeads').value = cfg.heads; $('sBlocks').value = cfg.blocks; $('sContext').value = cfg.context;
   sNote('sNetNote', `Şu anki beyin: ${gpt.p.length.toLocaleString('tr-TR')} ağırlık.`);
 }
+// A long set of files shrinks evenly, so every file keeps its share of the text.
 function sApplyText() {
-  const own = $('sText').value, text = cleanText(`${own} ${$('sUseDefault').checked ? defaultText() : ''}`);
+  const own = cleanText($('sText').value), ready = $('sUseDefault').checked ? cleanText(defaultText()) : '';
+  const total = sDocs.reduce((n, d) => n + d.text.length, 0);
+  const share = Math.min(1, Math.max(0, LLM_MAX_TEXT - own.length - ready.length - 2) / (total || 1));
+  const parts = sDocs.map(d => d.text.slice(0, Math.floor(d.text.length * share)));
+  const cut = total - parts.reduce((n, p) => n + p.length, 0);
+  const { text, dropped } = fitVocab(cleanText([own, ...parts, ready].join(' ')));
   const fail = msg => sNote('sTextNote', msg, true);
   if (!text) return fail('Okuyacak metin yok.');
   if (text.length > LLM_MAX_TEXT) return fail(`Metin en çok ${sCount(LLM_MAX_TEXT)} harf olabilir.`);
@@ -2084,7 +3015,203 @@ function sApplyText() {
   if (!corpusFits(corpus, T)) return fail(`Bu bağlam için metin en az ${sCount(llmMinText(T))} harf olmalı.`);
   if (serino.steps && !confirm('Yeni metin için Serino öğrendiği her şeyi unutacak. Devam edilsin mi?')) return;
   serinoReset(new SerinoModel(text, serino.cfg, Math.random));
-  if (text.length < 5000) sNote('sTextNote', `${sTextLine()} Metin kısa, ezberleyebilirim.`);
+  const extra = [
+    cut && `Sığmayan ${sCount(cut)} harf okunmadı.`,
+    dropped && `En seyrek ${dropped} karakter türü atlandı.`,
+    text.length < 5000 && 'Metin kısa, ezberleyebilirim.',
+  ].filter(Boolean).join(' ');
+  if (extra) sNote('sTextNote', `${sTextLine()} ${extra}`);
+}
+
+/* ---------- scanning text files ---------- */
+function decodeBytes(b) {
+  const utf16 = b[0] === 0xFF && b[1] === 0xFE ? 'utf-16le' : b[0] === 0xFE && b[1] === 0xFF ? 'utf-16be' : '';
+  if (utf16) return new TextDecoder(utf16).decode(b);
+  try { return new TextDecoder('utf-8', { fatal: true }).decode(b); }
+  catch { return new TextDecoder('windows-1254').decode(b); } // older Turkish files
+}
+function htmlText(raw) {
+  const doc = new DOMParser().parseFromString(raw, 'text/html');
+  doc.querySelectorAll('script,style,noscript,template').forEach(n => n.remove());
+  doc.querySelectorAll('p,div,br,li,tr,td,th,h1,h2,h3,h4,h5,h6').forEach(n => n.after('\n'));
+  return doc.body ? doc.body.textContent : '';
+}
+// A .docx is a zip; this walks its directory to word/document.xml and inflates that one entry.
+async function docxText(b) {
+  const v = new DataView(b.buffer, b.byteOffset, b.byteLength);
+  let end = b.length - 22;
+  while (end >= 0 && v.getUint32(end, true) !== 0x06054b50) end--;
+  let at = v.getUint32(end + 16, true);
+  for (let i = v.getUint16(end + 10, true); i > 0; i--) {
+    const nameLen = v.getUint16(at + 28, true), method = v.getUint16(at + 10, true);
+    const name = new TextDecoder().decode(b.subarray(at + 46, at + 46 + nameLen));
+    if (name === 'word/document.xml') {
+      const head = v.getUint32(at + 42, true), start = head + 30 + v.getUint16(head + 26, true) + v.getUint16(head + 28, true);
+      const data = b.subarray(start, start + v.getUint32(at + 20, true));
+      const xml = method
+        ? await new Response(new Blob([data]).stream().pipeThrough(new DecompressionStream('deflate-raw'))).text()
+        : new TextDecoder().decode(data);
+      const doc = new DOMParser().parseFromString(xml, 'application/xml');
+      [...doc.getElementsByTagName('mc:Fallback')].forEach(n => n.remove()); // the same text box a second time
+      let out = '';
+      for (const el of doc.getElementsByTagName('*')) {
+        if (el.tagName === 'w:t') out += el.textContent;
+        else if (el.tagName === 'w:p' || el.tagName === 'w:br') out += '\n';
+        else if (el.tagName === 'w:tab') out += ' ';
+      }
+      return out;
+    }
+    at += 46 + nameLen + v.getUint16(at + 30, true) + v.getUint16(at + 32, true);
+  }
+  throw new Error('no document');
+}
+async function readDoc(file) {
+  const ext = file.name.toLowerCase().split('.').pop();
+  if (file.size > 64 * 1024 * 1024) throw new Error('dosya çok büyük');
+  if (ext === 'pdf') throw new Error('PDF okuyamıyorum, metin ya da docx olarak kaydet');
+  const bytes = new Uint8Array(await file.arrayBuffer());
+  if (ext === 'docx') {
+    try { return await docxText(bytes); } catch { throw new Error('Word dosyası açılamadı'); }
+  }
+  const raw = decodeBytes(bytes);
+  if (raw.includes('\0')) throw new Error('metin dosyası değil');
+  return ext === 'html' || ext === 'htm' ? htmlText(raw) : raw;
+}
+function sDocTotal() {
+  const n = sDocs.reduce((sum, d) => sum + d.text.length, 0);
+  if (!sDocs.length) return '';
+  return n > LLM_MAX_TEXT
+    ? `Toplam ${sCount(n)} harf. En çok ${sCount(LLM_MAX_TEXT)} harf okuyabilirim, her dosyadan aynı oranda alırım.`
+    : `Toplam ${sCount(n)} harf.`;
+}
+function sFileList(box, list, sizeOf, remove) {
+  $(box).replaceChildren(...list.map(d => {
+    const row = document.createElement('li'), name = document.createElement('span');
+    const size = document.createElement('span'), del = document.createElement('button');
+    name.className = 'name'; size.className = 'size';
+    name.textContent = d.name;
+    size.textContent = sizeOf(d);
+    del.type = 'button'; del.textContent = '✕';
+    del.setAttribute('aria-label', `${d.name} dosyasını çıkar`);
+    del.addEventListener('click', () => remove(d));
+    row.append(name, size, del);
+    return row;
+  }));
+}
+function sDrawDocs() {
+  sFileList('sDocList', sDocs, d => `${sCount(d.text.length)} harf`, d => {
+    sDocs = sDocs.filter(x => x !== d);
+    sDrawDocs();
+    sNote('sDocNote', sDocTotal());
+  });
+}
+// An identical file would put the same text in both study and exam, so it is refused.
+async function sScan(files) {
+  const skipped = [];
+  let added = 0;
+  sNote('sDocNote', 'Dosyalar taranıyor.');
+  for (const file of files) {
+    try {
+      const text = cleanText(tidyText(await readDoc(file)));
+      if (!text) throw new Error('içinde metin bulunamadı');
+      if (sDocs.some(d => d.text === text)) throw new Error('aynı metin zaten listede');
+      sDocs.push({ name: file.name, text });
+      added++;
+    } catch (err) {
+      skipped.push(`${file.name}: ${err.message}.`);
+    }
+  }
+  if (added) $('sUseDefault').checked = false;
+  sDrawDocs();
+  const done = added ? 'Hazır metni kapattım, sınav senin metninden yapılacak. Başlamak için "Bu metni okut".' : '';
+  sNote('sDocNote', [sDocTotal(), done, ...skipped].filter(Boolean).join(' '), skipped.length > 0);
+}
+
+/* ---------- teaching questions and answers ---------- */
+const sQaCount = () => sQaDocs.reduce((n, d) => n + d.pairs.length, 0);
+const sQaTotal = () => (sQaDocs.length ? `Toplam ${sCount(sQaCount())} soru.` : '');
+function sDrawQa() {
+  sFileList('sQaList', sQaDocs, d => `${sCount(d.pairs.length)} soru`, d => {
+    sQaDocs = sQaDocs.filter(x => x !== d);
+    sDrawQa();
+    sNote('sQaNote', sQaTotal());
+  });
+}
+// A question repeated across files would sit in both study and exam, so only its first copy stays.
+async function sScanQa(files) {
+  const problems = [];
+  sNote('sQaNote', 'Dosyalar taranıyor.');
+  for (const file of files) {
+    try {
+      const { pairs, skipped } = parseQA(await readDoc(file));
+      const known = new Set(sQaDocs.flatMap(d => d.pairs.map(p => p.q)));
+      const fresh = pairs.filter(p => !known.has(p.q));
+      if (!fresh.length) throw new Error(pairs.length ? 'bu sorular zaten listede' : 'soru-cevap bulunamadı');
+      sQaDocs.push({ name: file.name, pairs: fresh });
+      const left = skipped + pairs.length - fresh.length;
+      if (left) problems.push(`${file.name}: ${sCount(left)} satır boş ya da tekrar, atlandı.`);
+    } catch (err) {
+      problems.push(`${file.name}: ${err.message}.`);
+    }
+  }
+  sDrawQa();
+  sNote('sQaNote', [sQaTotal(), ...problems].filter(Boolean).join(' '), problems.length > 0);
+}
+function sApplyQa() {
+  const fail = msg => sNote('sQaNote', msg, true);
+  if (!sQaDocs.length) return fail('Önce bir soru-cevap dosyası göster.');
+  const all = sQaDocs.flatMap(d => d.pairs);
+  for (let i = all.length - 1; i > 0; i--) { // otherwise the exam would be only the file's last topic
+    const j = Math.floor(Math.random() * (i + 1));
+    [all[i], all[j]] = [all[j], all[i]];
+  }
+  let room = LLM_MAX_TEXT;
+  const fits = all.filter(p => (room -= p.q.length + p.a.length + 3) >= 0);
+  const { text: fitted, dropped } = fitVocab(qaText(fits), LLM_MAX_VOCAB, QA_MARKS);
+  const pairs = (qaPairs(fitted) || []).filter(p => p.q.trim() && p.a.trim());
+  const text = qaText(pairs), T = serino.cfg.context;
+  if (pairs.length < 2) return fail('En az 2 soru gerekli.');
+  const corpus = buildCorpus(text);
+  if (corpus.chars.length > LLM_MAX_VOCAB) return fail(`Çok fazla farklı karakter var, en çok ${LLM_MAX_VOCAB} olabilir.`);
+  if (!corpusFits(corpus, T)) return fail(`Sınava ayrılan sorular ${T} harflik bağlam için kısa. Daha çok soru ekle ya da Bağlam'ı küçült.`);
+  if (serino.steps && !confirm('Yeni dersler için Serino öğrendiği her şeyi unutacak. Devam edilsin mi?')) return;
+  serinoReset(new SerinoModel(text, serino.cfg, Math.random));
+  const long = pairs.filter(p => p.q.length + p.a.length + 2 > T).length;
+  sNote('sQaNote', [
+    sTextLine(),
+    all.length > pairs.length && `Sığmayan ${sCount(all.length - pairs.length)} soru alınmadı.`,
+    dropped && `En seyrek ${dropped} karakter türü atlandı.`,
+    long && `${sCount(long)} soruda soru ve cevap ${T} harfi aşıyor: cevabın sonuna gelince soruyu göremem. Beyin kartından Bağlam'ı artır.`,
+  ].filter(Boolean).join(' '), !!long);
+}
+async function sQaExam() {
+  const s = serino, { study, exam } = s.corpus.qa;
+  sSetRun(false);
+  $('sExamRun').disabled = true;
+  const ask = async (list, name) => {
+    const rows = [];
+    for (const p of list.slice(0, QA_EXAM_MAX)) {
+      if (serino !== s) return null; // the model was replaced while the exam ran
+      sNote('sExamNote', `${name}: ${rows.length + 1}. soru.`);
+      await new Promise(done => setTimeout(done));
+      const got = s.answer(p.q);
+      rows.push({ ...p, got, right: got === p.a });
+    }
+    return rows;
+  };
+  const a = await ask(study, 'Çalıştığı sorular'), b = a && await ask(exam, 'Sınav soruları');
+  $('sExamRun').disabled = false;
+  if (!b) return;
+  const hits = rows => rows.filter(r => r.right).length;
+  sNote('sExamNote', `Hiç görmediği sorular: ${hits(b)}/${b.length} tam doğru. Çalıştığı sorular: ${hits(a)}/${a.length} tam doğru.`);
+  $('sExamList').replaceChildren(...b.map(r => {
+    const row = document.createElement('div'), when = document.createElement('div'), txt = document.createElement('div');
+    row.className = 'snap'; when.className = 'when'; txt.className = 'txt';
+    when.textContent = `${r.right ? '✓' : '✗'} ${r.q}`;
+    txt.textContent = r.right ? r.got : `${r.got || '(boş)'} · doğrusu: ${r.a}`;
+    row.append(when, txt);
+    return row;
+  }));
 }
 function sApplyNet(cfg) {
   const { dim, heads, blocks, context } = LLM_LIMITS;
@@ -2135,6 +3262,34 @@ $('sReset').addEventListener('click', () => {
   if (confirm('Serino öğrendiği her şeyi unutacak. Sıfırlansın mı?')) serinoReset(new SerinoModel(serino.corpus.text, serino.cfg, Math.random));
 });
 $('sTextApply').addEventListener('click', sApplyText);
+$('sSampleOn').addEventListener('change', e => {
+  const on = e.target.checked;
+  if (serino.steps && !confirm('Serino öğrendiği her şeyi unutacak. Devam edilsin mi?')) { e.target.checked = !on; return; }
+  serinoReset(new SerinoModel(on ? sampleCorpus() : cleanText(defaultText()), serino.cfg, Math.random));
+});
+function sDropZone(zoneId, inputId, scan) {
+  const zone = $(zoneId), input = $(inputId);
+  zone.addEventListener('click', () => input.click());
+  input.addEventListener('change', e => {
+    const files = [...e.target.files];
+    e.target.value = '';
+    if (files.length) scan(files);
+  });
+  zone.addEventListener('dragover', () => zone.classList.add('over'));
+  zone.addEventListener('dragleave', () => zone.classList.remove('over'));
+  zone.addEventListener('drop', e => {
+    zone.classList.remove('over');
+    if (e.dataTransfer.files.length) scan([...e.dataTransfer.files]);
+  });
+}
+sDropZone('sDrop', 'sDocFile', sScan);
+sDropZone('sQaDrop', 'sQaFile', sScanQa);
+$('sQaApply').addEventListener('click', sApplyQa);
+$('sExamRun').addEventListener('click', sQaExam);
+// A file dropped beside the box would open in the tab and lose the training.
+['dragover', 'drop'].forEach(type => window.addEventListener(type, e => {
+  if (whoNow === 'serino' && e.dataTransfer.types.includes('Files')) e.preventDefault();
+}));
 $('sNetForm').addEventListener('submit', e => {
   e.preventDefault();
   sApplyNet({ dim: +$('sDim').value, heads: +$('sHeads').value, blocks: +$('sBlocks').value, context: +$('sContext').value });
@@ -2829,6 +3984,341 @@ single.addEventListener('change', () => { if ($('bookDlg').open) openBook(); });
 afterRefresh = bookRefresh;
 </script>
 
+<!-- Eroson's screen: game board, training loop, report card. -->
+<script id="eroson-ui">
+'use strict';
+const EMOODS = {
+  fresh: { text: 'Yola hazır', mouth: 'M84 146 q16 10 32 0', say: 'Selam, ben Eroson! Hiç labirent görmedim. Eğitimi başlatır mısın?' },
+  lost: { text: 'Kaybolmuş', mouth: 'M84 150 q8 -8 16 0 t16 0', say: 'Duvarlar her yerde, nereye gittiğimi bilmiyorum.' },
+  try: { text: 'Yol arıyor', mouth: 'M86 148 L114 144', say: 'Bazen çıkışı buluyorum, hâlâ çok dolaşıyorum.' },
+  keen: { text: 'Hevesli', mouth: 'M82 142 q18 16 36 0', say: 'Çıkmazdan dönmeyi öğrendim, çoğu labirenti çözüyorum!' },
+  proud: { text: 'Kâşif', mouth: 'M78 138 q22 30 44 0 z', say: 'Hiç görmediğim labirentleri bile çözüyorum!' },
+  cram: { text: 'Ezberliyor', mouth: 'M82 150 l9 -6 l9 6 l9 -6 l9 6', say: 'Bildiğim labirentlerde iyiyim, yenilerde zorlanıyorum.' },
+};
+const ARROWS = ['↑', '→', '↓', '←'];
+let eroson = null, eStats = null, eBase = null, eHist = [], eRun = false, eFast = true, eSize = MAZE_DEFAULT;
+let eDrawn = 0, eLast = 0, eDemo = null, eHold = 0;
+let eMap = null, eTool = 'wall', ePaintOn = false;
+
+const eRatio = s => (s.won ? `${tr2(s.ratio)} kat` : '-');
+function eSetRun(on) {
+  eRun = on;
+  $('eAuto').textContent = on ? 'Eğitimi durdur' : 'Eğitimi başlat';
+  $('eroson').classList.toggle('busy', on);
+  if (on) { eStopDemo(); $('eGameNote').textContent = ''; requestAnimationFrame(eLoop); }
+  else if (eroson) $('eTicker').textContent = eroson.steps ? 'Eroson durdu.' : 'Eroson oyuna başlamayı bekliyor.';
+}
+function erosonReset(n) {
+  eSetRun(false);
+  eStopDemo();
+  eSize = n;
+  eroson = new ErosonAgent(n, Math.random);
+  eHist = []; eStats = null; eHold = 0;
+  if (!eMap || eMap.n !== n) eClearMap(n);
+  eShowStudyBtn();
+  eBase = { hand: eroson.score(eroson.sets.exam, rightHand), blind: eroson.score(eroson.sets.exam, randomWalker) };
+  document.querySelectorAll('#eSizes button').forEach(b => b.setAttribute('aria-pressed', String(+b.dataset.n === n)));
+  $('eGameNote').textContent = '';
+  $('eTicker').textContent = 'Eroson oyuna başlamayı bekliyor.';
+  eRefresh();
+}
+function eLoop() {
+  if (!eRun) return;
+  const start = performance.now();
+  if (eFast) {
+    // The move cap matters: without it the loop never ends if the clock stalls.
+    for (let i = 0; i < 400 && performance.now() - start < 14; i++) eroson.study();
+  } else if (start - eLast > 110) { eLast = start; eroson.study(); }
+  eDrawGame(eroson.run);
+  if (start - eDrawn > 1500) eRefresh();
+  else if (!eFast) eDrawBars(eroson.run);
+  requestAnimationFrame(eLoop);
+}
+
+/* ---------- watching one exam maze ---------- */
+function eStopDemo() {
+  if (eDemo) clearTimeout(eDemo.timer);
+  eDemo = null;
+  if ($('eWatch')) $('eWatch').textContent = 'Sınav labirentinde izle';
+}
+function eWatch(maze, text) {
+  eStopDemo();
+  eSetRun(false);
+  eDemo = { run: new MazeRun(maze), timer: 0 };
+  $('eWatch').textContent = 'İzlemeyi bitir';
+  $('eGameNote').textContent = text;
+  eDemoStep();
+}
+function eDemoStep() {
+  const { run } = eDemo;
+  eDrawGame(run);
+  eDrawBars(run);
+  if (run.done) {
+    const { best } = run.maze;
+    $('eGameNote').textContent = run.won
+      ? `Çıkışı ${sCount(run.steps)} adımda buldu. Haritayı görseydi en kısa yol ${sCount(best)} adımdı.`
+      : `${sCount(run.steps)} adımda çıkışı bulamadı, süre doldu.`;
+    eSay(run.won ? 'Buldum!' : 'Bu sefer kayboldum, biraz daha çalışmalıyım.', 5000);
+    eStopDemo();
+    return;
+  }
+  run.move(eroson.choose(run));
+  eDemo.timer = setTimeout(eDemoStep, 130);
+}
+
+/* ---------- the user's map ---------- */
+function eClearMap(n) {
+  eMap = { n, blocked: new Uint8Array(n * n), start: 0, exit: n * n - 1 };
+}
+function eShowStudyBtn() {
+  $('eMapStudy').textContent = eroson.custom ? 'Haritayı çalışmadan çıkar' : 'Bu haritada çalıştır';
+}
+const eMapMaze = () => customMaze(eMap.n, eMap.blocked, eMap.start, eMap.exit);
+function eMapBlocked() { sNote('eMapNote', 'Başlangıçtan çıkışa yol yok. Bir engeli kaldır.', true); }
+function ePaint(c) {
+  const m = eMap;
+  if (eTool === 'wall' && c !== m.start && c !== m.exit) m.blocked[c] = 1;
+  else if (eTool === 'erase') m.blocked[c] = 0;
+  else if (eTool === 'start' && c !== m.exit) { m.blocked[c] = 0; m.start = c; }
+  else if (eTool === 'exit' && c !== m.start) { m.blocked[c] = 0; m.exit = c; }
+  eDrawMap();
+}
+function eMapCell(e) {
+  const box = $('eMapCv').getBoundingClientRect(), S = (box.width - 8) / eMap.n;
+  const x = Math.floor((e.clientX - box.left - 4) / S), y = Math.floor((e.clientY - box.top - 4) / S);
+  return x >= 0 && y >= 0 && x < eMap.n && y < eMap.n ? y * eMap.n + x : -1;
+}
+function eDrawMap() {
+  const cv = $('eMapCv'), box = cv.getBoundingClientRect();
+  if (!box.width) return;
+  const dpr = window.devicePixelRatio || 1, W = box.width, side = Math.round(W * dpr);
+  if (cv.width !== side) { cv.width = side; cv.height = side; }
+  const c = cv.getContext('2d'), { n, blocked, start, exit } = eMap, S = (W - 8) / n;
+  const X = i => 4 + (i % n) * S, Y = i => 4 + Math.floor(i / n) * S;
+  c.setTransform(dpr, 0, 0, dpr, 0, 0);
+  c.clearRect(0, 0, W, W);
+  c.fillStyle = tokens.ink;
+  for (let i = 0; i < n * n; i++) if (blocked[i]) c.fillRect(X(i), Y(i), S, S);
+  c.strokeStyle = tokens.axis; c.lineWidth = 1;
+  c.beginPath();
+  for (let i = 0; i <= n; i++) {
+    c.moveTo(4 + i * S, 4); c.lineTo(4 + i * S, W - 4);
+    c.moveTo(4, 4 + i * S); c.lineTo(W - 4, 4 + i * S);
+  }
+  c.stroke();
+  c.font = `${Math.round(S * 0.55)}px system-ui, "Segoe UI", sans-serif`;
+  c.textAlign = 'center'; c.textBaseline = 'middle';
+  c.fillStyle = tokens.ink;
+  c.fillText('⚑', X(exit) + S / 2, Y(exit) + S / 2);
+  c.strokeStyle = tokens.ink; c.lineWidth = 2;
+  c.strokeRect(X(start) + S * .3, Y(start) + S * .3, S * .4, S * .4);
+}
+
+/* ---------- rendering ---------- */
+function eRefresh() {
+  eDrawn = performance.now();
+  eStats = eroson.evaluate();
+  const { study, exam } = eStats;
+  const tail = eHist[eHist.length - 1];
+  if (!tail || eroson.steps > tail.steps) {
+    eHist.push({ steps: eroson.steps, study: study.won, exam: exam.won });
+    if (eHist.length > 420) eHist = eHist.filter((_, i) => i % 2 === 0);
+  }
+  $('eGames').textContent = big(eroson.games);
+  $('eStudyWon').textContent = pct(study.won);
+  $('eExamWon').textContent = pct(exam.won);
+  $('eRSW').textContent = pct(study.won); $('eRSR').textContent = eRatio(study);
+  $('eREW').textContent = pct(exam.won); $('eRER').textContent = eRatio(exam);
+  $('eRHW').textContent = pct(eBase.hand.won); $('eRHR').textContent = eRatio(eBase.hand);
+  $('eRBW').textContent = pct(eBase.blind.won); $('eRBR').textContent = eRatio(eBase.blind);
+  if (eRun) $('eTicker').textContent = `${sCount(eroson.steps)} hamle · ${sCount(eroson.wins)} kez çıkışı buldu · rastgele deneme payı ${pct(eroson.eps)}`;
+  if (!eDemo) { eDrawGame(eroson.run); eDrawBars(eroson.run); }
+  eDrawMap();
+  eDrawChart();
+  eMood();
+  bookRefresh();
+}
+function eSay(text, hold) {
+  $('eSpeech').textContent = text;
+  eHold = hold ? performance.now() + hold : eHold;
+}
+function eMood() {
+  const { study, exam } = eStats;
+  let key;
+  if (!eroson.steps) key = 'fresh';
+  else if (study.won - exam.won >= 0.25) key = 'cram';
+  else if (exam.won < 0.3) key = 'lost';
+  else if (exam.won < 0.7) key = 'try';
+  else if (exam.won < 0.95) key = 'keen';
+  else key = 'proud';
+  const m = EMOODS[key];
+  $('eMouth').setAttribute('d', m.mouth);
+  $('eroson').classList.toggle('mouth-fill', key === 'proud');
+  $('eMoodText').textContent = 'Eroson şu an: ' + m.text;
+  if (performance.now() >= eHold) eSay(m.say);
+}
+function eDrawGame(run) {
+  const cv = $('eGame'), box = cv.getBoundingClientRect();
+  if (!box.width) return;
+  const dpr = window.devicePixelRatio || 1, W = box.width, side = Math.round(W * dpr);
+  if (cv.width !== side) { cv.width = side; cv.height = side; }
+  const c = cv.getContext('2d'), cs = getComputedStyle(document.body);
+  const { n, open, exit, start } = run.maze, S = (W - 8) / n, green = cs.getPropertyValue('--green').trim();
+  const X = i => 4 + (i % n) * S, Y = i => 4 + Math.floor(i / n) * S;
+  c.setTransform(dpr, 0, 0, dpr, 0, 0);
+  c.clearRect(0, 0, W, W);
+  for (let i = 0; i < n * n; i++) {
+    if (!run.seen[i]) continue;
+    c.globalAlpha = Math.min(0.15 + run.seen[i] * 0.13, 0.65);
+    c.fillStyle = green;
+    c.fillRect(X(i), Y(i), S, S);
+  }
+  c.globalAlpha = 1;
+  c.fillStyle = tokens.ink;
+  if (run.maze.blocked) for (let i = 0; i < n * n; i++) if (run.maze.blocked[i]) c.fillRect(X(i), Y(i), S, S);
+  c.font = `${Math.round(S * 0.55)}px system-ui, "Segoe UI", sans-serif`;
+  c.textAlign = 'center'; c.textBaseline = 'middle';
+  c.fillText('⚑', X(exit) + S / 2, Y(exit) + S / 2);
+  c.strokeStyle = tokens.muted; c.lineWidth = 1.5;
+  c.strokeRect(X(start) + S * .3, Y(start) + S * .3, S * .4, S * .4);
+  c.strokeStyle = tokens.ink; c.lineWidth = 2.5; c.lineCap = 'round';
+  c.beginPath();
+  for (let i = 0; i < n * n; i++) {
+    const x = X(i), y = Y(i);
+    if (!(open[i] & 1)) { c.moveTo(x, y); c.lineTo(x + S, y); }
+    if (!(open[i] & 2)) { c.moveTo(x + S, y); c.lineTo(x + S, y + S); }
+    if (!(open[i] & 4)) { c.moveTo(x + S, y + S); c.lineTo(x, y + S); }
+    if (!(open[i] & 8)) { c.moveTo(x, y + S); c.lineTo(x, y); }
+  }
+  c.stroke();
+  const ax = X(run.at) + S / 2, ay = Y(run.at) + S / 2, r = S * .34;
+  c.fillStyle = '#5cc48a';
+  c.beginPath(); c.arc(ax, ay, r, 0, 7); c.fill();
+  c.fillStyle = '#14573a';
+  c.beginPath(); c.arc(ax, ay - r * .2, r, Math.PI, 0); c.fill();
+  c.fillStyle = '#fff';
+  c.beginPath(); c.arc(ax - r * .38, ay + r * .25, r * .26, 0, 7); c.arc(ax + r * .38, ay + r * .25, r * .26, 0, 7); c.fill();
+}
+// Real scores for the four directions at the cell on screen.
+function eDrawBars(run) {
+  const q = eroson.values(run), ways = run.ways(), vals = ways.map(d => q[d]);
+  const lo = Math.min(...vals), hi = Math.max(...vals);
+  $('eBars').replaceChildren(...[0, 1, 2, 3].map(d => {
+    const row = document.createElement('div'), ch = document.createElement('span'), wrap = document.createElement('span');
+    const fill = document.createElement('i'), pc = document.createElement('span');
+    row.className = 'bar'; ch.className = 'ch'; pc.className = 'pc';
+    ch.textContent = ARROWS[d];
+    if (ways.includes(d)) {
+      fill.style.width = (hi > lo ? 8 + 92 * (q[d] - lo) / (hi - lo) : 100).toFixed(1) + '%';
+      pc.textContent = tr2(q[d]);
+      wrap.append(fill);
+    } else pc.textContent = 'duvar';
+    row.append(ch, wrap, pc);
+    return row;
+  }));
+}
+function eDrawChart() {
+  const cv = $('eChart'), box = cv.getBoundingClientRect();
+  if (!box.width) return;
+  const dpr = window.devicePixelRatio || 1, W = box.width, H = box.height;
+  if (cv.width !== Math.round(W * dpr)) { cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr); }
+  const c = cv.getContext('2d'), cs = getComputedStyle(document.body);
+  c.setTransform(dpr, 0, 0, dpr, 0, 0);
+  c.clearRect(0, 0, W, H);
+  const X0 = 36, X1 = W - 70, Y0 = H - 22, Y1 = 8;
+  const xMax = Math.max(eHist.length ? eHist[eHist.length - 1].steps : 0, 1000);
+  const sx = v => X0 + (X1 - X0) * v / xMax, sy = v => Y0 - (Y0 - Y1) * v;
+  c.font = '11px system-ui, "Segoe UI", sans-serif';
+  c.fillStyle = tokens.muted; c.textAlign = 'right'; c.textBaseline = 'middle'; c.lineWidth = 1;
+  for (let v = 0; v <= 4; v++) {
+    c.strokeStyle = v ? tokens.grid : tokens.axis;
+    c.beginPath(); c.moveTo(X0, Math.round(sy(v / 4)) + .5); c.lineTo(X1, Math.round(sy(v / 4)) + .5); c.stroke();
+    c.fillText(pct(v / 4), X0 - 6, sy(v / 4));
+  }
+  c.textAlign = 'center'; c.textBaseline = 'top';
+  const mag = Math.pow(10, Math.floor(Math.log10(xMax / 3)));
+  const step = [1, 2, 5, 10].map(m => m * mag).find(s => xMax / s <= 4);
+  for (let v = 0; v <= xMax; v += step) c.fillText(big(v), sx(v), Y0 + 6);
+  if (eHist.length < 2) return;
+  const ink = [[cs.getPropertyValue('--green').trim(), 'study', 'Çalışma'], [tokens.ink, 'exam', 'Sınav']];
+  c.lineWidth = 2; c.lineJoin = 'round'; c.lineCap = 'round';
+  for (const [color, key] of ink) {
+    c.strokeStyle = color;
+    c.beginPath();
+    eHist.forEach((h, i) => { const x = sx(h.steps), y = sy(h[key]); i ? c.lineTo(x, y) : c.moveTo(x, y); });
+    c.stroke();
+  }
+  const last = eHist[eHist.length - 1];
+  const ends = ink.map(([color, key, name]) => ({ color, name, y: sy(last[key]) })).sort((a, b) => a.y - b.y);
+  if (ends[1].y - ends[0].y < 13) ends[1].y = ends[0].y + 13;
+  c.textAlign = 'left'; c.textBaseline = 'middle'; c.font = '600 12px system-ui, "Segoe UI", sans-serif';
+  for (const e of ends) { c.fillStyle = e.color; c.fillText(e.name, X1 + 6, Math.min(e.y, Y0 - 4)); }
+}
+
+/* ---------- events ---------- */
+$('eAuto').addEventListener('click', () => eSetRun(!eRun));
+$('eReset').addEventListener('click', () => {
+  if (confirm('Eroson öğrendiği her şeyi unutacak. Sıfırlansın mı?')) erosonReset(eSize);
+});
+$('eWatch').addEventListener('click', () => {
+  if (eDemo) { eStopDemo(); return; }
+  const list = eroson.sets.exam;
+  eWatch(list[Math.floor(Math.random() * list.length)], 'Hiç görmediği bir labirent. Öğrenmiyor, yalnızca oynuyor.');
+});
+$('eTools').addEventListener('click', e => {
+  if (!e.target.dataset.tool) return;
+  eTool = e.target.dataset.tool;
+  document.querySelectorAll('#eTools button').forEach(b => b.setAttribute('aria-pressed', String(b === e.target)));
+});
+$('eMapCv').addEventListener('pointerdown', e => {
+  const c = eMapCell(e);
+  if (c < 0) return;
+  ePaintOn = true;
+  $('eMapCv').setPointerCapture(e.pointerId);
+  sNote('eMapNote', '');
+  ePaint(c);
+});
+$('eMapCv').addEventListener('pointermove', e => {
+  const c = eMapCell(e);
+  if (ePaintOn && c >= 0) ePaint(c);
+});
+['pointerup', 'pointercancel'].forEach(type => $('eMapCv').addEventListener(type, () => { ePaintOn = false; }));
+$('eMapWatch').addEventListener('click', () => {
+  const m = eMapMaze();
+  if (!m) return eMapBlocked();
+  const known = eroson.custom && eroson.custom.key === m.key;
+  eWatch(m, known ? 'Bu haritada çalıştı, sınav sayılmaz.' : 'Bu haritayı ilk kez görüyor. Öğrenmiyor, yalnızca oynuyor.');
+  $('eGame').scrollIntoView({ block: 'center' });
+});
+$('eMapStudy').addEventListener('click', () => {
+  if (eroson.custom) {
+    eroson.custom = null;
+    eShowStudyBtn();
+    return sNote('eMapNote', 'Harita çalışmadan çıktı.');
+  }
+  const m = eMapMaze();
+  if (!m) return eMapBlocked();
+  eroson.custom = m;
+  eShowStudyBtn();
+  sNote('eMapNote', 'Oyunların yarısı bu haritada geçecek. Sınav labirentleri değişmez, bu harita sınava girmez. Sonra çizdiklerin için yeniden seç.');
+  eSetRun(true);
+});
+$('eMapClear').addEventListener('click', () => { eClearMap(eSize); eDrawMap(); sNote('eMapNote', ''); });
+$('eSizes').addEventListener('click', e => {
+  const n = +e.target.dataset.n;
+  if (!n || n === eSize) return;
+  if (eroson.steps && !confirm('Yeni boyut için Eroson öğrendiği her şeyi unutacak. Devam edilsin mi?')) return;
+  erosonReset(n);
+});
+$('eSpeeds').addEventListener('click', e => {
+  if (!e.target.dataset.fast) return;
+  eFast = e.target.dataset.fast === '1';
+  document.querySelectorAll('#eSpeeds button').forEach(b => b.setAttribute('aria-pressed', String(b === e.target)));
+});
+window.addEventListener('resize', () => { if (whoNow === 'eroson' && eroson) eRefresh(); });
+window.addEventListener('wicofia-theme', () => { if (whoNow === 'eroson' && eroson) eRefresh(); });
+</script>
+
 <!-- Serino's book: same paper and page turning, her own pages, terms and numbers. -->
 <script id="serino-book">
 'use strict';
@@ -2942,7 +4432,7 @@ Object.assign(LIVE, {
   sExam: () => tr2(sStats.exam.loss),
   sHit: () => pct(sStats.exam.hit),
   sLr: () => serino.lr().toLocaleString('tr-TR', { maximumFractionDigits: 5 }),
-  sLatest: () => SERINO_SAMPLE + sSnaps[sSnaps.length - 1].text,
+  sLatest: () => (sSnaps[sSnaps.length - 1].head || SERINO_SAMPLE) + sSnaps[sSnaps.length - 1].text,
   sFormula: () => {
     const { V, d, T, B, f } = serino.gpt;
     return `(${V} + ${T}) × ${d} + ${B} × (4 × ${d}² + 2 × ${d} × ${f} + ${f} + ${d}) + (${d} + 1) × ${V}`;
@@ -3123,10 +4613,10 @@ const SPAGES = [
     <p class="margin-note">Eğitim yalnızca benim ekranım açıkken çalışır. Çıkarsan durur.</p>` },
 
   { head: 'Bölüm 5', html: () => `<h3>Dürüst sınav</h3>
-    <p>Metnin son %${Math.round(LLM_EXAM * 100)} kısmını, yani ${live('sExamN')} harfi hiç okumam. Çalışma pencerelerim ${live('sStudy')}. harften önce biter, sınav harfleri ağırlıklarımı hiç değiştirmez.</p>
+    <p>Metnin son kısmını, yani ${live('sExamN')} harfi hiç okumam. Düz metinde bu kısım %${Math.round(LLM_EXAM * 100)}'dur, soru-cevap varsa soruların %${Math.round(LLM_EXAM * 100)}'udur. Çalışma pencerelerim ${live('sStudy')}. harften önce biter, sınav harfleri ağırlıklarımı hiç değiştirmez.</p>
     <p>Karnede iki metinden düzenli aralıklı ${12}'şer pencere okunur. Şu an çalışma kaybım ${live('sTrain')}, sınav kaybım ${live('sExam')}.</p>
     <p>Sınav kaybı çalışmadan çok büyükse ${term('ezber', 'ezberliyorumdur')}. Yüzümdeki ifade de bu gerçek sayılardan gelir.</p>
-    <p class="margin-note">Hazır metin kalıplardan üretildiği için bazı cümleler iki kısımda da geçebilir. Kısa kendi metninde ezber çok daha görünür olur.</p>` },
+    <p class="margin-note">Hazır metin kalıplardan üretildiği için bazı cümleler iki kısımda da geçebilir. Kısa kendi metninde ezber çok daha görünür olur. Soru-cevap öğretirsen sınav harf ortasından değil, soru sınırından ayrılır.</p>` },
 
   { head: 'Bölüm 6', html: () => `<h2>Nasıl yazarım?</h2>
     <p class="dc">Yazmak için özel bir parçam yok. Eğitimdeki tahmini tekrarlarım:</p>
@@ -3145,7 +4635,7 @@ const SPAGES = [
   { head: 'Bölüm 6', html: () => `<h3>Neyi bilmem?</h3>
     <p><b>Anlamı bilmem.</b> "elma" kelimesinin ne olduğunu bilmem. Hangi harflerin peş peşe geldiğini bilirim.</p>
     <p><b>Doğruyu bilmem.</b> Bir şeyin gerçek olup olmadığına bakmam. Okuduğum metne benzeyen şeyi yazarım.</p>
-    <p><b>Sohbet edemem.</b> Soru sorarsan cevap vermem, yazını sürdürürüm.</p>
+    <p><b>Sohbet edemem.</b> Soru-cevap öğretirsen § soru → cevap ¶ kalıbını sürdürürüm. Soruyu anlamam, görmediğim soruda bildiğim cevaplara benzeyen şeyler yazarım.</p>
     <p><b>Okuduğumun dışına çıkamam.</b> Son yazdığım:</p>
     <p class="figcap"><span data-live="sLatest"></span></p>` },
 
@@ -3173,7 +4663,7 @@ const SPAGES = [
       <tr><td>Ağırlık</td><td>${live('sParams')}</td><td>Milyarlarca</td></tr>
       <tr><td>Metin</td><td>${live('sLetters')} harf</td><td>Çok büyük metin yığınları</td></tr>
       <tr><td>Donanım</td><td>Bu sekme</td><td>Çok sayıda özel işlemci</td></tr></tbody></table>
-    <p>Onlar sohbet edebilmek için ek eğitimlerden de geçer. Benim öyle bir eğitimim yok.</p>` },
+    <p>Onlar sohbet edebilmek için çok daha geniş ek eğitimlerden geçer. Benim soru-cevap dersim yalnızca verdiğin kalıbı öğretir.</p>` },
 
   { head: 'Son söz', html: () => `<h3>Son söz</h3>
     <p>Sana şunu göstermek istedim: makinenin yazması sihir değil, çok sayıda küçük tahmindir. Her harf gerçek bir hesapla seçilir ve o hesabın her adımını bu kitapta gördün.</p>
@@ -3187,10 +4677,126 @@ const SPAGES = [
   { head: 'Sözlük', html: () => `<h3>Öğrenme ve yazma</h3>${glossPage(['pencere', 'olasilik', 'kayip', 'isabet', 'sicaklik'])}` },
 ];
 BOOKS.serino = { pages: SPAGES, title: "Serino'nun Kitabı", at: 0 };
+</script>
+
+<!-- Eroson's book: same paper and page turning, his own pages and terms. -->
+<script id="eroson-book">
+'use strict';
+const EFACE = `<svg viewBox="0 0 200 200" aria-hidden="true">
+  <path fill="#5cc48a" d="M100 44 C152 44 176 76 176 120 C176 162 146 184 100 184 C54 184 24 162 24 120 C24 76 48 44 100 44Z"/>
+  <path fill="#1f7a52" d="M36 88 C42 46 72 30 100 30 C128 30 158 46 164 88 Z"/>
+  <path fill="#14573a" d="M22 84 H178 q10 0 10 9 q0 9 -10 9 H22 q-10 0 -10 -9 q0 -9 10 -9Z"/>
+  <circle cx="74" cy="124" r="15" fill="#fff"/><circle cx="126" cy="124" r="15" fill="#fff"/>
+  <circle cx="78" cy="127" r="7" fill="#0f3b28"/><circle cx="130" cy="127" r="7" fill="#0f3b28"/>
+  <path d="M82 150 q18 16 36 0" stroke="#0f3b28" stroke-width="5" fill="none" stroke-linecap="round"/>
+</svg>`;
+
+Object.assign(GLOSSARY, {
+  pekistirme: ['Pekiştirmeli öğrenme', 'Doğru cevabı söyleyen bir öğretmen olmadan, deneyip aldığı ödülden öğrenme.'],
+  odul: ['Ödül', 'Her hamleden sonra oyunun verdiği sayı. Çıkış artı, her adım eksi puandır.'],
+  qdeger: ['Puan (Q değeri)', 'Bir yöne gidersem bundan sonra toplam ne kadar ödül alacağımın tahmini.'],
+  iskonto: ['İskonto', 'Sonraki ödülü bugüne çevirirken çarptığım sayı. 1\'den küçük olduğu için yakın ödül daha değerlidir.'],
+  kesif: ['Keşif', 'En iyi bildiğim yol yerine bazen rastgele bir yol denemek.'],
+  tekrar: ['Tekrar belleği', 'Son hamlelerimi sakladığım liste. Öğrenirken buradan karışık hamleler çekerim.'],
+  hedefag: ['Hedef ağ', 'Beynimin ara sıra alınan kopyası. Sabit durur, böylece kendi tahminimi kovalamam.'],
+});
+
+Object.assign(LIVE, {
+  eSteps: () => sCount(eroson.steps),
+  eGames: () => sCount(eroson.games),
+  eWins: () => sCount(eroson.wins),
+  eEps: () => pct(eroson.eps),
+  eSize: () => `${eroson.n} × ${eroson.n}`,
+  eParams: () => eroson.brain.p.length.toLocaleString('tr-TR'),
+  eMem: () => sCount(eroson.memN),
+  eStudy: () => pct(eStats.study.won),
+  eExam: () => pct(eStats.exam.won),
+});
+
+const ECHAPTERS = [[3, 'Oyun'], [5, 'Ödül ve puan'], [7, 'Keşif'], [8, 'Nasıl öğrenirim?'], [9, 'Dürüst sınav'], [12, 'Sözlük']];
+
+// Index 0 is the cover; every other index equals its printed page number.
+const EPAGES = [
+  { cover: true, html: () => `<div class="cover-frame">${EFACE}<h2>Eroson'un Kitabı</h2>
+    <p>Duvarlara bakarak labirentten çıkmayı nasıl öğrendim</p><p class="by">YAZAN: EROSON</p></div>` },
+
+  { head: 'Önsöz', html: () => `<h3>Merhaba</h3>
+    <p>Ben Eroson. Phyou'ya doğru cevabı sen söylersin, Serino metnin devamına bakar. Bana kimse doğru yolu söylemez.</p>
+    <p>Labirente girer, dener, yanılırım. Çıkışı bulunca ödül alırım. Buna ${term('pekistirme', 'pekiştirmeli öğrenme')} denir.</p>
+    <p>Beynim Phyou'nunkiyle aynı türden, elle yazılmış küçük bir ağdır. Gradyan ve Adam'ı onun kitabı anlatıyor, burada kısa geçeceğim.</p>
+    <p class="margin-note">Şu ana kadar ${live('eGames')} oyun oynadım, ${live('eWins')} kez çıkışı buldum.</p>` },
+
+  { head: 'İçindekiler', html: () => `<h3>Bu kitapta neler var?</h3><ol class="toc">${ECHAPTERS.map(([p, t], i) =>
+    `<li><button type="button" data-go="${p}"><span>${i + 1}. ${t}</span><span class="no">${p}</span></button></li>`).join('')}</ol>` },
+
+  { head: 'Bölüm 1', html: () => `<h2>Oyun</h2>
+    <p class="dc">Her oyunda ${live('eSize')} bir labirente girerim. Başlangıç rastgeledir, çıkış başlangıca en uzak yerdedir.</p>
+    <p>Sırası gelince dört yönden birine bir kare giderim. Duvarın içinden geçemem.</p>
+    <p>Hazır labirentlerde iki kare arasında tam bir yol vardır, döngü yoktur. Yanlış kollar çıkmaza çıkar. Sen kendi haritanı çizersen geniş odalar ve başka yollar da olabilir.</p>
+    <p>Süre sınırım kare sayısının 3 katı kadar hamledir. Bu sürede çıkamazsam oyun biter, ödül alamam.</p>` },
+
+  { head: 'Bölüm 1', html: () => `<h3>Ne görüyorum?</h3>
+    <p>Haritayı görmem. Bir oyuncu labirentin içinde dururken neyi biliyorsa onu bilirim. Her yön için ${MAZE_F} sayı alırım:</p>
+    <ol class="steps"><li>Bu yön açık mı?</li><li>Oraya hiç gitmedim mi?</li><li>Oraya kaç kez gittim?</li><li>Bu yön çıkışa doğru mu, ters mi?</li><li>Geldiğim yön mü?</li><li>Çıkış hemen orada mı?</li><li>Durduğum kareye kaç kez geldim?</li><li>Yanımda kaç hiç gidilmemiş yol var?</li></ol>
+    <p>Dördüncü sayı bir pusula gibidir: yönü söyler, yolu söylemez. Duvarların arkasını bilmem.</p>` },
+
+  { head: 'Bölüm 2', html: () => `<h2>Ödül</h2>
+    <p class="dc">Bana ne yapacağımı kimse söylemez. Yalnızca her hamleden sonra bir ${term('odul', 'ödül')} alırım:</p>
+    <table class="calc plain"><thead><tr><th>Olay</th><th>Ödül</th></tr></thead><tbody>
+      <tr><td>Çıkışı buldum</td><td>${tr2(REWARD.exit)}</td></tr>
+      <tr><td>Her adım</td><td>${tr2(REWARD.step)}</td></tr>
+      <tr><td>Gittiğim yere yine gittim</td><td>${tr2(REWARD.again)} daha</td></tr></tbody></table>
+    <p>Ödül çok seyrektir: çıkışı bulana kadar hep küçük ceza alırım. Bu yüzden ilk oyunlarım boşa gider gibi görünür.</p>` },
+
+  { head: 'Bölüm 2', html: () => `<h3>Puan</h3>
+    <p>Beynim bir yöne bakıp tek sayı söyler: o yöne gidersem bundan sonra ne kadar ödül bekliyorum? Buna ${term('qdeger', 'puan')} denir.</p>
+    <p>Aynı ağ dört yön için ayrı ayrı çalışır, en yüksek puanlı açık yönü seçerim. Beynimde ${live('eParams')} ağırlık var.</p>
+    <p>Öğrenme kuralı: bir yönün puanı, aldığım ödül artı gittiğim yerdeki en iyi puanın ${tr2(RL_GAMMA)} katı olmalı. Bu çarpana ${term('iskonto', 'iskonto')} denir.</p>
+    <table class="calc plain"><tbody><tr><td>Ödül</td><td>−0,01</td></tr><tr><td>Sonraki en iyi puan</td><td>0,50</td></tr><tr><td>Hedef</td><td>−0,01 + 0,98 × 0,50 = 0,48</td></tr><tr><td>Tahminim</td><td>0,40</td></tr><tr><td>Hata</td><td>0,08 eksik, puanı yukarı çekerim</td></tr></tbody></table>` },
+
+  { head: 'Bölüm 3', html: () => `<h2>Keşif</h2>
+    <p class="dc">Hep en iyi bildiğim yola gidersem yeni bir şey öğrenemem. Bu yüzden bazen zarı atarım.</p>
+    <p>${term('kesif', 'Keşif')} payım %${Math.round(RL_EPS_START * 100)} ile başlar, ${sCount(RL_EPS_STEPS)} hamlede %${Math.round(RL_EPS_END * 100)}'e iner. Şu an ${live('eEps')}.</p>
+    <p>Başta neredeyse körüm, rastgele yürürüm. Puanlarım geliştikçe kendi kararlarıma güvenirim.</p>
+    <p>Sınavda ve sen izlerken zar atmam, en yüksek puanı seçerim.</p>` },
+
+  { head: 'Bölüm 4', html: () => `<h2>Nasıl öğrenirim?</h2>
+    <p class="dc">Her hamleyi ${term('tekrar', 'tekrar belleğime')} yazarım. En çok ${sCount(RL_MEMORY)} hamle tutar, şu an ${live('eMem')}.</p>
+    <ol class="steps"><li>Bir hamle oynarım</li><li>Her ${RL_EVERY} hamlede bellekten karışık ${RL_BATCH} hamle çekerim</li><li>Her biri için hedefi hesaplar, hatamı geri yayarım</li><li>Adam ile ağırlıklarımı düzeltirim</li></ol>
+    <p>Karışık çekmek önemlidir: peş peşe hamleler birbirine çok benzer, sırayla öğrenirsem son gördüğüm köşeye takılırım.</p>
+    <p>Hedefi ${term('hedefag', 'hedef ağ')} hesaplar. Beynimin ${sCount(RL_SYNC)} hamlede bir alınan kopyasıdır, yoksa kendi kuyruğumu kovalarım.</p>` },
+
+  { head: 'Bölüm 5', html: () => `<h2>Dürüst sınav</h2>
+    <p class="dc">Çalışmak için ${sCount(MAZE_STUDY)} labirentim var. Sınavın ${MAZE_EXAM} labirenti önce ayrılır, çalışma listesine aynısı giremez.</p>
+    <p>Sınav labirentlerinde hiç oynamam, belleğime hiçbir şey yazılmaz. Karnede ağırlıklarım değişmez. Beni kendi haritanda çalıştırırsan o harita sınava girmez.</p>
+    <p>Şu an çalıştığım labirentlerden ${MAZE_EXAM} tanesinin ${live('eStudy')} kadarını, hiç görmediklerimin ${live('eExam')} kadarını çözüyorum.</p>
+    <p>Yüzümdeki ifade de bu gerçek sayılardan gelir. Çalışmada iyi, sınavda kötüysem ${term('ezber', 'ezberliyorumdur')}.</p>` },
+
+  { head: 'Bölüm 5', html: () => `<h3>Ne kadar iyiyim?</h3>
+    <table class="calc plain"><thead><tr><th>Oyuncu, 7 × 7</th><th>Çözdüğü</th><th>En kısa yola göre</th></tr></thead><tbody>
+      <tr><td>Rastgele yürüyüş</td><td>%0-5</td><td>Çok uzun</td></tr>
+      <tr><td>Sağ el kuralı</td><td>%100</td><td>2,08 kat</td></tr>
+      <tr><td>Eroson</td><td>%100</td><td>1,94-2,06 kat</td></tr></tbody></table>
+    <p class="figcap">Sınav labirentleri, 100.000 hamleden sonraki ölçümler, 2 deneme. Arada başarı bir süre düşebilir.</p>
+    <p>9 × 9 labirentte tek denemede çoğunlukla hepsini çözdüm ama sağ el kuralını geçemedim: 1,86-2,13 kata karşı 1,88 kat.</p>
+    <p>Karşılaştırma haksız değil: en kısa yolu bulmak için haritayı görmek gerekir, ben görmüyorum. Yanlış kollara girmem bu yüzden kaçınılmazdır.</p>` },
+
+  { head: 'Son söz', html: () => `<h3>Son söz</h3>
+    <p>Sana şunu göstermek istedim: bir makineye her zaman doğru cevabı söylemek gerekmez. Ödülü tarif edersen yolu kendi bulur.</p>
+    <p>Ama ödülü iyi tarif etmek gerekir. İlk denememde çıkış hep aynı köşedeydi ve ben yalnızca "sağa ve aşağı git" demeyi öğrendim. Akıllı görünüyordum, labirent kolaydı.</p>
+    <p>Beni çalıştırdığın için teşekkürler.</p>
+    <p style="text-align:right;font-style:italic">Eroson</p>
+    <div style="width:84px;margin-left:auto">${EFACE}</div>` },
+
+  { head: 'Sözlük', html: () => `<h3>Oyunun sözlüğü</h3>${glossPage(['pekistirme', 'odul', 'qdeger', 'iskonto', 'kesif', 'tekrar', 'hedefag'])}` },
+];
+BOOKS.eroson = { pages: EPAGES, title: "Eroson'un Kitabı", at: 0 };
+$('eBookBtn').addEventListener('click', () => chooseBook('eroson'));
 
 // Starts here because every script must be loaded before the first screen draws.
 $('homeFaceP').innerHTML = FACE;
 $('homeFaceS').innerHTML = SFACE;
+$('homeFaceE').innerHTML = EFACE;
 setWho(route());
 
 // A service worker needs http(s), so the app simply skips it when opened as a file.

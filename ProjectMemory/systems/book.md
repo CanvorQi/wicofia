@@ -7,7 +7,7 @@
 Phyou explains in first person how it learns and where it stores what it learned. Serino's book does the same for a language model, in `<script id="serino-book">`.
 
 ## Two books
-`BOOKS` holds each book's pages, title and open page; `shelf` is the current one and `chooseBook(who)` switches it. `#bookDlg[data-who]` recolors the cover and accent. `serino-book` adds its entries to `GLOSSARY`, `NUMS` and `LIVE`, then sets `BOOKS.serino` with `SPAGES` (cover plus 32 pages). Page facts below describe Phyou's book.
+`BOOKS` holds each book's pages, title and open page; `shelf` is the current one and `chooseBook(who)` switches it. `#bookDlg[data-who]` recolors the cover and accent. `serino-book` adds its entries to `GLOSSARY`, `NUMS` and `LIVE`, then sets `BOOKS.serino` with `SPAGES` (cover plus 32 pages). `eroson-book` does the same with `EPAGES` (cover plus 12 pages) and `BOOKS.eroson`. Page facts below describe Phyou's book.
 
 ## How it works
 - **Content:** `PAGES` holds the cover (index 0) and 36 pages; index equals the printed page number. `CHAPTERS` feeds the contents page.
