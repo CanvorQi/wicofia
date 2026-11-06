@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <rect width="512" height="512" rx="112" fill="#33257d"/>
+  <circle cx="196" cy="266" r="108" fill="#8f83ea"/>
+  <circle cx="318" cy="266" r="108" fill="#f48fbf" fill-opacity=".94"/>
+  <circle cx="160" cy="250" r="19" fill="#fff"/><circle cx="165" cy="253" r="9" fill="#241f4d"/>
+  <circle cx="230" cy="250" r="19" fill="#fff"/><circle cx="235" cy="253" r="9" fill="#241f4d"/>
+  <circle cx="288" cy="250" r="19" fill="#fff"/><circle cx="293" cy="253" r="9" fill="#4a1432"/>
+  <circle cx="358" cy="250" r="19" fill="#fff"/><circle cx="363" cy="253" r="9" fill="#4a1432"/>
+  <path d="M170 306 q25 24 50 0" stroke="#241f4d" stroke-width="10" fill="none" stroke-linecap="round"/>
+  <path d="M298 306 q25 24 50 0" stroke="#4a1432" stroke-width="10" fill="none" stroke-linecap="round"/>
+  <path d="M196 160 q0 -24 12 -38" stroke="#7567dd" stroke-width="12" fill="none" stroke-linecap="round"/>
+  <circle cx="212" cy="116" r="15" fill="#e0bd67"/>
+  <path d="M352 150 L320 130 L324 172 Z M352 150 L384 130 L380 172 Z" fill="#d9558f"/>
+  <circle cx="352" cy="150" r="11" fill="#d9558f"/>
+</svg>

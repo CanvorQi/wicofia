@@ -1,0 +1,3202 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Wicofia</title>
+<meta name="description" content="Yapay zekânın nasıl öğrendiğini iki küçük karakterle, kendi elinle gör.">
+<meta name="theme-color" content="#f9f9f7">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="icon-192.png">
+<script>
+// Runs before the first paint so the page never flashes the wrong theme.
+(() => {
+  let saved = null;
+  try { saved = localStorage.getItem('wicofia-theme'); } catch {}
+  document.documentElement.dataset.theme = saved === 'light' || saved === 'dark' ? saved
+    : matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+})();
+</script>
+<style>
+:root {
+  color-scheme: light;
+  --page: #f9f9f7; --surface: #fcfcfb; --surface-2: #f0efec;
+  --ink: #0b0b0b; --ink-2: #52514e; --muted: #6f6d68;
+  --grid: #e1e0d9; --axis: #c3c2b7; --border: rgba(11,11,11,.10);
+  --accent: #6250d6; --accent-ink: #ffffff; --phyou: #8f83ea; --phyou-2: #7567dd;
+  --op0: #2a78d6; --op1: #eb6834; --op2: #1baf7a; --op3: #eda100;
+  --heat-lo: #fbdccb; --heat-hi: #a8321a;
+  --warn-bg: #fff3d6; --warn-ink: #5e4300;
+  --pink: #c92f7e; --pink-ink: #ffffff; --pink-body: #f48fbf; --pink-deep: #d9558f; --pink-soft: 214, 63, 140;
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --page: #0d0d0d; --surface: #1a1a19; --surface-2: #2c2c2a;
+  --ink: #f0efec; --ink-2: #c3c2b7; --muted: #9b9a93;
+  --grid: #2c2c2a; --axis: #383835; --border: rgba(255,255,255,.10);
+  --accent: #9085e9; --accent-ink: #0b0b0b; --phyou: #9085e9; --phyou-2: #7a6de0;
+  --op0: #3987e5; --op1: #d95926; --op2: #199e70; --op3: #c98500;
+  --heat-lo: #43271c; --heat-hi: #ff9a6e;
+  --warn-bg: #3d2f0c; --warn-ink: #fbd98a;
+  --pink: #f08cbf; --pink-ink: #0b0b0b; --pink-body: #ee84b6; --pink-deep: #d9558f; --pink-soft: 240, 140, 191;
+}
+body[data-who="serino"] { --accent: var(--pink); --accent-ink: var(--pink-ink); }
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+body {
+  margin: 0; background: var(--page); color: var(--ink);
+  font: 15px/1.45 system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+h1, h2, h3, p { margin: 0; }
+button, input, select { font: inherit; color: inherit; }
+button { cursor: pointer; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+.topbar {
+  display: flex; flex-wrap: wrap; align-items: center; gap: 12px 20px;
+  max-width: 1320px; margin: 0 auto; padding: 16px;
+}
+.brand { margin-right: auto; }
+.brand h1 { font-size: 22px; font-weight: 700; letter-spacing: -.01em; }
+.brand p { color: var(--ink-2); font-size: 13px; }
+.btn {
+  border: 1px solid var(--border); background: var(--surface); border-radius: 8px;
+  padding: 8px 14px; font-weight: 600;
+}
+.btn:hover { background: var(--surface-2); }
+.btn.primary { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
+.btn.primary:hover { filter: brightness(1.08); }
+.btn:disabled { opacity: .5; cursor: default; }
+.speed { display: flex; align-items: center; gap: 8px; color: var(--ink-2); font-size: 13px; }
+.seg { display: inline-flex; background: var(--surface-2); border-radius: 8px; padding: 2px; }
+.seg button {
+  border: 0; background: none; border-radius: 6px; padding: 5px 9px; font-size: 13px;
+  color: var(--ink-2); white-space: nowrap;
+}
+.seg button[aria-pressed="true"] { background: var(--surface); color: var(--ink); font-weight: 600; box-shadow: 0 0 0 1px var(--border); }
+
+.layout {
+  display: grid; grid-template-columns: 340px minmax(0, 1fr); gap: 16px;
+  max-width: 1320px; margin: 0 auto; padding: 0 16px 32px; align-items: start;
+}
+.side { display: grid; gap: 16px; position: sticky; top: 16px; }
+.main { display: grid; gap: 16px; min-width: 0; }
+.card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 16px; min-width: 0; }
+.card h2 { font-size: 15px; font-weight: 650; }
+.card .sub { color: var(--ink-2); font-size: 13px; margin-top: 2px; }
+
+/* Character */
+.phyou-card { text-align: center; }
+.bubble {
+  position: relative; background: var(--surface-2); border-radius: 12px; padding: 10px 14px;
+  min-height: 64px; display: flex; align-items: center; justify-content: center;
+}
+.bubble::after {
+  content: ""; position: absolute; bottom: -8px; left: 50%; margin-left: -8px;
+  border: 8px solid transparent; border-top-color: var(--surface-2); border-bottom: 0;
+}
+#phyou { width: 170px; height: 170px; display: block; margin: 12px auto 0; }
+#phyou .body { fill: var(--phyou); }
+#phyou .belly { fill: var(--phyou-2); opacity: .35; }
+#phyou .stalk { stroke: var(--phyou-2); stroke-width: 5; fill: none; stroke-linecap: round; }
+#phyou .bulb { fill: var(--op3); }
+#phyou .feature { stroke: #241f4d; stroke-width: 5; fill: none; stroke-linecap: round; stroke-linejoin: round; }
+#phyou.mouth-fill #mouth { fill: #241f4d; }
+#phyou .brow { transition: transform .3s; transform-box: fill-box; transform-origin: center; }
+#phyou.busy .bulb { animation: pulse .7s ease-in-out infinite alternate; }
+#eyes { animation: blink 5s infinite; transform-origin: 100px 100px; }
+@keyframes pulse { to { opacity: .35; } }
+@keyframes blink { 0%, 95%, 100% { transform: scaleY(1); } 97.5% { transform: scaleY(.08); } }
+@media (prefers-reduced-motion: reduce) {
+  #eyes, #phyou.busy .bulb { animation: none; }
+}
+.mood { font-size: 13px; color: var(--ink-2); margin-top: 4px; }
+.ctl { display: contents; }
+.brand a { color: inherit; text-decoration: none; }
+a.btn { color: inherit; text-decoration: none; display: inline-block; }
+
+/* Home */
+.home { max-width: 920px; margin: 0 auto; padding: 16px 16px 40px; }
+.home-lead { font-size: 22px; line-height: 1.3; font-weight: 650; letter-spacing: -.01em; max-width: 620px; }
+.who-cards { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; margin-top: 20px; }
+.who-card { display: flex; flex-direction: column; gap: 8px; padding: 20px; color: inherit; text-decoration: none; transition: border-color .15s, transform .15s; }
+.who-card:hover { border-color: var(--accent); transform: translateY(-2px); }
+.who-card.pink { --accent: var(--pink); --accent-ink: var(--pink-ink); }
+.who-card .face { width: 136px; height: 136px; margin: 0 auto 4px; }
+.who-card .face svg { display: block; width: 100%; height: 100%; }
+.who-card h2 { font-size: 22px; }
+.who-card p { color: var(--ink-2); }
+.who-card .now { margin-top: auto; padding-top: 4px; font-size: 13px; color: var(--ink); font-variant-numeric: tabular-nums; }
+.who-card .btn { text-align: center; margin-top: 6px; }
+@media (prefers-reduced-motion: reduce) { .who-card { transition: none; } .who-card:hover { transform: none; } }
+@media (max-width: 620px) { .who-cards { grid-template-columns: minmax(0, 1fr); } }
+#serino { width: 170px; height: 170px; display: block; margin: 12px auto 0; }
+#serino .s-body { fill: var(--pink-body); }
+#serino .s-cheek { fill: var(--pink-deep); opacity: .45; }
+#serino .s-curl { stroke: var(--pink-deep); stroke-width: 6; fill: none; stroke-linecap: round; }
+#serino .s-bow { fill: var(--pink-deep); }
+#serino .feature { stroke: #4a1432; stroke-width: 5; fill: none; stroke-linecap: round; stroke-linejoin: round; }
+#serino .lash { stroke: #4a1432; stroke-width: 3.5; fill: none; stroke-linecap: round; }
+#serino.mouth-fill #sMouth { fill: #4a1432; }
+#serino .brow { transition: transform .3s; transform-box: fill-box; transform-origin: center; }
+#serino.busy .s-bow { animation: pulse .7s ease-in-out infinite alternate; }
+#sEyes { animation: blink 6s infinite; transform-origin: 100px 104px; }
+@media (prefers-reduced-motion: reduce) { #sEyes, #serino.busy .s-bow { animation: none; } }
+
+/* Serino */
+.side textarea, .write input[type="text"] {
+  width: 100%; padding: 8px; border-radius: 8px; border: 1px solid var(--axis); background: var(--surface); font: inherit; color: inherit;
+}
+.side textarea { display: block; height: 110px; resize: vertical; margin-top: 12px; }
+.check { display: flex; align-items: center; gap: 8px; margin-top: 8px; font-size: 13px; color: var(--ink-2); }
+.card > .btn.wide { width: 100%; margin-top: 10px; }
+.net.four { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+.net.four .btn { grid-column: 1 / -1; }
+.write { display: grid; grid-template-columns: minmax(0, 1fr) auto auto; gap: 8px 12px; margin-top: 12px; align-items: center; }
+.write .temp { display: flex; align-items: center; gap: 6px; font-size: 13px; color: var(--ink-2); font-variant-numeric: tabular-nums; }
+.write .temp input { width: 96px; accent-color: var(--accent); }
+.typed {
+  margin-top: 12px; padding: 12px; min-height: 92px; border-radius: 8px; background: var(--surface-2);
+  font-family: Georgia, "Times New Roman", serif; font-size: 16px; line-height: 1.5; overflow-wrap: anywhere;
+}
+.typed b { color: var(--accent); }
+.look { display: grid; grid-template-columns: minmax(0, 1fr) 220px; gap: 16px; margin-top: 12px; }
+.letters { display: flex; flex-wrap: wrap; gap: 2px; align-content: flex-start; font: 16px/1 ui-monospace, Consolas, monospace; }
+.letters span {
+  display: inline-flex; align-items: center; justify-content: center; width: 22px; height: 28px; border-radius: 4px;
+  box-shadow: inset 0 0 0 1px var(--grid); cursor: default;
+}
+.letters .now { box-shadow: inset 0 0 0 2px var(--accent); }
+.bars { display: grid; gap: 4px; align-content: start; font-size: 13px; font-variant-numeric: tabular-nums; }
+.bars h3, .letters-h { font-size: 14px; font-weight: 600; margin-bottom: 6px; }
+.bar { display: grid; grid-template-columns: 22px minmax(0, 1fr) 40px; gap: 6px; align-items: center; }
+.bar i { display: block; height: 12px; border-radius: 0 3px 3px 0; background: var(--accent); min-width: 1px; }
+.bar .ch { font-family: ui-monospace, Consolas, monospace; text-align: center; }
+.bar .pc { text-align: right; color: var(--ink-2); }
+#sChart { width: 100%; height: 230px; display: block; margin-top: 12px; }
+.snaps { display: grid; gap: 8px; margin-top: 12px; }
+.snap { display: grid; grid-template-columns: 110px minmax(0, 1fr); gap: 12px; padding-bottom: 8px; border-bottom: 1px solid var(--grid); font-size: 14px; }
+.snap:last-child { border-bottom: 0; }
+.snap .when { color: var(--ink-2); font-size: 13px; font-variant-numeric: tabular-nums; }
+.snap .txt { font-family: Georgia, "Times New Roman", serif; overflow-wrap: anywhere; }
+@media (max-width: 620px) {
+  .look { grid-template-columns: minmax(0, 1fr); }
+  .write { grid-template-columns: minmax(0, 1fr) auto; }
+  .write input[type="text"] { grid-column: 1 / -1; }
+  .snap { grid-template-columns: minmax(0, 1fr); gap: 2px; }
+}
+
+/* Lesson */
+.ask { display: grid; grid-template-columns: 1fr auto 1fr auto; gap: 8px; margin-top: 12px; align-items: center; }
+.ask input, .answer input, .net input {
+  width: 100%; min-width: 0; padding: 8px; border-radius: 8px; border: 1px solid var(--axis);
+  background: var(--surface); text-align: center; font-size: 18px; font-variant-numeric: tabular-nums;
+}
+.ops { grid-column: 1 / -1; order: -1; display: grid; grid-template-columns: repeat(4, 1fr); }
+.ops button { font-size: 18px; padding: 4px 0; }
+.eq { font-size: 18px; color: var(--ink-2); }
+.linkbtn { border: 0; background: none; padding: 0; color: var(--accent); font-size: 13px; font-weight: 600; margin-top: 8px; }
+.linkbtn:hover { text-decoration: underline; }
+.answer { display: grid; grid-template-columns: 1fr auto; gap: 8px; margin-top: 12px; }
+.note { margin-top: 10px; font-size: 13px; color: var(--ink-2); min-height: 1.45em; }
+.note.warn { background: var(--warn-bg); color: var(--warn-ink); padding: 8px 10px; border-radius: 8px; }
+.ticker { font-size: 13px; color: var(--ink-2); font-variant-numeric: tabular-nums; }
+
+/* Stats */
+.stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+.stat .label { color: var(--ink-2); font-size: 13px; }
+.stat .value { font-size: 30px; font-weight: 700; letter-spacing: -.01em; line-height: 1.2; }
+
+table { width: 100%; border-collapse: collapse; font-size: 14px; margin-top: 8px; }
+th { text-align: right; font-weight: 500; color: var(--ink-2); font-size: 13px; }
+th:first-child, td:first-child { text-align: left; white-space: nowrap; }
+td { text-align: right; font-variant-numeric: tabular-nums; }
+th, td { padding: 6px 4px; border-bottom: 1px solid var(--grid); }
+tr:last-child td { border-bottom: 0; }
+.swatch { display: inline-block; width: 10px; height: 10px; border-radius: 3px; margin-right: 8px; }
+
+/* Heatmaps */
+.heats { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px; margin-top: 12px; }
+.heat h3 { font-size: 14px; font-weight: 600; margin-bottom: 6px; }
+.hgrid { display: grid; grid-template-columns: 14px repeat(10, minmax(0, 1fr)); gap: 2px; }
+.hlab { font-size: 10px; color: var(--muted); display: flex; align-items: center; justify-content: center; font-variant-numeric: tabular-nums; }
+.cell {
+  aspect-ratio: 1; border-radius: 3px; background: var(--surface-2); position: relative;
+  display: flex; align-items: center; justify-content: center; font-size: 10px; line-height: 1;
+  cursor: pointer; color: var(--ink-2);
+}
+.cell:hover { box-shadow: 0 0 0 2px var(--ink); z-index: 1; }
+.cell.none { background: none; cursor: default; }
+.cell.none:hover { box-shadow: none; }
+.cell.test::before { content: ""; position: absolute; inset: 2px; border-radius: 50%; border: 1.5px solid var(--ink); opacity: .7; }
+.cell.ok::after { content: "✓"; }
+.legend { display: flex; flex-wrap: wrap; gap: 6px 18px; align-items: center; margin-top: 12px; font-size: 13px; color: var(--ink-2); }
+.legend .item { display: inline-flex; align-items: center; gap: 6px; }
+.ramp { width: 96px; height: 10px; border-radius: 3px; background: linear-gradient(90deg, var(--heat-lo), var(--heat-hi)); }
+.key { width: 14px; height: 14px; border-radius: 3px; background: var(--surface-2); display: inline-flex; align-items: center; justify-content: center; font-size: 10px; position: relative; }
+.key.test::before { content: ""; position: absolute; inset: 1px; border-radius: 50%; border: 1.5px solid var(--ink); opacity: .7; }
+
+/* Charts */
+.charts { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; margin-top: 12px; }
+.chart h3 { font-size: 14px; font-weight: 600; margin-bottom: 6px; }
+.chart canvas { width: 100%; height: 210px; display: block; }
+
+#tip {
+  position: fixed; z-index: 10; pointer-events: none; display: none;
+  background: var(--surface); border: 1px solid var(--border); border-radius: 8px;
+  padding: 8px 10px; font-size: 13px; box-shadow: 0 4px 16px rgba(0,0,0,.14);
+  font-variant-numeric: tabular-nums; max-width: 240px;
+}
+#tip b { font-weight: 650; }
+#tip .row { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+
+.net { display: grid; grid-template-columns: 1fr 1fr auto; gap: 8px; margin-top: 12px; align-items: end; }
+.net label { display: grid; gap: 2px; font-size: 13px; color: var(--ink-2); }
+.mem-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 12px; }
+.mem-row .btn { padding: 8px 6px; }
+.term {
+  border: 0; background: none; padding: 0; font: inherit; color: inherit; cursor: help;
+  text-decoration: underline dotted; text-underline-offset: 3px;
+}
+.num { text-decoration-color: rgba(95, 84, 64, .55); }
+#termPop {
+  position: fixed; z-index: 20; width: min(300px, calc(100vw - 32px)); display: none;
+  background: #fcfcfb; color: #0b0b0b; border: 1px solid rgba(11, 11, 11, .14); border-radius: 8px;
+  padding: 10px 12px; font: 14px/1.4 system-ui, "Segoe UI", sans-serif; box-shadow: 0 6px 22px rgba(0, 0, 0, .28);
+}
+#termPop b { display: block; font-weight: 650; margin-bottom: 2px; }
+
+/* Book: a physical object, so it keeps its paper colors in both themes */
+.book-open { margin-top: 12px; }
+#bookDlg {
+  --paper: #f6efdf; --paper-edge: #e6d9bd; --b-ink: #2b2418; --b-ink-2: #5f5440; --b-rule: #d8cbb0;
+  --b-accent: #5a3fb5; --cover: #33257d; --cover-2: #241a5e; --gold: #e0bd67;
+  border: 0; padding: 0; background: none; max-width: none; max-height: none;
+  width: 100vw; height: 100dvh; overflow: hidden;
+}
+#bookDlg[data-who="serino"] { --b-accent: #b5266f; --cover: #a3246b; --cover-2: #6f1548; --gold: #ffdcea; }
+#bookDlg::backdrop { background: rgba(16, 12, 34, .78); }
+.stage { height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; padding: 12px 16px; }
+.book {
+  position: relative; display: grid; grid-template-columns: 1fr 1fr;
+  width: min(1040px, 100%); height: min(660px, calc(100dvh - 88px));
+  perspective: 2600px; transition: transform .55s ease;
+}
+.book.closed { transform: translateX(-25%); }
+.book-side { position: relative; min-width: 0; }
+.book:not(.closed) .book-side { box-shadow: 0 14px 34px rgba(0, 0, 0, .45); }
+.book:not(.closed) #sideL { border-radius: 6px 0 0 6px; }
+.book:not(.closed) #sideR { border-radius: 0 6px 6px 0; }
+.pg {
+  position: absolute; inset: 0; overflow-y: auto; background: var(--paper); color: var(--b-ink);
+  padding: 34px 40px 40px; font: 16px/1.55 Georgia, "Times New Roman", serif;
+}
+.pg.left { background: linear-gradient(270deg, #d9c9a6 0, var(--paper) 44px); border-radius: 6px 0 0 6px; box-shadow: inset 4px 0 0 var(--paper-edge); }
+.pg.right { background: linear-gradient(90deg, #d9c9a6 0, var(--paper) 44px); border-radius: 0 6px 6px 0; box-shadow: inset -4px 0 0 var(--paper-edge); }
+.pg .head { font: 12px system-ui, "Segoe UI", sans-serif; letter-spacing: .08em; text-transform: uppercase; color: var(--b-ink-2); }
+.pg h2 { font: 700 27px/1.2 Georgia, "Times New Roman", serif; margin: 2px 0 12px; }
+.pg h3 { font: 700 21px/1.25 Georgia, "Times New Roman", serif; margin: 0 0 10px; }
+.pg p { margin: 0 0 10px; }
+.pg .dc::first-letter { float: left; font-size: 54px; line-height: .9; padding: 4px 8px 0 0; color: var(--b-accent); font-weight: 700; }
+.pg .folio { position: absolute; bottom: 12px; font: italic 14px Georgia, serif; color: var(--b-ink-2); }
+.pg.left .folio { left: 40px; }
+.pg.right .folio { right: 40px; }
+.pg b { font-weight: 700; }
+.fig { margin: 12px 0; font: 13px/1.35 system-ui, "Segoe UI", sans-serif; color: var(--b-ink-2); }
+.fig svg, .fig canvas { display: block; width: 100%; }
+.fig svg { max-height: 28dvh; }
+.fig figcaption, .figcap { margin-top: 6px; font-style: italic; font-family: Georgia, serif; }
+.margin-note { border-left: 3px solid var(--b-accent); padding: 2px 0 2px 12px; font-style: italic; color: var(--b-ink-2); margin: 12px 0 0; }
+.boxes { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 6px; }
+.boxes div { border: 1px solid var(--b-rule); border-radius: 6px; text-align: center; padding: 6px 2px; font-size: 12px; }
+.boxes div.on { border-color: var(--b-accent); box-shadow: inset 0 0 0 1px var(--b-accent); }
+.boxes b { display: block; font-size: 16px; color: var(--b-ink); font-variant-numeric: tabular-nums; }
+.steps { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; list-style: none; padding: 0; margin: 12px 0; counter-reset: s; font: 14px/1.35 system-ui, "Segoe UI", sans-serif; }
+.steps li { border: 1px solid var(--b-rule); border-radius: 8px; padding: 8px 10px; counter-increment: s; }
+.steps li::before { content: counter(s); display: block; font: 700 20px Georgia, serif; color: var(--b-accent); }
+.line { position: relative; height: 58px; margin: 12px 8px; }
+.line .rail { position: absolute; left: 0; right: 0; top: 28px; height: 2px; background: var(--b-ink-2); }
+.line .gap { position: absolute; top: 26px; height: 6px; background: var(--b-accent); opacity: .45; }
+.line .mark { position: absolute; top: 22px; width: 12px; height: 12px; margin-left: -6px; border-radius: 50%; background: var(--b-ink); box-shadow: 0 0 0 2px var(--paper); }
+.line .mark.truth { background: var(--b-accent); border-radius: 2px; }
+.line .tag { position: absolute; white-space: nowrap; transform: translateX(-50%); font-size: 12px; color: var(--b-ink); }
+.line .tag.up { top: 0; }
+.line .tag.down { top: 40px; }
+.split { display: flex; gap: 2px; height: 26px; margin: 12px 0 6px; }
+.split div { display: flex; align-items: center; justify-content: center; color: #fff; font-size: 12px; border-radius: 3px; }
+.split .tr { flex: 266; background: #5a3fb5; }
+.split .ex { flex: 66; background: #2b2418; }
+.w-legend { display: flex; align-items: center; gap: 8px; margin-top: 6px; }
+.w-ramp { width: 110px; height: 8px; border-radius: 3px; background: linear-gradient(90deg, #d03b3b, #ddd8cc, #2a78d6); }
+.calc { width: 100%; margin: 10px 0; font: 14px/1.35 system-ui, "Segoe UI", sans-serif; }
+.calc td, .calc th { border-bottom: 1px solid var(--b-rule); padding: 5px 4px; color: var(--b-ink); }
+.calc th { color: var(--b-ink-2); font-size: 13px; }
+.calc tr:last-child td { border-bottom: 0; font-weight: 700; }
+.calc.plain tr:last-child td { font-weight: 400; }
+.gloss { margin: 8px 0 0; }
+.gloss dt { font-weight: 700; margin-top: 8px; }
+.gloss dd { margin: 0; font-size: 15px; line-height: 1.4; }
+.toc { list-style: none; margin: 8px 0 0; padding: 0; }
+.toc button {
+  width: 100%; display: flex; gap: 8px; align-items: baseline; border: 0; background: none; padding: 7px 0;
+  font: 16px Georgia, serif; color: var(--b-ink); text-align: left; border-bottom: 1px dotted var(--b-rule);
+}
+.toc button:hover { color: var(--b-accent); }
+.toc .no { margin-left: auto; font-style: italic; }
+.pg.cover {
+  background: linear-gradient(135deg, var(--cover), var(--cover-2)); color: var(--gold);
+  border-radius: 4px 10px 10px 4px; box-shadow: inset 12px 0 16px rgba(0, 0, 0, .35); padding: 26px; overflow: hidden;
+}
+.cover-frame {
+  height: 100%; border: 2px solid var(--gold); outline: 1px solid var(--gold); outline-offset: -8px; border-radius: 6px;
+  display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 28px;
+}
+.cover-frame svg { width: 170px; height: 170px; margin-bottom: 18px; }
+.cover-frame h2 { font-size: 38px; margin: 0 0 10px; color: var(--gold); }
+.cover-frame p { margin: 0; font-style: italic; }
+.cover-frame .by { margin-top: 26px; font-style: normal; font-size: 14px; letter-spacing: .1em; }
+.leaf { position: absolute; top: 0; left: 50%; width: 50%; height: 100%; transform-style: preserve-3d; transform-origin: left center; z-index: 5; }
+.leaf .face { position: absolute; inset: 0; backface-visibility: hidden; -webkit-backface-visibility: hidden; }
+.leaf .back { transform: rotateY(180deg); }
+.book-nav { display: flex; align-items: center; gap: 10px; color: #f0efec; font-size: 14px; }
+.book-nav .btn { background: #fcfcfb; color: #0b0b0b; border-color: transparent; }
+.book-nav .btn:hover { background: #e9e6df; }
+.book-nav span { min-width: 92px; text-align: center; font-variant-numeric: tabular-nums; }
+
+@media (max-height: 640px) {
+  .pg { padding-top: 22px; font-size: 15px; line-height: 1.45; }
+  .pg h2 { font-size: 23px; margin-bottom: 8px; }
+  .pg .steps { margin: 8px 0; }
+  .gloss dt { margin-top: 4px; }
+}
+@media (max-width: 820px) {
+  .book { grid-template-columns: minmax(0, 1fr); width: min(520px, 100%); height: calc(100dvh - 76px); }
+  .book.closed { transform: none; }
+  #sideL { display: none; }
+  .book #sideR, .book:not(.closed) #sideR { border-radius: 6px; }
+  .pg { padding: 24px 20px 40px; }
+  .pg.right { background: var(--paper); box-shadow: none; border-radius: 6px; }
+  .pg.right .folio { right: 20px; }
+  .pg.cover { border-radius: 6px; }
+}
+
+@media (max-width: 1100px) { .heats { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 820px) {
+  .layout { grid-template-columns: minmax(0, 1fr); }
+  .side { position: static; }
+  .charts { grid-template-columns: minmax(0, 1fr); }
+}
+@media (max-width: 480px) {
+  .stats { gap: 8px; }
+  .stat .value { font-size: 22px; }
+  .seg button { padding: 5px 6px; }
+}
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="brand">
+    <h1><a href="#home">Wicofia</a></h1>
+    <p id="brandSub"></p>
+  </div>
+  <a class="btn" id="homeBtn" href="#home" hidden>Ana sayfa</a>
+  <div class="seg" id="theme" role="group" aria-label="Tema">
+    <button type="button" data-theme="light">Açık</button>
+    <button type="button" data-theme="dark">Koyu</button>
+  </div>
+  <div class="ctl" id="phyouCtl" hidden>
+    <div class="speed">
+      <span id="speedLabel">Hız</span>
+      <div class="seg" id="speeds" role="group" aria-labelledby="speedLabel"></div>
+    </div>
+    <button class="btn primary" id="autoBtn" type="button">Otomatik öğretmeni başlat</button>
+    <button class="btn" id="resetBtn" type="button">Sıfırla</button>
+  </div>
+  <div class="ctl" id="serinoCtl" hidden>
+    <button class="btn primary" id="sAuto" type="button">Okumaya başlat</button>
+    <button class="btn" id="sReset" type="button">Sıfırla</button>
+  </div>
+</header>
+
+<main class="home" id="homeMode">
+  <p class="home-lead">Yapay zekânın nasıl öğrendiğini iki küçük karakterle, kendi elinle gör.</p>
+  <div class="who-cards">
+    <a class="card who-card" href="#phyou">
+      <div class="face" id="homeFaceP"></div>
+      <h2>Phyou</h2>
+      <p>Dört işlemi senden öğrenir. Sinir ağının temelini, gradyanı ve geri yayılımı gösterir.</p>
+      <p class="now" id="homeNowP"></p>
+      <span class="btn primary">Phyou'ya git</span>
+    </a>
+    <a class="card who-card pink" href="#serino">
+      <div class="face" id="homeFaceS"></div>
+      <h2>Serino</h2>
+      <p>Metin okuyarak yazmayı öğrenir. Küçük bir dil modelinin içini, dikkati ve bloklarını gösterir.</p>
+      <p class="now" id="homeNowS"></p>
+      <span class="btn primary">Serino'ya git</span>
+    </a>
+  </div>
+</main>
+
+<div class="layout" id="phyouMode" hidden>
+  <aside class="side">
+    <section class="card phyou-card" aria-label="Phyou">
+      <div class="bubble" id="speech" aria-live="polite"></div>
+      <svg id="phyou" viewBox="0 0 200 200" role="img" aria-labelledby="moodText">
+        <path class="stalk" d="M100 34 Q100 22 108 14"/>
+        <circle class="bulb" cx="110" cy="12" r="8"/>
+        <path class="body" d="M100 30 C150 30 176 68 176 116 C176 160 144 182 100 182 C56 182 24 160 24 116 C24 68 50 30 100 30Z"/>
+        <ellipse class="belly" cx="100" cy="150" rx="46" ry="24"/>
+        <g id="eyes">
+          <circle cx="74" cy="104" r="16" fill="#fff"/>
+          <circle cx="126" cy="104" r="16" fill="#fff"/>
+          <circle cx="76" cy="106" r="7" fill="#241f4d"/>
+          <circle cx="128" cy="106" r="7" fill="#241f4d"/>
+        </g>
+        <path class="feature brow" id="browL" d="M60 80 L88 80"/>
+        <path class="feature brow" id="browR" d="M112 80 L140 80"/>
+        <path class="feature" id="mouth" d="M92 136 q8 8 16 0"/>
+      </svg>
+      <p class="mood" id="moodText"></p>
+      <button class="btn book-open" id="bookBtn" type="button">Phyou'nun kitabını oku</button>
+    </section>
+
+    <section class="card">
+      <h2>Ders ver</h2>
+      <p class="sub">Soru sor, Phyou tahmin etsin, doğru cevabı sen söyle.</p>
+      <form class="ask" id="askForm" autocomplete="off" novalidate>
+        <div class="seg ops" id="opPick" role="group" aria-label="İşlem"></div>
+        <input id="inA" type="number" min="0" max="9" step="1" value="7" required aria-label="Birinci sayı">
+        <span class="eq" id="opShow">×</span>
+        <input id="inB" type="number" min="0" max="9" step="1" value="8" required aria-label="İkinci sayı">
+        <button class="btn" type="submit">Sor</button>
+      </form>
+      <button class="linkbtn" id="randBtn" type="button">Rastgele soru</button>
+      <form class="answer" id="answerForm" autocomplete="off" hidden>
+        <input id="inAns" type="number" step="1" required aria-label="Doğru cevap" placeholder="Doğru cevap">
+        <button class="btn primary" type="submit">Öğret</button>
+      </form>
+      <p class="note" id="lessonNote" aria-live="polite"></p>
+    </section>
+
+    <section class="card">
+      <h2>Beyin</h2>
+      <p class="sub">Kaç ara <button type="button" class="term" data-term="katman">katman</button>, her birinde kaç <button type="button" class="term" data-term="noron">nöron</button> olsun? Değiştirince Phyou baştan başlar.</p>
+      <form class="net" id="netForm" autocomplete="off" novalidate>
+        <label>Ara katman<input id="inLayers" type="number" step="1"></label>
+        <label>Nöron<input id="inNeurons" type="number" step="1"></label>
+        <button class="btn" type="submit">Uygula</button>
+      </form>
+      <button class="linkbtn" id="netDefault" type="button"></button>
+      <p class="note" id="netNote" aria-live="polite"></p>
+    </section>
+
+    <section class="card">
+      <h2>Hafıza</h2>
+      <p class="sub">Phyou'nun öğrendikleri bir dosyaya iner. Dosyayı geri yükleyince kaldığı yerden devam eder. İçinde <button type="button" class="term" data-term="agirlik">ağırlıkları</button> ve <button type="button" class="term" data-term="sinav">sınav soruları</button> var.</p>
+      <div class="mem-row">
+        <button class="btn" id="memSave" type="button">Hafızayı indir</button>
+        <button class="btn" id="memLoad" type="button">Hafıza yükle</button>
+        <input id="memFile" type="file" accept=".json,application/json" hidden>
+      </div>
+      <p class="note" id="memNote" aria-live="polite"></p>
+    </section>
+  </aside>
+
+  <main class="main">
+    <section class="card stats" aria-label="Genel durum">
+      <div class="stat"><div class="label">Çözdüğü soru</div><div class="value" id="sSeen">0</div></div>
+      <div class="stat"><div class="label">Çalıştığı sorularda başarı</div><div class="value" id="sTrain">%0</div></div>
+      <div class="stat"><div class="label">Hiç görmediği sorularda başarı</div><div class="value" id="sTest">%0</div></div>
+    </section>
+
+    <section class="card">
+      <h2>İşlem işlem karne</h2>
+      <p class="ticker" id="ticker">Otomatik öğretmen bekliyor.</p>
+      <table>
+        <thead><tr><th scope="col">İşlem</th><th scope="col"><button type="button" class="term" data-term="calisma">Çalışma</button> <button type="button" class="term" data-term="basari">başarısı</button></th><th scope="col"><button type="button" class="term" data-term="sinav">Sınav</button> <button type="button" class="term" data-term="basari">başarısı</button></th><th scope="col"><button type="button" class="term" data-term="calisma">Çalışma</button> <button type="button" class="term" data-term="hata">hatası</button></th><th scope="col"><button type="button" class="term" data-term="sinav">Sınav</button> <button type="button" class="term" data-term="hata">hatası</button></th></tr></thead>
+        <tbody id="report"></tbody>
+      </table>
+    </section>
+
+    <section class="card">
+      <h2>Hata haritası</h2>
+      <p class="sub">Her kare bir soru: satır birinci sayı, sütun ikinci sayı. Kareye tıklarsan soru derse gelir.</p>
+      <div class="heats" id="heats"></div>
+      <div class="legend">
+        <span class="item">Az hata <span class="ramp"></span> Çok hata</span>
+        <span class="item"><span class="key">✓</span> Doğru bildi</span>
+        <span class="item"><span class="key test"></span> Sınav sorusu, çalışmada hiç görmez</span>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>Hata grafiği</h2>
+      <p class="sub">Ortalama kaç sayı yanılıyor? Dikey eksen logaritmik, her çizgi 10 kat aralıkla okunur.</p>
+      <div class="legend" id="chartLegend"></div>
+      <div class="charts">
+        <div class="chart"><h3>Çalışma soruları</h3><canvas id="chartTrain" aria-label="Çalışma sorularındaki hatanın zamanla değişimi. Güncel değerler karne tablosunda."></canvas></div>
+        <div class="chart"><h3>Sınav soruları</h3><canvas id="chartTest" aria-label="Sınav sorularındaki hatanın zamanla değişimi. Güncel değerler karne tablosunda."></canvas></div>
+      </div>
+    </section>
+  </main>
+</div>
+
+<div class="layout" id="serinoMode" hidden>
+  <aside class="side">
+    <section class="card phyou-card" aria-label="Serino">
+      <div class="bubble" id="sSpeech" aria-live="polite"></div>
+      <svg id="serino" viewBox="0 0 200 200" role="img" aria-labelledby="sMoodText">
+        <path class="s-curl" d="M84 38 C70 14 100 6 106 22 C110 34 94 36 94 26"/>
+        <path class="s-body" d="M100 36 C152 36 178 74 178 120 C178 162 146 184 100 184 C54 184 22 162 22 120 C22 74 48 36 100 36Z"/>
+        <path class="s-bow" d="M138 54 L116 40 L118 68 Z M138 54 L160 40 L158 68 Z"/>
+        <circle class="s-bow" cx="138" cy="54" r="7"/>
+        <ellipse class="s-cheek" cx="50" cy="130" rx="13" ry="8"/>
+        <ellipse class="s-cheek" cx="150" cy="130" rx="13" ry="8"/>
+        <g id="sEyes">
+          <circle cx="74" cy="108" r="15" fill="#fff"/>
+          <circle cx="126" cy="108" r="15" fill="#fff"/>
+          <circle cx="76" cy="110" r="7" fill="#4a1432"/>
+          <circle cx="128" cy="110" r="7" fill="#4a1432"/>
+          <path class="lash" d="M60 98 L52 92 M64 94 L58 86 M140 98 L148 92 M136 94 L142 86"/>
+        </g>
+        <path class="feature brow" id="sBrowL" d="M62 84 L86 80"/>
+        <path class="feature brow" id="sBrowR" d="M114 80 L138 84"/>
+        <path class="feature" id="sMouth" d="M92 140 q8 8 16 0"/>
+      </svg>
+      <p class="mood" id="sMoodText"></p>
+      <button class="btn book-open" id="sBookBtn" type="button">Serino'nun kitabını oku</button>
+    </section>
+
+    <section class="card">
+      <h2>Okuyacağı metin</h2>
+      <p class="sub">Serino harf harf okur. Kendi metnini yapıştırırsan onun tarzına benzemeye çalışır. Yeni metin için baştan başlar.</p>
+      <textarea id="sText" aria-label="Serino'nun okuyacağı metin" placeholder="Metnini buraya yapıştır"></textarea>
+      <label class="check"><input id="sUseDefault" type="checkbox" checked> Hazır metni de oku</label>
+      <button class="btn wide" id="sTextApply" type="button">Bu metni okut</button>
+      <p class="note" id="sTextNote" aria-live="polite"></p>
+    </section>
+
+    <section class="card">
+      <h2>Beyin</h2>
+      <p class="sub">Değiştirince Serino baştan başlar. Boyut, kafa sayısına tam bölünmeli.</p>
+      <form class="net four" id="sNetForm" autocomplete="off" novalidate>
+        <label>Boyut<input id="sDim" type="number" step="1"></label>
+        <label>Kafa<input id="sHeads" type="number" step="1"></label>
+        <label>Blok<input id="sBlocks" type="number" step="1"></label>
+        <label>Bağlam<input id="sContext" type="number" step="1"></label>
+        <button class="btn" type="submit">Uygula</button>
+      </form>
+      <button class="linkbtn" id="sNetDefault" type="button"></button>
+      <p class="note" id="sNetNote" aria-live="polite"></p>
+    </section>
+
+    <section class="card">
+      <h2>Hafıza</h2>
+      <p class="sub">Serino'nun öğrendikleri ve okuduğu metin bir dosyaya iner. Dosyayı geri yükleyince kaldığı yerden devam eder.</p>
+      <div class="mem-row">
+        <button class="btn" id="sMemSave" type="button">Hafızayı indir</button>
+        <button class="btn" id="sMemLoad" type="button">Hafıza yükle</button>
+        <input id="sMemFile" type="file" accept=".json,application/json" hidden>
+      </div>
+      <p class="note" id="sMemNote" aria-live="polite"></p>
+    </section>
+  </aside>
+
+  <main class="main">
+    <section class="card stats" aria-label="Genel durum">
+      <div class="stat"><div class="label">Okuduğu harf</div><div class="value" id="sReadN">0</div></div>
+      <div class="stat"><div class="label">Çalıştığı metinde kayıp</div><div class="value" id="sTrainLoss">0</div></div>
+      <div class="stat"><div class="label">Hiç okumadığı metinde kayıp</div><div class="value" id="sExamLoss">0</div></div>
+    </section>
+
+    <section class="card">
+      <h2>Bana yazdır</h2>
+      <p class="sub">Bir başlangıç yaz, Serino harf harf sürdürsün. <button type="button" class="term" data-term="sicaklik">Sıcaklık</button> arttıkça daha cesur, daha hatalı yazar.</p>
+      <form class="write" id="sWriteForm" autocomplete="off" novalidate>
+        <input id="sPrompt" type="text" maxlength="200" value="bugün küçük" aria-label="Başlangıç metni">
+        <label class="temp">Sıcaklık <input id="sTemp" type="range" min="1" max="15" step="1" value="8"> <span id="sTempShow"></span></label>
+        <button class="btn primary" type="submit">Yaz</button>
+      </form>
+      <div class="typed" id="sOut" aria-live="polite"></div>
+      <p class="note" id="sWriteNote" aria-live="polite"></p>
+    </section>
+
+    <section class="card">
+      <h2>Şu an neye bakıyor?</h2>
+      <p class="sub">Yukarıdaki yazının son harfleri. Koyu harfler, son harfin <button type="button" class="term" data-term="dikkat">dikkatini</button> en çok çekenler. Çizgili kare son harf.</p>
+      <div class="look">
+        <div><h3 class="letters-h">Son bloktaki dikkat</h3><div class="letters" id="sLetters"></div></div>
+        <div class="bars"><h3>Sıradaki harf için tahmin</h3><div id="sBars"></div></div>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>Kayıp grafiği</h2>
+      <p class="sub"><button type="button" class="term" data-term="kayip">Kayıp</button> sıradaki harfe ne kadar şaşırdığını ölçer, azaldıkça iyidir. Noktalı çizgi rastgele tahminin kaybı.</p>
+      <canvas id="sChart" aria-label="Çalışma ve sınav kaybının zamanla değişimi. Güncel değerler karnede."></canvas>
+    </section>
+
+    <section class="card">
+      <h2>Karne</h2>
+      <p class="ticker" id="sTicker">Serino okumayı bekliyor.</p>
+      <table>
+        <thead><tr><th scope="col">Metin</th><th scope="col"><button type="button" class="term" data-term="kayip">Kayıp</button></th><th scope="col"><button type="button" class="term" data-term="isabet">Harf isabeti</button></th></tr></thead>
+        <tbody>
+          <tr><td>Çalıştığı metin</td><td id="sRTL"></td><td id="sRTH"></td></tr>
+          <tr><td>Hiç okumadığı metin</td><td id="sREL"></td><td id="sREH"></td></tr>
+          <tr><td>Rastgele tahmin</td><td id="sRRL"></td><td id="sRRH"></td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section class="card">
+      <h2>Gelişim defteri</h2>
+      <p class="sub">Aynı başlangıçla, öğrendikçe nasıl yazdığı. Yeni satırlar üstte.</p>
+      <div class="snaps" id="sSnaps"></div>
+    </section>
+  </main>
+</div>
+<div id="tip"></div>
+<div id="termPop" role="status"></div>
+
+<dialog id="bookDlg" aria-label="Phyou'nun Kitabı">
+  <div class="stage">
+    <div class="book closed" id="book">
+      <div class="book-side" id="sideL"></div>
+      <div class="book-side" id="sideR"></div>
+    </div>
+    <nav class="book-nav" aria-label="Kitap sayfaları">
+      <button class="btn" id="bookPrev" type="button">Önceki</button>
+      <span id="bookPos" aria-live="polite"></span>
+      <button class="btn" id="bookNext" type="button">Sonraki</button>
+      <button class="btn" id="bookClose" type="button">Kapat</button>
+    </nav>
+  </div>
+</dialog>
+
+<!-- Pure learning code: no DOM access, so it can be tested on its own. -->
+<script id="brain">
+'use strict';
+const OPS = [
+  { sym: '+', name: 'Toplama', did: 'Toplamayı',  f: (a, b) => a + b },
+  { sym: '−', name: 'Çıkarma', did: 'Çıkarmayı',  f: (a, b) => a - b },
+  { sym: '×', name: 'Çarpma',  did: 'Çarpmayı',   f: (a, b) => a * b },
+  { sym: '÷', name: 'Bölme',   did: 'Bölmeyi',    f: (a, b) => a / b },
+];
+const Y_SCALE = 40;        // answers (-9..81) are divided by this for the network
+const TEST_SHARE = 0.2;
+const BATCH = 16;
+const BASE_LR = 0.003;
+const LR_HALFLIFE = 1500000; // examples until the learning rate halves
+const LESSON_REPEATS = 20;   // a hand-given lesson is studied this many times
+const NET_DEFAULT = { layers: 2, neurons: 32 };                // hidden layers, neurons in each
+const NET_LIMITS = { layers: [1, 4], neurons: [1, 128] };
+
+const netSizes = ({ layers, neurons }) => [6, ...new Array(layers).fill(neurons), 1];
+const validShape = shape => ['layers', 'neurons'].every(k =>
+  Number.isInteger(shape[k]) && shape[k] >= NET_LIMITS[k][0] && shape[k] <= NET_LIMITS[k][1]);
+// The shape behind a sizes list, or null when no allowed network has those sizes.
+function shapeOf(sizes) {
+  if (!Array.isArray(sizes)) return null;
+  const shape = { layers: sizes.length - 2, neurons: sizes[1] };
+  return validShape(shape) && sizes.join() === netSizes(shape).join() ? shape : null;
+}
+
+function encode(a, b, op) {
+  const x = new Float64Array(6);
+  x[0] = a / 4.5 - 1;
+  x[1] = b / 4.5 - 1;
+  x[2 + op] = 1;
+  return x;
+}
+
+function shuffle(arr, rand) {
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(rand() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
+
+// All valid questions, split per operation into study and exam sets.
+function buildData(rand) {
+  const grid = OPS.map(() => Array.from({ length: 10 }, () => new Array(10).fill(null)));
+  const train = [], test = [];
+  OPS.forEach((o, op) => {
+    const items = [];
+    for (let a = 0; a < 10; a++) for (let b = 0; b < 10; b++) {
+      if (op === 3 && (b === 0 || a % b !== 0)) continue;
+      const item = { a, b, op, y: o.f(a, b), x: encode(a, b, op), test: false, pred: 0, err: 0 };
+      grid[op][a][b] = item;
+      items.push(item);
+    }
+    shuffle(items, rand);
+    const nTest = Math.round(items.length * TEST_SHARE);
+    items.forEach((it, i) => { it.test = i < nTest; });
+    train[op] = items.filter(it => !it.test);
+    test[op] = items.filter(it => it.test);
+  });
+  return { grid, train, test };
+}
+
+class Brain {
+  constructor(sizes, rand) {
+    this.sizes = sizes;
+    this.L = sizes.length - 1;
+    this.off = [];
+    let n = 0;
+    for (let l = 0; l < this.L; l++) { this.off[l] = n; n += (sizes[l] + 1) * sizes[l + 1]; }
+    this.p = new Float64Array(n);
+    this.g = new Float64Array(n);
+    this.m = new Float64Array(n);
+    this.v = new Float64Array(n);
+    this.t = 0;
+    this.pending = 0;
+    this.act = sizes.map(s => new Float64Array(s));
+    this.back = sizes.map(s => new Float64Array(s));
+    const gauss = () => Math.sqrt(-2 * Math.log(1 - rand())) * Math.cos(2 * Math.PI * rand());
+    for (let l = 0; l < this.L; l++) {
+      const nI = sizes[l], nO = sizes[l + 1], scale = Math.sqrt(2 / (nI + nO));
+      let o = this.off[l];
+      for (let j = 0; j < nO; j++, o += nI + 1) {
+        for (let i = 0; i < nI; i++) this.p[o + i] = gauss() * scale;
+      }
+    }
+  }
+
+  forward(x) {
+    const { p, act, sizes, off, L } = this;
+    act[0].set(x);
+    for (let l = 0; l < L; l++) {
+      const inp = act[l], out = act[l + 1], nI = sizes[l], nO = sizes[l + 1], last = l === L - 1;
+      let o = off[l];
+      for (let j = 0; j < nO; j++, o += nI + 1) {
+        let s = p[o + nI];
+        for (let i = 0; i < nI; i++) s += p[o + i] * inp[i];
+        out[j] = last ? s : Math.tanh(s);
+      }
+    }
+    return act[L][0];
+  }
+
+  // Backpropagation: adds this example's gradient to the running batch.
+  accumulate(x, target) {
+    const { p, g, act, back, sizes, off, L } = this;
+    const pred = this.forward(x);
+    back[L][0] = pred - target;
+    for (let l = L - 1; l >= 0; l--) {
+      const inp = act[l], out = act[l + 1], dOut = back[l + 1], dIn = back[l];
+      const nI = sizes[l], nO = sizes[l + 1], last = l === L - 1;
+      dIn.fill(0);
+      let o = off[l];
+      for (let j = 0; j < nO; j++, o += nI + 1) {
+        const gj = last ? dOut[j] : dOut[j] * (1 - out[j] * out[j]);
+        for (let i = 0; i < nI; i++) {
+          g[o + i] += gj * inp[i];
+          dIn[i] += gj * p[o + i];
+        }
+        g[o + nI] += gj;
+      }
+    }
+    this.pending++;
+    return pred;
+  }
+
+  // Adam update using the accumulated gradient.
+  step(lr) {
+    if (!this.pending) return;
+    const { p, g, m, v } = this;
+    const b1 = 0.9, b2 = 0.999, eps = 1e-8, k = 1 / this.pending;
+    this.t++;
+    const c1 = 1 - Math.pow(b1, this.t), c2 = 1 - Math.pow(b2, this.t);
+    for (let i = 0; i < p.length; i++) {
+      const gi = g[i] * k;
+      m[i] = b1 * m[i] + (1 - b1) * gi;
+      v[i] = b2 * v[i] + (1 - b2) * gi * gi;
+      p[i] -= lr * (m[i] / c1) / (Math.sqrt(v[i] / c2) + eps);
+      g[i] = 0;
+    }
+    this.pending = 0;
+  }
+}
+
+class Student {
+  constructor(rand, shape = NET_DEFAULT) {
+    this.rand = rand;
+    this.data = buildData(rand);
+    this.brain = new Brain(netSizes(shape), rand);
+    this.seen = 0;
+    this.last = null;
+  }
+  get shape() { return { layers: this.brain.L - 1, neurons: this.brain.sizes[1] }; }
+  lr() { return BASE_LR / (1 + this.seen / LR_HALFLIFE); }
+  predict(item) { return this.brain.forward(item.x) * Y_SCALE; }
+
+  // One random study question; every operation gets equal attention.
+  studyOne() {
+    const list = this.data.train[Math.floor(this.rand() * OPS.length)];
+    const item = list[Math.floor(this.rand() * list.length)];
+    const pred = this.brain.accumulate(item.x, item.y / Y_SCALE) * Y_SCALE;
+    this.seen++;
+    this.last = { item, pred };
+    if (this.brain.pending >= BATCH) this.brain.step(this.lr());
+  }
+
+  // A hand-given lesson trusts the teacher's label, right or wrong.
+  lesson(item, label) {
+    this.brain.step(this.lr());
+    for (let i = 0; i < LESSON_REPEATS; i++) {
+      this.brain.accumulate(item.x, label / Y_SCALE);
+      this.brain.step(this.lr());
+    }
+    this.seen += LESSON_REPEATS;
+  }
+
+  // Grades every question; rounded answer must equal the true one.
+  evaluate() {
+    const zero = () => OPS.map(() => 0);
+    const score = list => {
+      const acc = zero(), mae = zero();
+      list.forEach((items, op) => {
+        let ok = 0, sum = 0;
+        for (const it of items) {
+          it.pred = this.predict(it);
+          it.err = Math.abs(it.pred - it.y);
+          if (Math.round(it.pred) === it.y) ok++;
+          sum += it.err;
+        }
+        acc[op] = ok / items.length;
+        mae[op] = sum / items.length;
+      });
+      return { acc, mae, meanAcc: acc.reduce((s, v) => s + v, 0) / acc.length };
+    };
+    return { train: score(this.data.train), test: score(this.data.test) };
+  }
+
+  // Everything needed to continue exactly here, including which questions are exams.
+  toMemory() {
+    const b = this.brain, exam = [];
+    this.data.test.forEach(items => items.forEach(it => exam.push([it.op, it.a, it.b])));
+    return {
+      format: 'phyou-memory', version: 1, savedAt: new Date().toISOString(),
+      seen: this.seen, sizes: b.sizes, exam,
+      weights: Array.from(b.p),
+      adam: { t: b.t, m: Array.from(b.m), v: Array.from(b.v) },
+    };
+  }
+
+  // Validates fully before returning, so a bad file can never damage the current Phyou.
+  static fromMemory(mem, rand) {
+    const fail = msg => { throw new Error(msg); };
+    const broken = 'Dosya bozuk ya da başka bir beyin için yazılmış.';
+    if (!mem || mem.format !== 'phyou-memory') fail('Bu bir Phyou hafıza dosyası değil.');
+    if (mem.version !== 1) fail('Bu dosya başka bir sürümden, okuyamıyorum.');
+    const shape = shapeOf(mem.sizes);
+    if (!shape) fail(broken);
+    const s = new Student(rand, shape), b = s.brain;
+    const good = a => Array.isArray(a) && a.length === b.p.length && a.every(Number.isFinite);
+    if (!good(mem.weights) || !mem.adam || !good(mem.adam.m) || !good(mem.adam.v)) fail(broken);
+    if (!mem.adam.v.every(x => x >= 0)) fail(broken);
+    if (!Number.isInteger(mem.adam.t) || mem.adam.t < 0) fail(broken);
+    if (!Number.isInteger(mem.seen) || mem.seen < 0 || !Array.isArray(mem.exam)) fail(broken);
+    const exam = new Set();
+    for (const e of mem.exam) {
+      const it = Array.isArray(e) ? s.data.grid[e[0]]?.[e[1]]?.[e[2]] : null;
+      if (!it) fail(broken);
+      exam.add(it);
+    }
+    s.data.grid.forEach((rows, op) => {
+      const items = rows.flat().filter(Boolean);
+      items.forEach(it => { it.test = exam.has(it); });
+      s.data.train[op] = items.filter(it => !it.test);
+      s.data.test[op] = items.filter(it => it.test);
+      if (!s.data.train[op].length || !s.data.test[op].length) fail(broken);
+    });
+    b.p.set(mem.weights);
+    b.m.set(mem.adam.m);
+    b.v.set(mem.adam.v);
+    b.t = mem.adam.t;
+    s.seen = mem.seen;
+    return s;
+  }
+}
+</script>
+
+<!-- Serino's language model: a character-level GPT with hand-written backprop. No DOM access. -->
+<script id="llm">
+'use strict';
+const LLM_DEFAULT = { dim: 32, heads: 2, blocks: 2, context: 32 };
+const LLM_LIMITS = { dim: [8, 64], heads: [1, 4], blocks: [1, 4], context: [4, 64] };
+const LLM_FF = 2;           // the feed-forward layer is this many times wider than dim
+const LLM_BATCH = 16;       // text windows per update
+const LLM_LR = 0.003;
+const LLM_LR_HALFLIFE = 4000; // updates until the step size halves
+const LLM_EXAM = 0.1;       // the last part of the text is never studied
+const LLM_MAX_TEXT = 200000, LLM_MAX_VOCAB = 120;
+
+const validLLM = c => !!c && Object.keys(LLM_LIMITS).every(k =>
+  Number.isInteger(c[k]) && c[k] >= LLM_LIMITS[k][0] && c[k] <= LLM_LIMITS[k][1]) && c.dim % c.heads === 0;
+
+const cleanText = raw => raw.toLocaleLowerCase('tr').replace(/\s+/g, ' ').trim();
+
+// Writes the ready text from sentence patterns; the seed keeps it the same on every visit.
+function defaultText(size = 30000) {
+  let seed = 20261106;
+  const pick = a => { seed = (seed * 1664525 + 1013904223) % 4294967296; return a[Math.floor(seed / 4294967296 * a.length)]; };
+  const who = ['küçük kedi', 'yaşlı balıkçı', 'pembe kuş', 'akıllı kız', 'neşeli çocuk', 'sessiz köpek', 'genç öğretmen',
+    'tatlı tavşan', 'cesur kaplumbağa', 'meraklı sincap', 'çalışkan arı', 'uykulu ayı', 'kurnaz tilki', 'nazik doktor'];
+  const when = ['sabah', 'akşam', 'gece', 'bugün', 'dün', 'ilkbaharda', 'yazın', 'kışın', 'öğleden sonra', 'yağmurlu bir günde'];
+  const where = ['bahçede', 'ormanda', 'evde', 'deniz kenarında', 'okulda', 'pazarda', 'nehrin yanında', 'dağın üstünde',
+    'köyün ortasında', 'ağacın altında', 'kütüphanede', 'yolun sonunda'];
+  const did = ['kırmızı elmayı yedi', 'sıcak ekmeği paylaştı', 'eski kitabı okudu', 'güzel bir şarkı söyledi', 'mavi çiçeği buldu',
+    'uzun bir mektup yazdı', 'büyük topu attı', 'küçük bir ev yaptı', 'yeni arkadaşlar edindi', 'yıldızlara baktı',
+    'uzun uzun uyudu', 'hızlıca koştu', 'mutlu mutlu güldü', 'sessizce bekledi', 'yolunu kaybetti', 'bir sır sakladı'];
+  const forms = [
+    () => `${pick(when)} ${pick(who)} ${pick(where)} ${pick(did)}.`,
+    () => `${pick(who)} ${pick(where)} ${pick(did)}, sonra ${pick(did)}.`,
+    () => `${pick(when)} ${pick(who)} ile ${pick(who)} ${pick(where)} buluştu.`,
+    () => `${pick(who)} çok mutluydu çünkü ${pick(did)}.`,
+    () => `${pick(who)} dedi ki: bugün hava çok güzel, ${pick(where)} oynayalım.`,
+    () => `${pick(who)} yoruldu ama yine de ${pick(did)}.`,
+  ];
+  let text = '';
+  while (text.length < size) text += pick(forms)() + ' ';
+  return text.trim();
+}
+
+// The last part of the text becomes the exam, so no study window may touch it.
+function buildCorpus(text) {
+  const letters = Array.from(text), chars = [...new Set(letters)].sort();
+  const stoi = new Map(chars.map((ch, i) => [ch, i]));
+  const ids = Int32Array.from(letters, ch => stoi.get(ch));
+  return { text, chars, stoi, ids, split: Math.floor(ids.length * (1 - LLM_EXAM)) };
+}
+const corpusFits = (c, context) => c.split >= context + 2 && c.ids.length - c.split >= context + 2;
+const llmMinText = context => Math.ceil((context + 2) / LLM_EXAM);
+
+function mulF(p, o, nI, nO, inp, out, len) {
+  for (let t = 0; t < len; t++) {
+    const ti = t * nI, to = t * nO;
+    for (let j = 0, w = o; j < nO; j++, w += nI) {
+      let s = 0;
+      for (let i = 0; i < nI; i++) s += p[w + i] * inp[ti + i];
+      out[to + j] = s;
+    }
+  }
+}
+// Reverse of mulF: adds the matrix gradient to g and the input's gradient to dIn.
+function mulB(p, g, o, nI, nO, inp, dOut, dIn, len) {
+  for (let t = 0; t < len; t++) {
+    const ti = t * nI, to = t * nO;
+    for (let j = 0, w = o; j < nO; j++, w += nI) {
+      const dj = dOut[to + j];
+      for (let i = 0; i < nI; i++) {
+        g[w + i] += dj * inp[ti + i];
+        dIn[ti + i] += dj * p[w + i];
+      }
+    }
+  }
+}
+function normF(x, n, r, d, len) {
+  for (let t = 0; t < len; t++) {
+    const b = t * d;
+    let s = 0;
+    for (let c = 0; c < d; c++) s += x[b + c] * x[b + c];
+    const rt = Math.sqrt(s / d + 1e-5);
+    r[t] = rt;
+    for (let c = 0; c < d; c++) n[b + c] = x[b + c] / rt;
+  }
+}
+function normB(x, r, dN, dX, d, len) {
+  for (let t = 0; t < len; t++) {
+    const b = t * d, rt = r[t];
+    let dot = 0;
+    for (let c = 0; c < d; c++) dot += dN[b + c] * x[b + c];
+    const k = dot / (d * rt * rt * rt);
+    for (let c = 0; c < d; c++) dX[b + c] += dN[b + c] / rt - x[b + c] * k;
+  }
+}
+
+class MiniGPT {
+  constructor(cfg, vocab, rand) {
+    const d = cfg.dim, T = cfg.context, B = cfg.blocks, f = d * LLM_FF, V = vocab;
+    Object.assign(this, { cfg, V, d, T, B, f, H: cfg.heads, t: 0, pending: 0 });
+    let n = 0;
+    const take = k => { const o = n; n += k; return o; };
+    this.oTok = take(V * d);
+    this.oPos = take(T * d);
+    this.blk = [];
+    for (let b = 0; b < B; b++) {
+      this.blk.push({ q: take(d * d), k: take(d * d), v: take(d * d), o: take(d * d), f1: take(d * f), b1: take(f), f2: take(f * d), b2: take(d) });
+    }
+    this.oHead = take(d * V);
+    this.oBias = take(V);
+    for (const a of ['p', 'g', 'm', 'v']) this[a] = new Float64Array(n);
+    this.initWeights(rand);
+
+    const row = () => new Float64Array(T * d);
+    this.xs = Array.from({ length: B + 1 }, row);
+    this.blk.forEach(s => Object.assign(s, {
+      nA: row(), rA: new Float64Array(T), Q: row(), K: row(), W: row(), mix: row(), att: new Float64Array(this.H * T * T),
+      y: row(), nB: row(), rB: new Float64Array(T), h: new Float64Array(T * f),
+    }));
+    this.nL = row(); this.rL = new Float64Array(T);
+    this.logits = new Float64Array(T * V); this.dLog = new Float64Array(T * V);
+    this.u = row(); this.dX = row(); this.dY = row(); this.dN = row(); this.dMix = row();
+    this.dQ = row(); this.dK = row(); this.dW = row();
+    this.dH = new Float64Array(T * f);
+    this.scores = new Float64Array(T); this.ds = new Float64Array(T);
+  }
+
+  initWeights(rand) {
+    const { p, V, d, T, f, B, blk } = this;
+    const gauss = () => Math.sqrt(-2 * Math.log(1 - rand())) * Math.cos(2 * Math.PI * rand());
+    const fill = (o, n, s) => { for (let i = 0; i < n; i++) p[o + i] = gauss() * s; };
+    const wide = 1 / Math.sqrt(d), late = wide / Math.sqrt(2 * B); // blocks start close to doing nothing
+    fill(this.oTok, V * d, 0.3);
+    fill(this.oPos, T * d, 0.3);
+    for (const s of blk) {
+      fill(s.q, d * d, wide); fill(s.k, d * d, wide); fill(s.v, d * d, wide); fill(s.o, d * d, late);
+      fill(s.f1, d * f, wide); fill(s.f2, f * d, late / Math.sqrt(LLM_FF));
+    }
+    fill(this.oHead, d * V, wide * 0.3);
+  }
+
+  forward(ids, start, len) {
+    const { p, d, V, B, f, H, T, oTok, oPos, xs } = this, x0 = xs[0];
+    for (let t = 0, i = 0; t < len; t++) {
+      const a = oTok + ids[start + t] * d, b = oPos + t * d;
+      for (let c = 0; c < d; c++, i++) x0[i] = p[a + c] + p[b + c];
+    }
+    const dh = d / H, scale = 1 / Math.sqrt(dh), scores = this.scores, u = this.u;
+    for (let l = 0; l < B; l++) {
+      const s = this.blk[l], x = xs[l], z = xs[l + 1], { nA, Q, K, W, mix, att, y, nB, h } = s;
+      normF(x, nA, s.rA, d, len);
+      mulF(p, s.q, d, d, nA, Q, len);
+      mulF(p, s.k, d, d, nA, K, len);
+      mulF(p, s.v, d, d, nA, W, len);
+      for (let hd = 0; hd < H; hd++) {
+        const ho = hd * dh, base = hd * T * T;
+        for (let t = 0; t < len; t++) {
+          const qo = t * d + ho, a = base + t * T;
+          let top = -Infinity;
+          for (let i = 0; i <= t; i++) {
+            const ko = i * d + ho;
+            let v = 0;
+            for (let c = 0; c < dh; c++) v += Q[qo + c] * K[ko + c];
+            v *= scale;
+            scores[i] = v;
+            if (v > top) top = v;
+          }
+          let sum = 0;
+          for (let i = 0; i <= t; i++) { const e = Math.exp(scores[i] - top); att[a + i] = e; sum += e; }
+          for (let c = 0; c < dh; c++) mix[qo + c] = 0;
+          for (let i = 0; i <= t; i++) {
+            const w = att[a + i] /= sum, vo = i * d + ho;
+            for (let c = 0; c < dh; c++) mix[qo + c] += w * W[vo + c];
+          }
+        }
+      }
+      mulF(p, s.o, d, d, mix, u, len);
+      for (let i = 0, n = len * d; i < n; i++) y[i] = x[i] + u[i];
+      normF(y, nB, s.rB, d, len);
+      mulF(p, s.f1, d, f, nB, h, len);
+      for (let t = 0; t < len; t++) for (let j = 0; j < f; j++) h[t * f + j] = Math.tanh(h[t * f + j] + p[s.b1 + j]);
+      mulF(p, s.f2, f, d, h, u, len);
+      for (let t = 0; t < len; t++) for (let c = 0; c < d; c++) z[t * d + c] = y[t * d + c] + u[t * d + c] + p[s.b2 + c];
+    }
+    normF(xs[B], this.nL, this.rL, d, len);
+    mulF(p, this.oHead, d, V, this.nL, this.logits, len);
+    for (let t = 0; t < len; t++) for (let v = 0; v < V; v++) this.logits[t * V + v] += p[this.oBias + v];
+  }
+
+  // Backpropagation for one window: adds its gradient to the running batch.
+  accumulate(ids, start, len) {
+    this.forward(ids, start, len);
+    const { p, g, d, V, B, f, H, T, logits, dLog, xs, oTok, oPos, dX, dY, dN, dMix, dQ, dK, dW, dH, ds } = this;
+    const k = 1 / len;
+    let loss = 0;
+    for (let t = 0; t < len; t++) {
+      const o = t * V, target = ids[start + t + 1];
+      let top = -Infinity, sum = 0;
+      for (let v = 0; v < V; v++) if (logits[o + v] > top) top = logits[o + v];
+      for (let v = 0; v < V; v++) { const e = Math.exp(logits[o + v] - top); dLog[o + v] = e; sum += e; }
+      for (let v = 0; v < V; v++) dLog[o + v] = dLog[o + v] / sum * k;
+      loss -= Math.log(dLog[o + target] / k);
+      dLog[o + target] -= k;
+      for (let v = 0; v < V; v++) g[this.oBias + v] += dLog[o + v];
+    }
+    dN.fill(0); dX.fill(0);
+    mulB(p, g, this.oHead, d, V, this.nL, dLog, dN, len);
+    normB(xs[B], this.rL, dN, dX, d, len);
+
+    const dh = d / H, scale = 1 / Math.sqrt(dh), n = len * d;
+    for (let l = B - 1; l >= 0; l--) {
+      const s = this.blk[l], { nA, Q, K, W, mix, att, y, nB, h } = s;
+      // Feed-forward half, dX holds the gradient of the block's output.
+      dH.fill(0);
+      mulB(p, g, s.f2, f, d, h, dX, dH, len);
+      for (let t = 0; t < len; t++) for (let c = 0; c < d; c++) g[s.b2 + c] += dX[t * d + c];
+      for (let t = 0; t < len; t++) for (let j = 0; j < f; j++) {
+        const i = t * f + j, v = dH[i] * (1 - h[i] * h[i]);
+        dH[i] = v;
+        g[s.b1 + j] += v;
+      }
+      dN.fill(0);
+      mulB(p, g, s.f1, d, f, nB, dH, dN, len);
+      dY.set(dX);
+      normB(y, s.rB, dN, dY, d, len);
+
+      // Attention half, dY holds the gradient of the sum after attention.
+      dMix.fill(0);
+      mulB(p, g, s.o, d, d, mix, dY, dMix, len);
+      dQ.fill(0); dK.fill(0); dW.fill(0);
+      for (let hd = 0; hd < H; hd++) {
+        const ho = hd * dh, base = hd * T * T;
+        for (let t = 0; t < len; t++) {
+          const mo = t * d + ho, a = base + t * T;
+          let dm = 0;
+          for (let c = 0; c < dh; c++) dm += dMix[mo + c] * mix[mo + c];
+          for (let i = 0; i <= t; i++) {
+            const vo = i * d + ho, w = att[a + i];
+            let dv = 0;
+            for (let c = 0; c < dh; c++) { dv += dMix[mo + c] * W[vo + c]; dW[vo + c] += w * dMix[mo + c]; }
+            const e = w * (dv - dm) * scale;
+            for (let c = 0; c < dh; c++) { dQ[mo + c] += e * K[vo + c]; dK[vo + c] += e * Q[mo + c]; }
+          }
+        }
+      }
+      dN.fill(0);
+      mulB(p, g, s.q, d, d, nA, dQ, dN, len);
+      mulB(p, g, s.k, d, d, nA, dK, dN, len);
+      mulB(p, g, s.v, d, d, nA, dW, dN, len);
+      dX.set(dY);
+      normB(xs[l], s.rA, dN, dX, d, len);
+    }
+    for (let t = 0, i = 0; t < len; t++) {
+      const a = oTok + ids[start + t] * d, b = oPos + t * d;
+      for (let c = 0; c < d; c++, i++) { g[a + c] += dX[i]; g[b + c] += dX[i]; }
+    }
+    this.pending++;
+    return loss * k;
+  }
+
+  // Adam, the same update Phyou uses.
+  step(lr) {
+    if (!this.pending) return;
+    const { p, g, m, v } = this;
+    const b1 = 0.9, b2 = 0.999, eps = 1e-8, k = 1 / this.pending;
+    this.t++;
+    const c1 = 1 - Math.pow(b1, this.t), c2 = 1 - Math.pow(b2, this.t);
+    for (let i = 0; i < p.length; i++) {
+      const gi = g[i] * k;
+      m[i] = b1 * m[i] + (1 - b1) * gi;
+      v[i] = b2 * v[i] + (1 - b2) * gi * gi;
+      p[i] -= lr * (m[i] / c1) / (Math.sqrt(v[i] / c2) + eps);
+      g[i] = 0;
+    }
+    this.pending = 0;
+  }
+
+  // Next-letter probabilities after ids, at the given temperature.
+  nextProbs(ids, temp = 1) {
+    const len = ids.length, V = this.V;
+    this.forward(ids, 0, len);
+    const o = (len - 1) * V, out = new Float64Array(V);
+    let top = -Infinity, sum = 0;
+    for (let v = 0; v < V; v++) if (this.logits[o + v] > top) top = this.logits[o + v];
+    for (let v = 0; v < V; v++) { out[v] = Math.exp((this.logits[o + v] - top) / temp); sum += out[v]; }
+    for (let v = 0; v < V; v++) out[v] /= sum;
+    return out;
+  }
+
+  // How much the last letter looked at each earlier letter in the final block, averaged over heads.
+  // Call right after nextProbs on the same ids.
+  lastAttention(len) {
+    const { H, T } = this, att = this.blk[this.B - 1].att, out = new Float64Array(len);
+    for (let hd = 0; hd < H; hd++) {
+      const a = hd * T * T + (len - 1) * T;
+      for (let i = 0; i < len; i++) out[i] += att[a + i] / H;
+    }
+    return out;
+  }
+}
+
+class SerinoModel {
+  constructor(text, cfg, rand) {
+    this.rand = rand;
+    this.corpus = buildCorpus(text);
+    this.gpt = new MiniGPT(cfg, this.corpus.chars.length, rand);
+    this.steps = 0;
+    const { split, ids } = this.corpus, T = cfg.context;
+    const spaced = (from, last) => Array.from({ length: 12 }, (_, i) => from + Math.floor((last - from) * i / 11));
+    this.trainStarts = spaced(0, split - T - 1);
+    this.examStarts = spaced(split, ids.length - T - 1);
+  }
+  get cfg() { return this.gpt.cfg; }
+  get seen() { return this.steps * LLM_BATCH * this.cfg.context; }
+  lr() { return LLM_LR / (1 + this.steps / LLM_LR_HALFLIFE); }
+
+  // One text window; every LLM_BATCH windows make one update.
+  // Windows end before the split, so exam letters are never studied.
+  studyWindow() {
+    const { split, ids } = this.corpus, T = this.cfg.context, last = split - T - 1;
+    const loss = this.gpt.accumulate(ids, Math.floor(this.rand() * (last + 1)), T);
+    if (this.gpt.pending >= LLM_BATCH) {
+      this.gpt.step(this.lr());
+      this.steps++;
+    }
+    return loss;
+  }
+
+  score(starts) {
+    const { gpt } = this, { ids } = this.corpus, T = gpt.T, V = gpt.V;
+    let loss = 0, hit = 0;
+    for (const s of starts) {
+      gpt.forward(ids, s, T);
+      for (let t = 0; t < T; t++) {
+        const o = t * V, y = ids[s + t + 1];
+        let top = 0, sum = 0, best = -Infinity;
+        for (let v = 0; v < V; v++) best = Math.max(best, gpt.logits[o + v]);
+        for (let v = 0; v < V; v++) {
+          const e = Math.exp(gpt.logits[o + v] - best);
+          sum += e;
+          if (gpt.logits[o + v] === best) top = v;
+        }
+        loss -= Math.log(Math.exp(gpt.logits[o + y] - best) / sum);
+        if (top === y) hit++;
+      }
+    }
+    const n = starts.length * T;
+    return { loss: loss / n, hit: hit / n };
+  }
+  evaluate() { return { train: this.score(this.trainStarts), exam: this.score(this.examStarts) }; }
+
+  // Letters the model does not know are dropped, since it has no number for them.
+  encode(text) {
+    const { stoi } = this.corpus, ids = [];
+    let dropped = 0;
+    for (const ch of Array.from(text.toLocaleLowerCase('tr').replace(/\s+/g, ' '))) {
+      if (stoi.has(ch)) ids.push(stoi.get(ch)); else dropped++;
+    }
+    return { ids, dropped };
+  }
+  look(ids) {
+    const use = ids.slice(-this.cfg.context), probs = this.gpt.nextProbs(use);
+    return { use, probs, attention: this.gpt.lastAttention(use.length) };
+  }
+  write(ids, count, temp) {
+    const { chars } = this.corpus, out = ids.length ? ids.slice() : [this.corpus.ids[0]];
+    let text = '';
+    for (let n = 0; n < count; n++) {
+      const probs = this.gpt.nextProbs(out.slice(-this.cfg.context), temp);
+      let r = this.rand(), v = 0;
+      while (v < probs.length - 1 && (r -= probs[v]) > 0) v++;
+      out.push(v);
+      text += chars[v];
+    }
+    return text;
+  }
+
+  toMemory() {
+    const g = this.gpt;
+    return {
+      format: 'serino-memory', version: 1, savedAt: new Date().toISOString(),
+      text: this.corpus.text, cfg: g.cfg, steps: this.steps,
+      weights: Array.from(g.p), adam: { t: g.t, m: Array.from(g.m), v: Array.from(g.v) },
+    };
+  }
+
+  // Validates fully before returning, so a bad file can never damage the current Serino.
+  static fromMemory(mem, rand) {
+    const fail = msg => { throw new Error(msg); };
+    const broken = 'Dosya bozuk ya da başka bir beyin için yazılmış.';
+    if (!mem || mem.format !== 'serino-memory') fail('Bu bir Serino hafıza dosyası değil.');
+    if (mem.version !== 1) fail('Bu dosya başka bir sürümden, okuyamıyorum.');
+    if (!validLLM(mem.cfg) || typeof mem.text !== 'string' || mem.text.length > LLM_MAX_TEXT) fail(broken);
+    const corpus = buildCorpus(mem.text);
+    if (corpus.chars.length > LLM_MAX_VOCAB || !corpusFits(corpus, mem.cfg.context)) fail(broken);
+    const s = new SerinoModel(mem.text, mem.cfg, rand), g = s.gpt;
+    const good = a => Array.isArray(a) && a.length === g.p.length && a.every(Number.isFinite);
+    if (!good(mem.weights) || !mem.adam || !good(mem.adam.m) || !good(mem.adam.v)) fail(broken);
+    if (!mem.adam.v.every(x => x >= 0)) fail(broken);
+    if (!Number.isInteger(mem.adam.t) || mem.adam.t < 0) fail(broken);
+    if (!Number.isInteger(mem.steps) || mem.steps < 0) fail(broken);
+    g.p.set(mem.weights); g.m.set(mem.adam.m); g.v.set(mem.adam.v);
+    g.t = mem.adam.t;
+    s.steps = mem.steps;
+    return s;
+  }
+}
+</script>
+
+<script id="ui">
+'use strict';
+const $ = id => document.getElementById(id);
+const SPEEDS = [
+  { v: 10, label: '10/sn' }, { v: 100, label: '100/sn' }, { v: 1000, label: '1 bin/sn' },
+  { v: 10000, label: '10 bin/sn' }, { v: Infinity, label: 'En hızlı' },
+];
+const MOODS = {
+  fresh: { text: 'Yeni doğmuş', mouth: 'M92 136 q8 8 16 0', brow: [0, 0], fill: false,
+    say: 'Merhaba, ben Phyou! Daha hiçbir şey bilmiyorum. Bana bir şey öğretir misin?' },
+  lost: { text: 'Kafası karışık', mouth: 'M82 136 q9 -9 18 0 t18 0', brow: [-12, 12], fill: false,
+    say: 'Sayılar uçuşuyor, ipucu arıyorum.' },
+  think: { text: 'Düşünüyor', mouth: 'M86 136 L114 132', brow: [8, -6], fill: false,
+    say: 'Bazı kalıplar görmeye başladım.' },
+  keen: { text: 'Hevesli', mouth: 'M82 128 q18 18 36 0', brow: [0, 0], fill: false,
+    say: 'Çoğunu tutturuyorum, biraz daha çalışayım!' },
+  proud: { text: 'Özgüvenli', mouth: 'M78 124 q22 34 44 0 z', brow: [-6, 6], fill: true,
+    say: 'Hiç görmediğim soruları bile çözüyorum!' },
+  cram: { text: 'Ezberliyor', mouth: 'M82 136 l9 -6 l9 6 l9 -6 l9 6', brow: [-14, 14], fill: false,
+    say: 'Gördüğüm soruları biliyorum ama yenilerinde zorlanıyorum. Sanırım ezberliyorum.' },
+};
+
+let student, stats, history, recGap, learned;
+let running = false, speedIdx = 3, carry = 0, lastT = 0, lastRefresh = 0, rate = 0, rateT = 0, rateSeen = 0;
+let opChoice = 2, current = null, sayHold = 0, afterRefresh = null;
+const tokens = {};
+const num1 = v => v.toLocaleString('tr-TR', { minimumFractionDigits: 1, maximumFractionDigits: 1 });
+const pct = v => '%' + Math.round(v * 100);
+function big(n) {
+  if (n < 1000) return String(n);
+  if (n < 1e6) return (n / 1e3).toLocaleString('tr-TR', { maximumFractionDigits: 1 }) + ' bin';
+  return (n / 1e6).toLocaleString('tr-TR', { maximumFractionDigits: 2 }) + ' mn';
+}
+
+function readTokens() {
+  const cs = getComputedStyle(document.documentElement);
+  const get = n => cs.getPropertyValue(n).trim();
+  Object.assign(tokens, {
+    ops: [0, 1, 2, 3].map(i => get('--op' + i)), grid: get('--grid'), axis: get('--axis'),
+    muted: get('--muted'), ink: get('--ink'), surface: get('--surface'),
+    lo: hexRgb(get('--heat-lo')), hi: hexRgb(get('--heat-hi')),
+  });
+}
+function hexRgb(h) { return [1, 3, 5].map(i => parseInt(h.slice(i, i + 2), 16)); }
+
+/* ---------- build static parts ---------- */
+function buildUI() {
+  $('speeds').innerHTML = SPEEDS.map((s, i) => `<button type="button" data-i="${i}">${s.label}</button>`).join('');
+  $('opPick').innerHTML = OPS.map((o, i) => `<button type="button" data-i="${i}" aria-label="${o.name}">${o.sym}</button>`).join('');
+  $('report').innerHTML = OPS.map((o, i) =>
+    `<tr><td><span class="swatch" style="background:var(--op${i})"></span>${o.name}</td>` +
+    `<td id="rTrA${i}"></td><td id="rTeA${i}"></td><td id="rTrE${i}"></td><td id="rTeE${i}"></td></tr>`).join('');
+  $('chartLegend').innerHTML = OPS.map((o, i) =>
+    `<span class="item"><span class="swatch" style="background:var(--op${i});margin:0"></span>${o.sym} ${o.name}</span>`).join('');
+  let html = '';
+  OPS.forEach((o, op) => {
+    html += `<div class="heat"><h3>${o.sym} ${o.name}</h3><div class="hgrid" data-op="${op}"><span></span>`;
+    for (let b = 0; b < 10; b++) html += `<span class="hlab">${b}</span>`;
+    for (let a = 0; a < 10; a++) {
+      html += `<span class="hlab">${a}</span>`;
+      for (let b = 0; b < 10; b++) html += `<div class="cell" id="c${op}-${a}-${b}" data-op="${op}" data-a="${a}" data-b="${b}"></div>`;
+    }
+    html += '</div></div>';
+  });
+  $('heats').innerHTML = html;
+  [['inLayers', 'layers'], ['inNeurons', 'neurons']].forEach(([id, k]) => {
+    [$(id).min, $(id).max] = NET_LIMITS[k];
+  });
+  $('netDefault').textContent = `Varsayılana dön (${NET_DEFAULT.layers} ara katman, ${NET_DEFAULT.neurons} nöron)`;
+  markSpeed();
+  markOp();
+}
+function markSpeed() {
+  [...$('speeds').children].forEach((b, i) => b.setAttribute('aria-pressed', i === speedIdx));
+}
+function markOp() {
+  [...$('opPick').children].forEach((b, i) => b.setAttribute('aria-pressed', i === opChoice));
+  $('opShow').textContent = OPS[opChoice].sym;
+}
+
+/* ---------- state ---------- */
+function reset(next, past) {
+  setRunning(false);
+  student = next || new Student(Math.random, student && student.shape);
+  history = past || []; recGap = 0; learned = OPS.map(() => false);
+  current = null; sayHold = 0;
+  $('answerForm').hidden = true;
+  setNote('');
+  showNet();
+  $('ticker').textContent = 'Otomatik öğretmen bekliyor.';
+  OPS.forEach((_, op) => {
+    for (let a = 0; a < 10; a++) for (let b = 0; b < 10; b++) {
+      const el = $(`c${op}-${a}-${b}`), it = student.data.grid[op][a][b];
+      el.className = 'cell' + (it ? (it.test ? ' test' : '') : ' none');
+      el.style.background = '';
+      el.dataset.tone = '';
+    }
+  });
+  refresh(true);
+}
+function setRunning(on) {
+  running = on;
+  $('autoBtn').textContent = on ? 'Otomatik öğretmeni durdur' : 'Otomatik öğretmeni başlat';
+  $('phyou').classList.toggle('busy', on);
+  carry = 0;
+  if (on) {
+    lastT = rateT = performance.now();
+    rateSeen = student.seen;
+    requestAnimationFrame(loop);
+  }
+}
+function record() {
+  const seen = student.seen, tail = history[history.length - 1];
+  if (tail && seen - tail.seen < recGap) return;
+  history.push({ seen, train: stats.train.mae.slice(), test: stats.test.mae.slice() });
+  if (history.length > 420) {
+    history = history.filter((_, i) => i % 2 === 0);
+    recGap = Math.max(1, (history[history.length - 1].seen - history[0].seen) / 210);
+  }
+}
+
+/* ---------- training loop ---------- */
+function loop(t) {
+  if (!running) return;
+  const dt = Math.max(0, Math.min(0.1, (t - lastT) / 1000));
+  lastT = t;
+  const speed = SPEEDS[speedIdx].v;
+  carry = speed === Infinity ? 4000 : Math.min(4000, carry + speed * dt);
+  const start = performance.now(), budget = 12;
+  while (carry >= 1) {
+    student.studyOne();
+    carry--;
+    if ((student.seen & 63) === 0 && performance.now() - start > budget) { carry = 0; break; }
+  }
+  if (t - lastRefresh > 200) { lastRefresh = t; refresh(); }
+  requestAnimationFrame(loop);
+}
+
+/* ---------- rendering ---------- */
+function refresh(force) {
+  stats = student.evaluate();
+  record();
+  $('sSeen').textContent = big(student.seen);
+  $('sTrain').textContent = pct(stats.train.meanAcc);
+  $('sTest').textContent = pct(stats.test.meanAcc);
+  OPS.forEach((_, i) => {
+    $('rTrA' + i).textContent = pct(stats.train.acc[i]);
+    $('rTeA' + i).textContent = pct(stats.test.acc[i]);
+    $('rTrE' + i).textContent = num1(stats.train.mae[i]);
+    $('rTeE' + i).textContent = num1(stats.test.mae[i]);
+  });
+  if (running && student.last) {
+    const { item, pred } = student.last, now = performance.now();
+    if (now > rateT) rate = (student.seen - rateSeen) / (now - rateT) * 1000;
+    rateT = now; rateSeen = student.seen;
+    $('ticker').textContent = `Şu an: ${item.a} ${OPS[item.op].sym} ${item.b} = ${item.y}, Phyou ${num1(pred)} dedi · saniyede ${big(Math.round(rate))} soru`;
+  } else if (student.seen) {
+    $('ticker').textContent = 'Otomatik öğretmen durdu.';
+  }
+  paintHeat();
+  drawChart($('chartTrain'), 'train');
+  drawChart($('chartTest'), 'test');
+  updateMood(force);
+  if (afterRefresh) afterRefresh();
+}
+function paintHeat() {
+  const { lo, hi } = tokens;
+  OPS.forEach((_, op) => {
+    for (let a = 0; a < 10; a++) for (let b = 0; b < 10; b++) {
+      const it = student.data.grid[op][a][b];
+      if (!it) continue;
+      const el = $(`c${op}-${a}-${b}`);
+      const ok = Math.round(it.pred) === it.y;
+      const tone = ok ? -1 : Math.round(16 * Math.min(1, Math.log(Math.max(it.err, 0.5) / 0.5) / Math.log(40)));
+      if (el.dataset.tone === String(tone)) continue;
+      el.dataset.tone = tone;
+      el.classList.toggle('ok', ok);
+      if (ok) { el.style.background = ''; continue; }
+      const k = tone / 16;
+      el.style.background = `rgb(${lo.map((v, i) => Math.round(v + (hi[i] - v) * k)).join(',')})`;
+    }
+  });
+}
+function say(text, holdMs) {
+  $('speech').textContent = text;
+  sayHold = holdMs ? performance.now() + holdMs : sayHold;
+}
+function updateMood() {
+  const trainAcc = stats.train.meanAcc, testAcc = stats.test.meanAcc;
+  let key;
+  if (!student.seen) key = 'fresh';
+  else if (trainAcc > 0.5 && trainAcc - testAcc >= 0.25) key = 'cram';
+  else if (testAcc < 0.15) key = 'lost';
+  else if (testAcc < 0.5) key = 'think';
+  else if (testAcc < 0.9) key = 'keen';
+  else key = 'proud';
+  const m = MOODS[key];
+  $('mouth').setAttribute('d', m.mouth);
+  $('phyou').classList.toggle('mouth-fill', m.fill);
+  $('browL').style.transform = `rotate(${m.brow[0]}deg)`;
+  $('browR').style.transform = `rotate(${m.brow[1]}deg)`;
+  $('moodText').textContent = 'Phyou şu an: ' + m.text;
+  OPS.forEach((o, i) => {
+    if (!learned[i] && stats.test.acc[i] >= 0.9 && stats.train.acc[i] >= 0.9) {
+      learned[i] = true;
+      say(`${o.did} kavradım! Sınav sorularında bile %${Math.round(stats.test.acc[i] * 100)} doğru.`, 4000);
+    }
+  });
+  if (performance.now() >= sayHold) say(m.say);
+}
+
+function drawChart(cv, key, hoverIdx) {
+  const box = cv.getBoundingClientRect();
+  if (!box.width) return;
+  const dpr = window.devicePixelRatio || 1;
+  const W = box.width, H = box.height;
+  if (cv.width !== Math.round(W * dpr)) { cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr); }
+  const c = cv.getContext('2d');
+  c.setTransform(dpr, 0, 0, dpr, 0, 0);
+  c.clearRect(0, 0, W, H);
+  const P = { l: 30, r: 20, t: 8, b: 22 }, yMin = 0.1, yMax = 50;
+  const lo = Math.log10(yMin), hi = Math.log10(yMax);
+  const X0 = P.l, X1 = W - P.r, Y0 = H - P.b, Y1 = P.t;
+  const xMax = Math.max(history.length ? history[history.length - 1].seen : 0, 100);
+  const sx = v => X0 + (X1 - X0) * v / xMax;
+  const sy = v => Y0 - (Y0 - Y1) * (Math.log10(Math.max(yMin, Math.min(yMax, v))) - lo) / (hi - lo);
+  c.font = '11px system-ui, "Segoe UI", sans-serif';
+  c.lineWidth = 1;
+  c.fillStyle = tokens.muted;
+  c.textBaseline = 'middle';
+  c.textAlign = 'right';
+  for (const v of [0.1, 1, 10]) {
+    c.strokeStyle = v === 0.1 ? tokens.axis : tokens.grid;
+    c.beginPath(); c.moveTo(X0, Math.round(sy(v)) + .5); c.lineTo(X1, Math.round(sy(v)) + .5); c.stroke();
+    c.fillText(String(v).replace('.', ','), X0 - 6, sy(v));
+  }
+  c.textBaseline = 'top';
+  c.textAlign = 'center';
+  const mag = Math.pow(10, Math.floor(Math.log10(xMax / 3)));
+  const step = [1, 2, 5, 10].map(m => m * mag).find(s => xMax / s <= 4);
+  for (let v = 0; v <= xMax; v += step) c.fillText(big(v), sx(v), Y0 + 6);
+  if (history.length < 2) {
+    c.textBaseline = 'middle';
+    c.fillText('Phyou çalışmaya başlayınca çizgiler burada belirir', (X0 + X1) / 2, (Y0 + Y1) / 2);
+    return;
+  }
+  c.lineWidth = 2; c.lineJoin = 'round'; c.lineCap = 'round';
+  OPS.forEach((_, op) => {
+    c.strokeStyle = tokens.ops[op];
+    c.beginPath();
+    history.forEach((h, i) => { const x = sx(h.seen), y = sy(h[key][op]); i ? c.lineTo(x, y) : c.moveTo(x, y); });
+    c.stroke();
+  });
+  // Direct labels at line ends, nudged apart so they never overlap.
+  const tail = history[history.length - 1];
+  const ends = OPS.map((o, op) => ({ sym: o.sym, y: sy(tail[key][op]) })).sort((a, b) => a.y - b.y);
+  for (let i = 1; i < ends.length; i++) ends[i].y = Math.max(ends[i].y, ends[i - 1].y + 12);
+  c.fillStyle = tokens.ink; c.textAlign = 'left'; c.textBaseline = 'middle';
+  c.font = '600 12px system-ui, "Segoe UI", sans-serif';
+  ends.forEach(e => c.fillText(e.sym, X1 + 5, Math.min(e.y, Y0 - 2)));
+  if (hoverIdx != null) {
+    const h = history[hoverIdx], x = sx(h.seen);
+    c.strokeStyle = tokens.axis; c.lineWidth = 1;
+    c.beginPath(); c.moveTo(x, Y1); c.lineTo(x, Y0); c.stroke();
+    OPS.forEach((_, op) => {
+      c.beginPath(); c.arc(x, sy(h[key][op]), 4, 0, 7);
+      c.fillStyle = tokens.ops[op]; c.fill();
+      c.lineWidth = 2; c.strokeStyle = tokens.surface; c.stroke();
+    });
+  }
+}
+
+/* ---------- tooltips ---------- */
+function showTip(html, x, y) {
+  const t = $('tip');
+  t.innerHTML = html;
+  t.style.display = 'block';
+  const r = t.getBoundingClientRect();
+  t.style.left = Math.max(8, Math.min(innerWidth - r.width - 8, x + 14)) + 'px';
+  t.style.top = Math.max(8, Math.min(innerHeight - r.height - 8, y + 14)) + 'px';
+}
+function hideTip() { $('tip').style.display = 'none'; }
+function hookChart(cv, key) {
+  cv.addEventListener('mousemove', e => {
+    if (history.length < 2) return;
+    const r = cv.getBoundingClientRect();
+    const xMax = Math.max(history[history.length - 1].seen, 100);
+    const target = (e.clientX - r.left - 30) / (r.width - 50) * xMax;
+    let idx = 0;
+    history.forEach((h, i) => { if (Math.abs(h.seen - target) < Math.abs(history[idx].seen - target)) idx = i; });
+    drawChart(cv, key, idx);
+    const h = history[idx];
+    showTip(`<b>${big(h.seen)} soru sonra</b>` + OPS.map((o, i) =>
+      `<div class="row"><span><span class="swatch" style="background:var(--op${i})"></span>${o.name}</span><span>${num1(h[key][i])}</span></div>`).join(''), e.clientX, e.clientY);
+  });
+  cv.addEventListener('mouseleave', () => { hideTip(); drawChart(cv, key); });
+}
+
+/* ---------- lesson flow ---------- */
+function setNote(text, warn) {
+  $('lessonNote').textContent = text;
+  $('lessonNote').classList.toggle('warn', !!warn);
+}
+function ask(a, op, b) {
+  const q = `${a} ${OPS[op].sym} ${b}`;
+  const valid = [a, b].every(n => Number.isInteger(n) && n >= 0 && n <= 9);
+  if (!valid) { setNote('Phyou şimdilik yalnızca 0 ile 9 arasındaki tam sayıları biliyor.', true); return; }
+  const item = student.data.grid[op][a][b];
+  $('answerForm').hidden = true;
+  current = null;
+  if (!item) {
+    setNote(b === 0 ? 'Sıfıra bölme tanımsız, bunu öğretemeyiz.' : 'Bölmede yalnızca sonucu tam sayı olan sorular var.', true);
+    return;
+  }
+  const pred = student.predict(item);
+  say(`${q} mü? Sanırım ${Math.round(pred)}.`, 8000);
+  if (item.test) {
+    setNote(`Bu bir sınav sorusu, gerçek cevabı ${item.y}. Sınav dürüst kalsın diye Phyou bunun üzerinde çalışmaz. Ham tahmin: ${num1(pred)}.`);
+    return;
+  }
+  current = item;
+  $('answerForm').hidden = false;
+  $('inAns').value = '';
+  $('inAns').focus();
+  setNote(`Ham tahmin: ${num1(pred)}. Cevabı yuvarlayıp söyledi.`);
+}
+function teach(label) {
+  const item = current;
+  if (!item) return;
+  const before = student.predict(item);
+  student.lesson(item, label);
+  const after = student.predict(item);
+  const q = `${item.a} ${OPS[item.op].sym} ${item.b}`;
+  $('answerForm').hidden = true;
+  current = null;
+  refresh();
+  if (label === item.y) {
+    setNote(`${q} üzerinde ${LESSON_REPEATS} tekrar yaptı: ${num1(before)} → ${num1(after)}. Diğer sorular da bundan etkilendi, haritaya bak.`);
+    say(Math.round(after) === item.y ? `Tamam, ${q} = ${item.y}. Aklımda!` : `Yaklaştım ama henüz oturmadı.`, 4000);
+  } else {
+    setNote(`Dikkat: gerçek cevap ${item.y}, sen ${label} dedin. Phyou öğretmenine inanır: ${num1(before)} → ${num1(after)}.`, true);
+    say(`Tamam, ${q} = ${label}. Sana güveniyorum.`, 4000);
+  }
+}
+
+/* ---------- network shape ---------- */
+function setNetNote(text, warn) {
+  $('netNote').textContent = text;
+  $('netNote').classList.toggle('warn', !!warn);
+}
+function showNet() {
+  const { brain, shape } = student;
+  $('inLayers').value = shape.layers;
+  $('inNeurons').value = shape.neurons;
+  setNetNote(`Şu anki beyin: ${brain.sizes.join('-')}, ${brain.p.length.toLocaleString('tr-TR')} ağırlık.`);
+}
+function applyNet(shape) {
+  if (!validShape(shape)) {
+    const { layers: l, neurons: n } = NET_LIMITS;
+    setNetNote(`Ara katman ${l[0]} ile ${l[1]}, nöron ${n[0]} ile ${n[1]} arasında tam sayı olmalı.`, true);
+    return;
+  }
+  const same = netSizes(shape).join() === student.brain.sizes.join();
+  if (same || (student.seen && !confirm('Yeni beyin için Phyou öğrendiği her şeyi unutacak. Devam edilsin mi?'))) {
+    showNet();
+    return;
+  }
+  reset(new Student(Math.random, shape));
+}
+
+/* ---------- memory file ---------- */
+function setMemNote(text, warn) {
+  $('memNote').textContent = text;
+  $('memNote').classList.toggle('warn', !!warn);
+}
+function exportMemory() {
+  const text = JSON.stringify({ ...student.toMemory(), history });
+  const url = URL.createObjectURL(new Blob([text], { type: 'application/json' }));
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = `phyou-hafiza-${new Date().toISOString().slice(0, 10)}.json`;
+  link.click();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+  setMemNote(`Hafıza indirildi (${Math.round(text.length / 1024)} KB, ${big(student.seen)} soru sonrası).`);
+}
+async function importMemory(file) {
+  let mem, next;
+  try {
+    if (file.size > 5 * 1024 * 1024) throw new Error('Bu dosya bir Phyou hafızası için fazla büyük.');
+    try { mem = JSON.parse(await file.text()); } catch { throw new Error('Bu dosya okunamadı.'); }
+    next = Student.fromMemory(mem, Math.random);
+  } catch (err) {
+    setMemNote(err.message, true);
+    return;
+  }
+  if (student.seen && !confirm('Phyou\'nun şu anki hafızası silinip dosyadaki yüklenecek. Devam edilsin mi?')) return;
+  const validPoint = h => h && Number.isFinite(h.seen) &&
+    [h.train, h.test].every(a => Array.isArray(a) && a.length === 4 && a.every(Number.isFinite));
+  const past = Array.isArray(mem.history) && mem.history.every(validPoint) ? mem.history : [];
+  reset(next, past);
+  say(`Hafızam geri geldi! ${big(student.seen)} soruluk deneyimle devam ediyorum.`, 5000);
+  setMemNote(`Hafıza yüklendi. Sınav başarısı: ${pct(stats.test.meanAcc)}.`);
+}
+
+/* ---------- events ---------- */
+$('netForm').addEventListener('submit', e => {
+  e.preventDefault();
+  applyNet({ layers: +$('inLayers').value, neurons: +$('inNeurons').value });
+});
+$('netDefault').addEventListener('click', () => applyNet(NET_DEFAULT));
+$('memSave').addEventListener('click', exportMemory);
+$('memLoad').addEventListener('click', () => $('memFile').click());
+$('memFile').addEventListener('change', e => {
+  const file = e.target.files[0];
+  e.target.value = '';
+  if (file) importMemory(file);
+});
+$('autoBtn').addEventListener('click', () => setRunning(!running));
+$('resetBtn').addEventListener('click', () => {
+  if (confirm('Phyou öğrendiği her şeyi unutacak. Sıfırlansın mı?')) reset();
+});
+$('speeds').addEventListener('click', e => {
+  const i = e.target.dataset.i;
+  if (i === undefined) return;
+  speedIdx = +i; carry = 0; markSpeed();
+});
+$('opPick').addEventListener('click', e => {
+  const i = e.target.dataset.i;
+  if (i === undefined) return;
+  opChoice = +i; markOp();
+});
+$('askForm').addEventListener('submit', e => {
+  e.preventDefault();
+  ask(+$('inA').value, opChoice, +$('inB').value);
+});
+$('answerForm').addEventListener('submit', e => {
+  e.preventDefault();
+  teach(+$('inAns').value);
+});
+$('randBtn').addEventListener('click', () => {
+  const list = student.data.train[Math.floor(Math.random() * OPS.length)];
+  const it = list[Math.floor(Math.random() * list.length)];
+  loadQuestion(it);
+});
+function loadQuestion(it) {
+  $('inA').value = it.a; $('inB').value = it.b;
+  opChoice = it.op; markOp();
+  ask(it.a, it.op, it.b);
+}
+$('heats').addEventListener('click', e => {
+  const d = e.target.dataset;
+  if (!e.target.classList.contains('cell')) return;
+  const it = student.data.grid[+d.op][+d.a][+d.b];
+  if (it) { loadQuestion(it); hideTip(); }
+});
+$('heats').addEventListener('mousemove', e => {
+  const d = e.target.dataset;
+  const it = e.target.classList.contains('cell') ? student.data.grid[+d.op][+d.a][+d.b] : null;
+  if (!it) { hideTip(); return; }
+  showTip(`<b>${it.a} ${OPS[it.op].sym} ${it.b} = ${it.y}</b><div>Phyou: ${num1(it.pred)}</div><div>Hata: ${num1(it.err)}</div><div>${it.test ? 'Sınav sorusu' : 'Çalışma sorusu'}</div>`, e.clientX, e.clientY);
+});
+$('heats').addEventListener('mouseleave', hideTip);
+hookChart($('chartTrain'), 'train');
+hookChart($('chartTest'), 'test');
+window.addEventListener('resize', () => { if (stats) { drawChart($('chartTrain'), 'train'); drawChart($('chartTest'), 'test'); } });
+
+/* ---------- theme ---------- */
+const savedTheme = () => { try { return localStorage.getItem('wicofia-theme'); } catch { return null; } };
+function setTheme(theme, keep) {
+  document.documentElement.dataset.theme = theme;
+  document.querySelector('meta[name="theme-color"]').content = theme === 'dark' ? '#0d0d0d' : '#f9f9f7';
+  if (keep) { try { localStorage.setItem('wicofia-theme', theme); } catch {} }
+  [...$('theme').children].forEach(b => b.setAttribute('aria-pressed', b.dataset.theme === theme));
+  readTokens();
+  document.querySelectorAll('.cell').forEach(el => { el.dataset.tone = ''; });
+  if (stats) refresh();
+  window.dispatchEvent(new Event('wicofia-theme'));
+}
+$('theme').addEventListener('click', e => { if (e.target.dataset.theme) setTheme(e.target.dataset.theme, true); });
+// The system setting applies only until the user picks a theme.
+matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
+  if (!savedTheme()) setTheme(e.matches ? 'dark' : 'light');
+});
+
+readTokens();
+buildUI();
+reset();
+setTheme(document.documentElement.dataset.theme);
+</script>
+
+<!-- Serino's screen: training loop, writing, attention view, charts. -->
+<script id="serino-ui">
+'use strict';
+const SMOODS = {
+  fresh: { text: 'Yeni doğmuş', mouth: 'M92 140 q8 8 16 0', brow: [0, 0], fill: false,
+    say: 'Merhaba, ben Serino! Daha tek harf okumadım. Bana okumayı başlatır mısın?' },
+  lost: { text: 'Harf çorbası', mouth: 'M82 140 q9 -9 18 0 t18 0', brow: [-12, 12], fill: false,
+    say: 'Harfler karışık geliyor, hangisi hangisinden sonra gelir bilmiyorum.' },
+  think: { text: 'Kelime arıyor', mouth: 'M86 140 L114 136', brow: [8, -6], fill: false,
+    say: 'Boşluktan sonra ne geldiğini, bazı harflerin yan yana durduğunu fark ettim.' },
+  keen: { text: 'Hevesli', mouth: 'M82 132 q18 18 36 0', brow: [0, 0], fill: false,
+    say: 'Kelimeler çıkmaya başladı, cümleleri de deniyorum!' },
+  proud: { text: 'Özgüvenli', mouth: 'M78 128 q22 34 44 0 z', brow: [-6, 6], fill: true,
+    say: 'Hiç okumadığım metnin bile sıradaki harfini çoğu zaman tutturuyorum!' },
+  cram: { text: 'Ezberliyor', mouth: 'M82 140 l9 -6 l9 6 l9 -6 l9 6', brow: [-14, 14], fill: false,
+    say: 'Okuduğum metni çok iyi biliyorum ama yeni metinde zorlanıyorum. Sanırım ezberliyorum.' },
+};
+const SERINO_SAMPLE = 'bugün ';
+let serino = null, sStats = null, sHist = [], sSnaps = [], sRun = false, sGap = 0;
+let sDrawn = 0, sNextSnap = 0, sRate = 0, sRateT = 0, sRateN = 0, sSayHold = 0, whoNow = 'home';
+
+const tr3 = v => v.toLocaleString('tr-TR', { minimumFractionDigits: 3, maximumFractionDigits: 3 });
+const tr2 = v => v.toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+const sNote = (id, text, warn) => { $(id).textContent = text; $(id).classList.toggle('warn', !!warn); };
+const sCount = n => n.toLocaleString('tr-TR');
+const stepsToNext = s => (s < 20 ? 20 : s * 2);
+
+/* ---------- switching characters ---------- */
+const WHO = {
+  home: { title: 'Wicofia', sub: 'İki küçük karakterle yapay zekâ nasıl öğrenir?' },
+  phyou: { title: 'Phyou · Wicofia', sub: 'Phyou: dört işlemi senden öğrenen küçük bir sinir ağı' },
+  serino: { title: 'Serino · Wicofia', sub: 'Serino: metin okuyarak yazmayı öğrenen küçük bir dil modeli' },
+};
+function setWho(who) {
+  const isP = who === 'phyou', isS = who === 'serino', isH = who === 'home';
+  whoNow = who;
+  document.body.dataset.who = who;
+  if (!isP) setRunning(false);
+  if (!isS) sSetRun(false);
+  if (isS && !serino) serinoReset(new SerinoModel(cleanText(defaultText()), LLM_DEFAULT, Math.random));
+  $('homeMode').hidden = !isH; $('homeBtn').hidden = isH;
+  $('phyouMode').hidden = !isP; $('phyouCtl').hidden = !isP;
+  $('serinoMode').hidden = !isS; $('serinoCtl').hidden = !isS;
+  $('brandSub').textContent = WHO[who].sub;
+  document.title = WHO[who].title;
+  window.scrollTo(0, 0);
+  if (isS) sRefresh(); else if (isP) refresh(); else showHome();
+}
+// The cards report real progress, so coming back home shows what each character has learned.
+function showHome() {
+  $('homeNowP').textContent = student.seen
+    ? `${big(student.seen)} soru çözdü, sınav başarısı ${pct(stats.test.meanAcc)}` : 'Henüz ders almadı.';
+  $('homeNowS').textContent = serino && serino.steps
+    ? `${sCount(serino.steps)} güncelleme yaptı, sınav kaybı ${tr2(sStats.exam.loss)}` : 'Henüz okumaya başlamadı.';
+}
+const route = () => { const h = location.hash.slice(1); return h === 'phyou' || h === 'serino' ? h : 'home'; };
+window.addEventListener('hashchange', () => { if (route() !== whoNow) setWho(route()); });
+
+/* ---------- state ---------- */
+function serinoReset(next, past = [], notes = []) {
+  sSetRun(false);
+  serino = next; sHist = past; sSnaps = notes; sGap = 0; sSayHold = 0; sStats = null;
+  sNextSnap = sSnaps.length ? stepsToNext(sSnaps[sSnaps.length - 1].steps) : 0;
+  sShowNet();
+  sNote('sTextNote', sTextLine());
+  $('sOut').textContent = '';
+  sNote('sWriteNote', '');
+  $('sTicker').textContent = serino.steps ? 'Serino durdu.' : 'Serino okumayı bekliyor.';
+  sRefresh();
+}
+function sTextLine() {
+  const c = serino.corpus;
+  return `Metin: ${sCount(c.ids.length)} harf, ${c.chars.length} farklı karakter. Son ${sCount(c.ids.length - c.split)} harf sınav için ayrıldı.`;
+}
+function sSetRun(on) {
+  sRun = on;
+  $('sAuto').textContent = on ? 'Okumayı durdur' : 'Okumaya başlat';
+  $('serino').classList.toggle('busy', on);
+  if (on) {
+    sRateT = performance.now(); sRateN = serino.steps;
+    $('sTicker').textContent = 'Serino okuyor.';
+    requestAnimationFrame(sLoop);
+  } else if (serino && serino.steps) {
+    $('sTicker').textContent = 'Serino durdu.';
+  }
+}
+
+/* ---------- training loop ---------- */
+function sLoop() {
+  if (!sRun) return;
+  const start = performance.now();
+  // The window cap matters: without it the loop never ends if the clock stalls.
+  for (let i = 0; i < LLM_BATCH && performance.now() - start < 14; i++) serino.studyWindow();
+  if (start - sDrawn > 1500) sRefresh();
+  requestAnimationFrame(sLoop);
+}
+
+/* ---------- rendering ---------- */
+function sRefresh() {
+  sDrawn = performance.now();
+  sStats = serino.evaluate();
+  const { train, exam } = sStats, V = serino.gpt.V;
+  const tail = sHist[sHist.length - 1];
+  if (!tail || serino.steps - tail.steps >= Math.max(1, sGap)) {
+    sHist.push({ steps: serino.steps, train: train.loss, exam: exam.loss });
+    if (sHist.length > 420) {
+      sHist = sHist.filter((_, i) => i % 2 === 0);
+      sGap = (sHist[sHist.length - 1].steps - sHist[0].steps) / 210;
+    }
+  }
+  if (serino.steps >= sNextSnap) {
+    sSnaps.push({ steps: serino.steps, exam: exam.loss, text: serino.write(serino.encode(SERINO_SAMPLE).ids, 90, 0.8) });
+    sNextSnap = stepsToNext(serino.steps);
+  }
+  $('sReadN').textContent = big(serino.seen);
+  $('sTrainLoss').textContent = tr2(train.loss);
+  $('sExamLoss').textContent = tr2(exam.loss);
+  $('sRTL').textContent = tr3(train.loss); $('sRTH').textContent = pct(train.hit);
+  $('sREL').textContent = tr3(exam.loss); $('sREH').textContent = pct(exam.hit);
+  $('sRRL').textContent = tr3(Math.log(V)); $('sRRH').textContent = pct(1 / V);
+  if (sRun) {
+    const now = performance.now();
+    if (now - sRateT > 400) { sRate = (serino.steps - sRateN) / (now - sRateT) * 1000; sRateT = now; sRateN = serino.steps; }
+    $('sTicker').textContent = `${sCount(serino.steps)} güncelleme · saniyede ${tr2(sRate)} güncelleme · adım boyu ${serino.lr().toLocaleString('tr-TR', { maximumFractionDigits: 5 })}`;
+  }
+  sDrawChart();
+  sDrawSnaps();
+  sDrawLook();
+  sMood();
+  bookRefresh();
+}
+function sSay(text, hold) {
+  $('sSpeech').textContent = text;
+  sSayHold = hold ? performance.now() + hold : sSayHold;
+}
+function sMood() {
+  const { train, exam } = sStats, r = exam.loss / Math.log(serino.gpt.V);
+  let key;
+  if (!serino.steps) key = 'fresh';
+  else if (train.hit > 0.5 && exam.loss - train.loss >= 0.4) key = 'cram';
+  else if (r > 0.7) key = 'lost';
+  else if (r > 0.4) key = 'think';
+  else if (r > 0.2) key = 'keen';
+  else key = 'proud';
+  const m = SMOODS[key];
+  $('sMouth').setAttribute('d', m.mouth);
+  $('serino').classList.toggle('mouth-fill', m.fill);
+  $('sBrowL').style.transform = `rotate(${m.brow[0]}deg)`;
+  $('sBrowR').style.transform = `rotate(${m.brow[1]}deg)`;
+  $('sMoodText').textContent = 'Serino şu an: ' + m.text;
+  if (performance.now() >= sSayHold) sSay(m.say);
+}
+function sDrawChart() {
+  const cv = $('sChart'), box = cv.getBoundingClientRect();
+  if (!box.width) return;
+  const dpr = window.devicePixelRatio || 1, W = box.width, H = box.height;
+  if (cv.width !== Math.round(W * dpr)) { cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr); }
+  const c = cv.getContext('2d'), cs = getComputedStyle(document.body);
+  c.setTransform(dpr, 0, 0, dpr, 0, 0);
+  c.clearRect(0, 0, W, H);
+  const P = { l: 30, r: 70, t: 8, b: 22 }, X0 = P.l, X1 = W - P.r, Y0 = H - P.b, Y1 = P.t;
+  const chance = Math.log(serino.gpt.V), yMax = Math.ceil(chance + 0.2);
+  const xMax = Math.max(sHist.length ? sHist[sHist.length - 1].steps : 0, 100);
+  const sx = v => X0 + (X1 - X0) * v / xMax, sy = v => Y0 - (Y0 - Y1) * Math.min(v, yMax) / yMax;
+  c.font = '11px system-ui, "Segoe UI", sans-serif';
+  c.fillStyle = tokens.muted; c.textAlign = 'right'; c.textBaseline = 'middle'; c.lineWidth = 1;
+  for (let v = 0; v <= yMax; v++) {
+    c.strokeStyle = v ? tokens.grid : tokens.axis;
+    c.beginPath(); c.moveTo(X0, Math.round(sy(v)) + .5); c.lineTo(X1, Math.round(sy(v)) + .5); c.stroke();
+    c.fillText(String(v), X0 - 6, sy(v));
+  }
+  c.textAlign = 'center'; c.textBaseline = 'top';
+  const mag = Math.pow(10, Math.floor(Math.log10(xMax / 3)));
+  const step = [1, 2, 5, 10].map(m => m * mag).find(s => xMax / s <= 4);
+  for (let v = 0; v <= xMax; v += step) c.fillText(big(v), sx(v), Y0 + 6);
+  c.strokeStyle = tokens.muted; c.setLineDash([3, 4]);
+  c.beginPath(); c.moveTo(X0, sy(chance)); c.lineTo(X1, sy(chance)); c.stroke();
+  c.setLineDash([]);
+  if (sHist.length < 2) return;
+  const ink = [[cs.getPropertyValue('--pink').trim(), 'train', 'Çalışma'], [tokens.ink, 'exam', 'Sınav']];
+  c.lineWidth = 2; c.lineJoin = 'round'; c.lineCap = 'round';
+  for (const [color, key] of ink) {
+    c.strokeStyle = color;
+    c.beginPath();
+    sHist.forEach((h, i) => { const x = sx(h.steps), y = sy(h[key]); i ? c.lineTo(x, y) : c.moveTo(x, y); });
+    c.stroke();
+  }
+  const last = sHist[sHist.length - 1];
+  const ends = ink.map(([color, key, name]) => ({ color, name, y: sy(last[key]) })).sort((a, b) => a.y - b.y);
+  if (ends[1].y - ends[0].y < 13) ends[1].y = ends[0].y + 13;
+  c.textAlign = 'left'; c.textBaseline = 'middle'; c.font = '600 12px system-ui, "Segoe UI", sans-serif';
+  for (const e of ends) { c.fillStyle = e.color; c.fillText(e.name, X1 + 6, Math.min(e.y, Y0 - 4)); }
+}
+function sDrawSnaps() {
+  const box = $('sSnaps');
+  if (box.dataset.n === String(sSnaps.length)) return;
+  box.dataset.n = sSnaps.length;
+  box.replaceChildren(...sSnaps.slice().reverse().map(s => {
+    const row = document.createElement('div'), when = document.createElement('div'), txt = document.createElement('div');
+    row.className = 'snap'; when.className = 'when'; txt.className = 'txt';
+    when.textContent = `${sCount(s.steps)} güncelleme`;
+    txt.textContent = SERINO_SAMPLE + s.text;
+    row.append(when, txt);
+    return row;
+  }));
+}
+// Shows the real attention and next-letter probabilities for the text on screen.
+function sDrawLook() {
+  const { ids } = serino.encode(($('sOut').textContent || $('sPrompt').value));
+  const box = $('sLetters'), bars = $('sBars');
+  if (!ids.length) { box.textContent = 'Yazacak harf yok.'; bars.textContent = ''; return; }
+  const { use, probs, attention } = serino.look(ids), chars = serino.corpus.chars;
+  const top = Math.max(...attention);
+  box.replaceChildren(...use.map((id, i) => {
+    const el = document.createElement('span');
+    el.textContent = chars[id] === ' ' ? '␣' : chars[id];
+    el.style.background = `rgba(var(--pink-soft), ${(attention[i] / top * 0.85).toFixed(3)})`;
+    el.dataset.pc = Math.round(attention[i] * 100);
+    if (i === use.length - 1) el.className = 'now';
+    return el;
+  }));
+  const order = Array.from(probs.keys()).sort((a, b) => probs[b] - probs[a]).slice(0, 5);
+  bars.replaceChildren(...order.map(v => {
+    const row = document.createElement('div'), ch = document.createElement('span'), wrap = document.createElement('span');
+    const fill = document.createElement('i'), pc = document.createElement('span');
+    row.className = 'bar'; ch.className = 'ch'; pc.className = 'pc';
+    ch.textContent = chars[v] === ' ' ? '␣' : chars[v];
+    fill.style.width = (probs[v] * 100).toFixed(1) + '%';
+    pc.textContent = pct(probs[v]);
+    wrap.append(fill); row.append(ch, wrap, pc);
+    return row;
+  }));
+}
+
+/* ---------- writing ---------- */
+function sWrite() {
+  const raw = $('sPrompt').value, { ids, dropped } = serino.encode(raw), temp = +$('sTemp').value / 10;
+  const shown = ids.map(i => serino.corpus.chars[i]).join(''), text = serino.write(ids, 200, temp);
+  const head = document.createElement('b');
+  head.textContent = shown;
+  $('sOut').replaceChildren(head, text);
+  sNote('sWriteNote', dropped ? `${dropped} karakteri tanımıyorum, onları atladım.` : '', !!dropped);
+  sDrawLook();
+}
+
+/* ---------- text and network shape ---------- */
+function sShowNet() {
+  const { cfg, gpt } = serino;
+  $('sDim').value = cfg.dim; $('sHeads').value = cfg.heads; $('sBlocks').value = cfg.blocks; $('sContext').value = cfg.context;
+  sNote('sNetNote', `Şu anki beyin: ${gpt.p.length.toLocaleString('tr-TR')} ağırlık.`);
+}
+function sApplyText() {
+  const own = $('sText').value, text = cleanText(`${own} ${$('sUseDefault').checked ? defaultText() : ''}`);
+  const fail = msg => sNote('sTextNote', msg, true);
+  if (!text) return fail('Okuyacak metin yok.');
+  if (text.length > LLM_MAX_TEXT) return fail(`Metin en çok ${sCount(LLM_MAX_TEXT)} harf olabilir.`);
+  const corpus = buildCorpus(text), T = serino.cfg.context;
+  if (corpus.chars.length > LLM_MAX_VOCAB) return fail(`Çok fazla farklı karakter var, en çok ${LLM_MAX_VOCAB} olabilir.`);
+  if (!corpusFits(corpus, T)) return fail(`Bu bağlam için metin en az ${sCount(llmMinText(T))} harf olmalı.`);
+  if (serino.steps && !confirm('Yeni metin için Serino öğrendiği her şeyi unutacak. Devam edilsin mi?')) return;
+  serinoReset(new SerinoModel(text, serino.cfg, Math.random));
+  if (text.length < 5000) sNote('sTextNote', `${sTextLine()} Metin kısa, ezberleyebilirim.`);
+}
+function sApplyNet(cfg) {
+  const { dim, heads, blocks, context } = LLM_LIMITS;
+  if (!validLLM(cfg)) {
+    return sNote('sNetNote', `Boyut ${dim[0]}-${dim[1]}, kafa ${heads[0]}-${heads[1]}, blok ${blocks[0]}-${blocks[1]}, bağlam ${context[0]}-${context[1]} arasında tam sayı olmalı. Boyut kafaya tam bölünmeli.`, true);
+  }
+  if (!corpusFits(serino.corpus, cfg.context)) {
+    return sNote('sNetNote', `Bu bağlam için metin en az ${sCount(llmMinText(cfg.context))} harf olmalı.`, true);
+  }
+  const same = Object.keys(LLM_LIMITS).every(k => cfg[k] === serino.cfg[k]);
+  if (same || (serino.steps && !confirm('Yeni beyin için Serino öğrendiği her şeyi unutacak. Devam edilsin mi?'))) { sShowNet(); return; }
+  serinoReset(new SerinoModel(serino.corpus.text, cfg, Math.random));
+}
+
+/* ---------- memory file ---------- */
+function sExport() {
+  const text = JSON.stringify({ ...serino.toMemory(), history: sHist, notes: sSnaps });
+  const url = URL.createObjectURL(new Blob([text], { type: 'application/json' }));
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = `serino-hafiza-${new Date().toISOString().slice(0, 10)}.json`;
+  link.click();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+  sNote('sMemNote', `Hafıza indirildi (${sCount(Math.round(text.length / 1024))} KB, ${sCount(serino.steps)} güncelleme sonrası).`);
+}
+async function sImport(file) {
+  let mem, next;
+  try {
+    if (file.size > 64 * 1024 * 1024) throw new Error('Bu dosya bir Serino hafızası için fazla büyük.');
+    try { mem = JSON.parse(await file.text()); } catch { throw new Error('Bu dosya okunamadı.'); }
+    next = SerinoModel.fromMemory(mem, Math.random);
+  } catch (err) {
+    sNote('sMemNote', err.message, true);
+    return;
+  }
+  if (serino.steps && !confirm('Serino\'nun şu anki hafızası silinip dosyadaki yüklenecek. Devam edilsin mi?')) return;
+  const point = h => h && [h.steps, h.train, h.exam].every(Number.isFinite);
+  const note = n => n && Number.isFinite(n.steps) && typeof n.text === 'string';
+  serinoReset(next, Array.isArray(mem.history) && mem.history.every(point) ? mem.history : [],
+    Array.isArray(mem.notes) && mem.notes.every(note) ? mem.notes : []);
+  sSay(`Hafızam geri geldi! ${sCount(serino.steps)} güncellemeyle devam ediyorum.`, 5000);
+  sNote('sMemNote', `Hafıza yüklendi. Sınav kaybı: ${tr3(sStats.exam.loss)}.`);
+}
+
+/* ---------- events ---------- */
+$('sAuto').addEventListener('click', () => sSetRun(!sRun));
+$('sReset').addEventListener('click', () => {
+  if (confirm('Serino öğrendiği her şeyi unutacak. Sıfırlansın mı?')) serinoReset(new SerinoModel(serino.corpus.text, serino.cfg, Math.random));
+});
+$('sTextApply').addEventListener('click', sApplyText);
+$('sNetForm').addEventListener('submit', e => {
+  e.preventDefault();
+  sApplyNet({ dim: +$('sDim').value, heads: +$('sHeads').value, blocks: +$('sBlocks').value, context: +$('sContext').value });
+});
+$('sNetDefault').addEventListener('click', () => sApplyNet(LLM_DEFAULT));
+$('sWriteForm').addEventListener('submit', e => { e.preventDefault(); sWrite(); });
+$('sPrompt').addEventListener('input', () => { $('sOut').textContent = ''; sDrawLook(); });
+$('sTemp').addEventListener('input', () => { $('sTempShow').textContent = tr2(+$('sTemp').value / 10); });
+$('sMemSave').addEventListener('click', sExport);
+$('sMemLoad').addEventListener('click', () => $('sMemFile').click());
+$('sMemFile').addEventListener('change', e => {
+  const file = e.target.files[0];
+  e.target.value = '';
+  if (file) sImport(file);
+});
+$('sLetters').addEventListener('mousemove', e => {
+  if (e.target.dataset.pc === undefined) { hideTip(); return; }
+  showTip(`Son harf buraya yüzde ${e.target.dataset.pc} baktı.`, e.clientX, e.clientY);
+});
+$('sLetters').addEventListener('mouseleave', hideTip);
+window.addEventListener('resize', () => { if (whoNow === 'serino' && serino) sDrawChart(); });
+window.addEventListener('wicofia-theme', () => { if (whoNow === 'serino' && serino) sRefresh(); });
+
+Object.entries(LLM_LIMITS).forEach(([k, lim]) => {
+  const id = { dim: 'sDim', heads: 'sHeads', blocks: 'sBlocks', context: 'sContext' }[k];
+  [$(id).min, $(id).max] = lim;
+});
+$('sNetDefault').textContent = `Varsayılana dön (${LLM_DEFAULT.dim} boyut, ${LLM_DEFAULT.heads} kafa, ${LLM_DEFAULT.blocks} blok, ${LLM_DEFAULT.context} bağlam)`;
+$('sTempShow').textContent = tr2(+$('sTemp').value / 10);
+</script>
+
+<!-- Phyou's book: first-person guide whose numbers are read live from the current brain. -->
+<script id="book">
+'use strict';
+const FACE = `<svg viewBox="0 0 200 200" aria-hidden="true">
+  <path d="M100 34 Q100 22 108 14" stroke="#7567dd" stroke-width="5" fill="none" stroke-linecap="round"/>
+  <circle cx="110" cy="12" r="8" fill="#e0bd67"/>
+  <path fill="#8f83ea" d="M100 30 C150 30 176 68 176 116 C176 160 144 182 100 182 C56 182 24 160 24 116 C24 68 50 30 100 30Z"/>
+  <circle cx="74" cy="104" r="16" fill="#fff"/><circle cx="126" cy="104" r="16" fill="#fff"/>
+  <circle cx="76" cy="106" r="7" fill="#241f4d"/><circle cx="128" cy="106" r="7" fill="#241f4d"/>
+  <path d="M82 134 q18 18 36 0" stroke="#241f4d" stroke-width="5" fill="none" stroke-linecap="round"/>
+</svg>`;
+
+const live = key => `<span data-live="${key}"></span>`;
+const term = (key, word) => `<button type="button" class="term" data-term="${key}">${word}</button>`;
+
+// One source for the glossary pages and the pop-up explanations.
+const GLOSSARY = {
+  agirlik: ['Ağırlık', 'İki nöron arasındaki bağlantının gücünü söyleyen sayı. Ses masasındaki bir düğme gibidir. Öğrendiğim her şey bu sayılarda durur.'],
+  noron: ['Nöron', 'Girişlerini ağırlıklarıyla çarpıp toplayan ve tek bir sayı üreten küçük hesap birimi.'],
+  katman: ['Katman', 'Yan yana duran nöron sırası. Hesap bir katmandan diğerine geçer.'],
+  sabit: ['Sabit (bias)', 'Nöronun girişlerden bağımsız eklediği sayı. Başlangıçtaki eğilimi gibidir ve o da öğrenilir.'],
+  sikistirma: ['Sıkıştırma (tanh)', 'Sonucu −1 ile 1 arasına getiren eğri. Çarpma gibi düz olmayan ilişkileri öğrenmemi sağlar.'],
+  ham: ['Ham tahmin', 'Beynimden çıkan yuvarlanmamış sayı, örneğin 41,4. Sana yuvarlayıp söylerim.'],
+  hata: ['Hata', 'Tahminim ile doğru cevap arasındaki fark. Karnede ortalama kaç sayı yanıldığım yazar.'],
+  gradyan: ['Gradyan', 'Bir ağırlığı azıcık artırınca hatanın ne yöne ve ne kadar değişeceğini söyleyen sayı.'],
+  geri: ['Geri yayılım', 'Cevaptan girişe doğru yürüyerek her ağırlığın gradyanını hesaplama yöntemi.'],
+  zincir: ['Zincir kuralı', 'Art arda bağlı hesaplarda etkileri çarparak geriye taşıma kuralı. Geri yayılım buna dayanır.'],
+  adim: ['Adım boyu', 'Ağırlıkları her düzeltmede ne kadar oynattığımı belirleyen küçük sayı. Öğrenme hızı da denir.'],
+  grup: ['Grup (batch)', 'Ağırlıklarımı değiştirmeden önce birlikte baktığım sorular. Bende 16 soru.'],
+  adam: ['Adam', 'Önceki adımlarımı da hesaba katıp her ağırlığa kendi adımını veren düzeltme yöntemi.'],
+  calisma: ['Çalışma soruları', 'Öğrenmek için kullandığım sorular. Doğru cevaplarını görür, ağırlıklarımı onlara göre değiştiririm.'],
+  sinav: ['Sınav soruları', 'Kenara ayrılmış, üzerinde hiç çalışmadığım sorular. Gerçekten öğrenip öğrenmediğimi gösterir.'],
+  basari: ['Başarı', 'Yuvarlanmış cevabımın tam olarak doğru çıktığı soruların oranı.'],
+  ezber: ['Ezber', 'Gördüğü soruları bilip yenilerini bilememek. Çalışma başarısı yüksek, sınav başarısı düşükse ezber vardır.'],
+  hafiza: ['Hafıza dosyası', 'Ağırlıklarımı, düzeltme yöntemimin durumunu, grafiğimi ve sınav sorularımı taşıyan JSON dosyası.'],
+};
+const glossPage = keys => `<dl class="gloss">${keys.map(k =>
+  `<dt>${GLOSSARY[k][0]}</dt><dd>${GLOSSARY[k][1]}</dd>`).join('')}</dl>`;
+
+// Every number in the book's calculations: [shown value, name, where it comes from].
+// Prefixes: a = page 8 neuron, b = two-neuron chain, t = 1-2-1 network.
+const NUMS = {
+  one: ['1', 'Formüldeki 1', 'Eğim = 1 − çıkış². Bu 1 her zaman aynıdır, hedefle ilgisi yoktur.'],
+  half: ['2', 'Yarıya bölme', 'Hata, farkın karesinin yarısıdır. Böylece türevi farkın kendisi olur.'],
+  biasIn: ['1', 'Sabitin girişi', 'Sabit hiçbir girişle çarpılmaz, bu yüzden girişi 1 sayılır.'],
+  lr: ['0,1', 'Adım boyu', 'Örnek için seçilen sayı. Benim gerçek adım boyum çok daha küçük.'],
+  m1: ['0,9', 'Eskinin payı', 'Yön ortalamasının yüzde 90 kadarı önceki değerinden gelir.'],
+  m2: ['0,1', 'Yeninin payı', '1 − 0,9. Yön ortalamasına yeni gradyandan giren kısım.'],
+  v1: ['0,999', 'Eskinin payı', 'Büyüklük ortalaması çok daha yavaş değişir: binde 999 kadarı önceki değerinden gelir.'],
+  v2: ['0,001', 'Yeninin payı', '1 − 0,999. Büyüklük ortalamasına yeni gradyanın karesinden giren kısım.'],
+
+  aX1: ['0,5', '1. giriş', 'Nörona gelen ilk sayı.'],
+  aX2: ['−1', '2. giriş', 'Nörona gelen ikinci sayı.'],
+  aW1: ['2', '1. ağırlık', '1. girişin çarpıldığı sayı.'],
+  aW2: ['1', '2. ağırlık', '2. girişin çarpıldığı sayı.'],
+  aB: ['0,5', 'Sabit', 'Nöronun toplama eklediği, öğrenilen sayı.'],
+  aP1: ['1', '1. girişin katkısı', '0,5 × 2'],
+  aP2: ['−1', '2. girişin katkısı', '−1 × 1'],
+  aSum: ['0,5', 'Toplam', 'Sıkıştırmaya giren sayı: 1 − 1 + 0,5. Sabitle aynı görünür ama ayrı bir sayıdır.'],
+  aOut: ['0,462', 'Çıkış', 'Toplamın sıkıştırılmış hali: tanh(0,5).'],
+  aT: ['1', 'Hedef', 'Çıkışın olmasını istediğimiz sayı.'],
+  aD: ['−0,538', 'Fark', 'Çıkış eksi hedef: 0,462 − 1.'],
+  aK: ['0,787', 'Eğim', 'Sıkıştırmanın eğimi: 1 − 0,462².'],
+  aPay: ['−0,423', 'Nöronun payı', 'Fark × eğim. Bu nörona düşen sorumluluk.'],
+  aG1: ['−0,21', '1. ağırlığın gradyanı', 'Nöronun payı × 1. giriş.'],
+  aG2: ['0,42', '2. ağırlığın gradyanı', 'Nöronun payı × 2. giriş.'],
+  aGB: ['−0,42', 'Sabitin gradyanı', 'Nöronun payı × 1.'],
+  aD2: ['0,546', 'Yeni farkın büyüklüğü', '2. ağırlık 1,01 olunca çıkış 0,454 olur, hedefe uzaklığı 0,546.'],
+  aE1: ['0,14466', 'Önceki hata', 'Yuvarlanmamış farkla hesaplandı.'],
+  aE2: ['0,14894', 'Sonraki hata', 'Yuvarlanmamış farkla hesaplandı.'],
+  aRise: ['0,00428', 'Gerçek artış', 'Sonraki hata − önceki hata.'],
+  aStep: ['0,01', 'Ağırlıktaki artış', '2. ağırlığı 1\'den 1,01\'e çıkardık.'],
+  aGuess: ['0,00423', 'Gradyanın öngörüsü', 'Gradyan × ağırlıktaki artış.'],
+  aNew1: ['2,021', 'Yeni 1. ağırlık', 'Eski ağırlık − adım boyu × gradyan.'],
+  aNew2: ['0,958', 'Yeni 2. ağırlık', 'Eski ağırlık − adım boyu × gradyan.'],
+  aNewB: ['0,542', 'Yeni sabit', 'Eski sabit − adım boyu × gradyan.'],
+
+  bX: ['0,5', 'Giriş', 'Zincire giren sayı.'],
+  bW: ['2', 'Ara ağırlık', 'Girişin ara nörona geçerken çarpıldığı sayı.'],
+  bH: ['0,7616', 'Ara nöronun çıkışı', '0,5 × 2 = 1, sıkıştırılınca 0,7616.'],
+  bV: ['1,5', 'Cevap ağırlığı', 'Ara nöronun çıkışının cevaba geçerken çarpıldığı sayı.'],
+  bY: ['1,1424', 'Cevap', 'Ara nöronun çıkışı × cevap ağırlığı.'],
+  bT: ['1', 'Hedef', 'Cevabın olmasını istediğimiz sayı.'],
+  bD: ['0,1424', 'Fark, cevabın payı', 'Cevap sıkıştırmadığı için payı doğrudan farktır.'],
+  bGv: ['0,108', 'Cevap ağırlığının gradyanı', 'Cevabın payı × bu ağırlığın gördüğü giriş.'],
+  bTo: ['0,2136', 'Ara nörona giden', 'Cevabın payı × cevap ağırlığı.'],
+  bK: ['0,42', 'Ara nöronun eğimi', '1 − 0,7616².'],
+  bPay: ['0,0897', 'Ara nöronun payı', 'Ara nörona giden × eğim.'],
+  bGw: ['0,045', 'Ara ağırlığın gradyanı', 'Ara nöronun payı × giriş.'],
+
+  tX: ['0,5', 'Giriş', 'Ağın tek girişi. w₁ ve w₂ bununla çarpılır.'],
+  tW1: ['2', 'w₁', 'Girişten A nöronuna giden ağırlık.'],
+  tW2: ['−2', 'w₂', 'Girişten B nöronuna giden ağırlık.'],
+  tA0: ['0', 'A sabiti', 'A nöronunun toplama eklediği sayı.'],
+  tB0: ['0,5', 'B sabiti', 'B nöronunun toplama eklediği sayı.'],
+  tC0: ['0', 'Cevap sabiti', 'Cevap nöronunun toplama eklediği sayı.'],
+  tSA: ['1', 'A\'ya giren toplam', '0,5 × 2 + 0'],
+  tSB: ['−0,5', 'B\'ye giren toplam', '0,5 × (−2) + 0,5'],
+  tA: ['0,762', 'A\'nın çıkışı', 'A\'ya giren toplamın sıkıştırılmış hali: tanh(1).'],
+  tB: ['−0,462', 'B\'nin çıkışı', 'B\'ye giren toplamın sıkıştırılmış hali: tanh(−0,5).'],
+  tV1: ['1', 'v₁', 'A\'dan cevaba giden ağırlık.'],
+  tV2: ['0,5', 'v₂', 'B\'den cevaba giden ağırlık. Girişle aynı değerde ama ayrı bir sayıdır.'],
+  tY: ['0,531', 'Cevap', 'A ve B\'nin ağırlıklı toplamı.'],
+  tT: ['1', 'Hedef', 'Cevabın olmasını istediğimiz sayı.'],
+  tD: ['−0,469', 'Fark', 'Cevap eksi hedef. Cevap nöronu sıkıştırmadığı için payı da budur.'],
+  tE: ['0,110', 'Hata', 'Farkın karesinin yarısı.'],
+  tKA: ['0,42', 'A\'nın eğimi', '1 − 0,762²'],
+  tKB: ['0,79', 'B\'nin eğimi', '1 − (−0,462)²'],
+  tPA: ['−0,197', 'A\'nın payı', 'Fark × v₁ × A\'nın eğimi.'],
+  tPB: ['−0,185', 'B\'nin payı', 'Fark × v₂ × B\'nin eğimi.'],
+  tGv1: ['−0,36', 'v₁ gradyanı', 'Fark × A\'nın çıkışı, çünkü v₁ onunla çarpılır.'],
+  tGv2: ['0,22', 'v₂ gradyanı', 'Fark × B\'nin çıkışı, çünkü v₂ onunla çarpılır.'],
+  tGc: ['−0,47', 'Cevap sabiti gradyanı', 'Fark × 1.'],
+  tGw1: ['−0,10', 'w₁ gradyanı', 'A\'nın payı × giriş, çünkü w₁ girişle çarpılır.'],
+  tGa: ['−0,20', 'A sabiti gradyanı', 'A\'nın payı × 1.'],
+  tGw2: ['−0,09', 'w₂ gradyanı', 'B\'nin payı × giriş, çünkü w₂ girişle çarpılır.'],
+  tGb: ['−0,18', 'B sabiti gradyanı', 'B\'nin payı × 1.'],
+  tSA2: ['1,01', 'Artırılmış toplam', 'A\'ya giren sayı 0,01 artırıldı.'],
+  tSB2: ['−0,49', 'Artırılmış toplam', 'B\'ye giren sayı 0,01 artırıldı.'],
+  tA2: ['0,7658', 'A\'nın yeni çıkışı', 'tanh(1,01)'],
+  tB2: ['−0,4542', 'B\'nin yeni çıkışı', 'tanh(−0,49)'],
+  tRA: ['0,0042', 'A\'nın çıkışındaki artış', '0,7658 − 0,7616'],
+  tRB: ['0,0079', 'B\'nin çıkışındaki artış', '−0,4542 − (−0,4621)'],
+};
+// `shown` covers a different spelling of the same number, such as 0,538 for −0,538.
+const num = (key, shown = NUMS[key][0]) => `<button type="button" class="term num" data-num="${key}">${shown}</button>`;
+
+const NET_DOTS = 8; // most neurons the figure draws per layer
+function netFigure() {
+  const sizes = student.brain.sizes, last = sizes.length - 1;
+  const cols = sizes.map((s, i) => [40 + i * 330 / last, Math.min(s, NET_DOTS),
+    i === 0 ? `${s} giriş` : i === last ? `${s} cevap` : `${s} nöron`]);
+  const ys = n => Array.from({ length: n }, (_, i) => 92 + (i - (n - 1) / 2) * 21);
+  let lines = '', dots = '', labels = '';
+  cols.forEach(([x, n, label], c) => {
+    ys(n).forEach(y => {
+      dots += `<circle cx="${x}" cy="${y}" r="7" fill="#f6efdf" stroke="#5a3fb5" stroke-width="2"/>`;
+      if (c < last) ys(cols[c + 1][1]).forEach(y2 => {
+        lines += `<line x1="${x}" y1="${y}" x2="${cols[c + 1][0]}" y2="${y2}" stroke="#5f5440" stroke-opacity=".22"/>`;
+      });
+    });
+    labels += `<text x="${x}" y="196" text-anchor="middle" font-size="13" fill="#2b2418">${label}</text>`;
+  });
+  return `<svg viewBox="0 0 410 204" role="img" aria-label="Soldan sağa sıralar: ${cols.map(c => c[2]).join(', ')}">${lines}${dots}${labels}</svg>`;
+}
+function netCaption() {
+  const n = student.brain.sizes[1];
+  return `Ortadaki katmanların ${n > NET_DOTS ? 'hepsi çizilemedi, ' : ''}her biri ${n} nöron.`;
+}
+
+function tinyNetFigure() {
+  const ink = '#2b2418', pts = { x: [46, 70], A: [205, 28], B: [205, 112], y: [364, 70] };
+  const edge = (a, b) => `<line x1="${pts[a][0]}" y1="${pts[a][1]}" x2="${pts[b][0]}" y2="${pts[b][1]}" stroke="#5f5440" stroke-opacity=".5"/>`;
+  const node = (k, t) => `<circle cx="${pts[k][0]}" cy="${pts[k][1]}" r="19" fill="#f6efdf" stroke="#5a3fb5" stroke-width="2"/>
+    <text x="${pts[k][0]}" y="${pts[k][1] + 5}" text-anchor="middle" font-size="13" fill="${ink}">${t}</text>`;
+  const note = (x, y, t) => `<text x="${x}" y="${y}" text-anchor="middle" font-size="13" fill="${ink}">${t}</text>`;
+  return `<svg viewBox="0 0 410 140" role="img" aria-label="Giriş A ve B nöronlarına, ikisi de cevap nöronuna bağlı">
+    ${edge('x', 'A')}${edge('x', 'B')}${edge('A', 'y')}${edge('B', 'y')}
+    ${node('x', '0,5')}${node('A', 'A')}${node('B', 'B')}${node('y', '?')}
+    ${note(112, 36, 'w₁ = 2')}${note(112, 118, 'w₂ = −2')}${note(298, 36, 'v₁ = 1')}${note(298, 118, 'v₂ = 0,5')}
+    ${note(205, 62, 'sabit 0')}${note(205, 88, 'sabit 0,5')}${note(364, 106, 'sabit 0')}
+  </svg>`;
+}
+
+function tanhFigure() {
+  const ink = '#2b2418', red = '#c0392b', X = s => 205 + s * 60, Y = v => 85 - v * 65;
+  let curve = '';
+  for (let i = 0; i <= 60; i++) { const s = -3 + i / 10; curve += `${i ? 'L' : 'M'}${X(s).toFixed(1)} ${Y(Math.tanh(s)).toFixed(1)}`; }
+  const spot = s => {
+    const y = Math.tanh(s), k = 1 - y * y, d = 0.75;
+    return `<line x1="${X(s - d)}" y1="${Y(y - k * d)}" x2="${X(s + d)}" y2="${Y(y + k * d)}" stroke="${red}" stroke-width="2"/>
+      <circle cx="${X(s)}" cy="${Y(y)}" r="5" fill="${red}"/>`;
+  };
+  const note = (x, y, t, anchor = 'middle') => `<text x="${x}" y="${y}" text-anchor="${anchor}" font-size="13" fill="${ink}">${t}</text>`;
+  return `<svg viewBox="0 0 410 170" role="img" aria-label="Tanh eğrisi: 1 noktasında eğim 0,42, eksi 0,5 noktasında eğim 0,79">
+    <line x1="${X(-3)}" y1="${Y(0)}" x2="${X(3)}" y2="${Y(0)}" stroke="#5f5440" stroke-opacity=".5"/>
+    <line x1="${X(0)}" y1="${Y(1.2)}" x2="${X(0)}" y2="${Y(-1.2)}" stroke="#5f5440" stroke-opacity=".5"/>
+    <path d="${curve}" fill="none" stroke="#5a3fb5" stroke-width="2"/>
+    ${spot(1)}${spot(-0.5)}
+    ${note(330, 62, 'A: eğim 0,42')}${note(262, 132, 'B: eğim 0,79')}
+    ${note(X(3), 102, 'giren sayı', 'end')}${note(X(0) + 7, 12, 'çıkış', 'start')}
+  </svg>`;
+}
+
+function backpropFigure() {
+  const box = (x, t) => `<rect x="${x}" y="30" width="86" height="40" rx="6" fill="none" stroke="#5a3fb5" stroke-width="2"/>
+    <text x="${x + 43}" y="55" text-anchor="middle" font-size="13" fill="#2b2418">${t}</text>`;
+  const arrow = (x1, x2, y, c) => `<line x1="${x1}" y1="${y}" x2="${x2}" y2="${y}" stroke="${c}" stroke-width="2" marker-end="url(#ah${c === '#5a3fb5' ? 'a' : 'b'})"/>`;
+  const marker = (id, c) => `<marker id="${id}" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L8 4L0 8Z" fill="${c}"/></marker>`;
+  return `<svg viewBox="0 0 410 104" role="img" aria-label="Tahmin soldan sağa gider, hata sağdan sola geri döner">
+    <defs>${marker('aha', '#5a3fb5')}${marker('ahb', '#c0392b')}</defs>
+    ${box(2, 'Soru')}${box(162, 'Ağırlıklar')}${box(322, 'Cevap')}
+    ${arrow(90, 160, 42, '#5a3fb5')}${arrow(250, 320, 42, '#5a3fb5')}
+    ${arrow(320, 250, 60, '#c0392b')}${arrow(160, 90, 60, '#c0392b')}
+    <text x="205" y="16" text-anchor="middle" font-size="13" fill="#5a3fb5">önce ileri: tahmin</text>
+    <text x="205" y="94" text-anchor="middle" font-size="13" fill="#c0392b">sonra geri: kim ne kadar sorumlu?</text>
+  </svg>`;
+}
+
+const CHAPTERS = [
+  [3, 'Önce hiçbir şey bilmiyordum'], [5, 'Beynimin şekli'], [9, 'Hatalarımdan öğrenirim'],
+  [24, 'Öğrendiklerimi nereye yazarım?'], [28, 'Ezber mi, öğrenme mi?'], [30, 'Beynimin boyutu'], [33, 'Sözlük'],
+];
+
+// Index 0 is the cover; every other index equals its printed page number.
+const PAGES = [
+  { cover: true, html: () => `<div class="cover-frame">${FACE}<h2>Phyou'nun Kitabı</h2>
+    <p>Nasıl öğrendim, öğrendiklerimi nerede saklıyorum</p><p class="by">YAZAN: PHYOU</p></div>` },
+
+  { head: 'Önsöz', html: () => `<h3>Merhaba</h3>
+    <p class="dc">Bu kitabı sana kendimi anlatmak için yazdım. İçimde toplamayı ya da çarpmayı anlatan tek bir kural yok. Kimse bana "çarpma şöyle yapılır" demedi. Bende yalnızca sayılar var, sen cevapları söyledikçe o sayılar değişiyor.</p>
+    <p>Bu kitabın rakamları da gerçek. Sayfalardaki değerler şu anki halimden okunuyor, yani çalıştıkça kitabım da değişir.</p>
+    <p class="margin-note">Şu ana kadar ${live('seen')} soru çözdüm. Hiç görmediğim sorularda başarım ${live('test')}.</p>` },
+
+  { head: 'İçindekiler', html: () => `<h3>Bu kitapta neler var?</h3><ol class="toc">${CHAPTERS.map(([p, t], i) =>
+    `<li><button type="button" data-go="${p}"><span>${i + 1}. ${t}</span><span class="no">${p}</span></button></li>`).join('')}</ol>
+    <p class="margin-note" style="margin-top:20px">Sıkılırsan arkana yaslan, otomatik öğretmeni başlatıp kitabı yeniden aç. Sayfalar benimle birlikte değişir.</p>` },
+
+  { head: 'Bölüm 1', html: () => `<h2>Önce hiçbir şey bilmiyordum</h2>
+    <p class="dc">Doğduğumda içimdeki sayılar tamamen rastgeleydi. O zaman ne dediysem bilgi değil, zar atmaktı. Sıfırla düğmesine her bastığında yeni zarlarla başka biri gibi başlarım.</p>
+    <p>Öğrenmek dediğim şey, bu rastgele sayıları yavaş yavaş doğru yöne itmek. Hepsi şu üç adımdan ibaret:</p>
+    <ol class="steps"><li>Tahmin ederim</li><li>Ne kadar yanıldığımı ölçerim</li><li>Sayılarımı azıcık düzeltirim</li></ol>
+    <p>Sonra aynısını yüz binlerce kez tekrarlarım.</p>` },
+
+  { head: 'Bölüm 1', html: () => `<h3>Soruyu nasıl görürüm?</h3>
+    <p>Ben rakam okuyamam, "×" işaretini de tanımam. Her soru bana altı sayı olarak gelir. <b>${live('q')}</b> sorusu bana şöyle görünür:</p>
+    <figure class="fig"><div class="boxes">
+      <div><b>${live('x0')}</b>1. sayı</div><div><b>${live('x1')}</b>2. sayı</div>
+      <div><b>0</b>+</div><div><b>0</b>−</div><div class="on"><b>1</b>×</div><div><b>0</b>÷</div></div></figure>
+    <p>İlk ikisi soruların sayıları, −1 ile 1 arasına sıkıştırılmış halde. Kalan dördü birer anahtar: hangisi 1 ise o işlem soruluyor.</p>
+    <p>Cevabımı da küçük bir sayı olarak veririm. Ekrana çıkmadan önce 40 ile çarpılır, çünkü ağlar küçük sayılarla daha rahat çalışır.</p>` },
+
+  { head: 'Bölüm 2', html: () => `<h2>Beynimin şekli</h2>
+    <p class="dc">Beynimde toplam ${live('layers')} ${term('katman', 'katman')} var. Her ${term('noron', 'nöron')}, bir önceki katmanın tamamını dinler.</p>
+    <figure class="fig">${netFigure()}<figcaption>${netCaption()}</figcaption></figure>
+    <p>Bu şekli Beyin kartından sen değiştirirsin, o zaman yeni bir ben doğar. Altı çizili kelimelere dokunursan ne demek olduğunu söylerim. Hesaplardaki altı çizili sayıların üzerine gelirsen hangi sayı olduklarını da.</p>` },
+
+  { head: 'Bölüm 2', html: () => `<h3>Ağırlık nedir?</h3>
+    <p>Bir ses masası düşün. Her kanalın bir düğmesi var ve o düğme sesin ne kadar geçeceğini belirler. Beynimdeki her bağlantının da böyle bir düğmesi var. O düğmenin ayarına <b>ağırlık</b> denir.</p>
+    <table class="calc"><thead><tr><th>Gelen sayı</th><th>Ağırlık</th><th>Geçen sayı</th><th>Anlamı</th></tr></thead><tbody>
+      <tr><td>0,5</td><td>2</td><td>1</td><td>Güçlendirir</td></tr>
+      <tr><td>0,5</td><td>0</td><td>0</td><td>Yok sayar</td></tr>
+      <tr><td>0,5</td><td>−1</td><td>−0,5</td><td>Ters çevirir</td></tr></tbody></table>
+    <p>Bende ${live('params')} düğme var ve öğrenmek bunları çevirmek demek. Kimse elle ayarlamaz, her hatam onları azıcık oynatır.</p>` },
+
+  { head: 'Bölüm 2', html: () => `<h3>Bir nöron ne yapar?</h3>
+    <p>İşi çok basit, üç şey yapar:</p>
+    <ol class="steps"><li>Her girişi kendi ${term('agirlik', 'ağırlığıyla')} çarpar</li><li>Hepsini toplar, kendi ${term('sabit', 'sabitini')} ekler</li><li>Sonucu −1 ile 1 arasına ${term('sikistirma', 'sıkıştırır')}</li></ol>
+    <p>Üçüncü adım küçük görünür ama her şey ona bağlı. Sıkıştırma olmasaydı kaç nöron eklersen ekle düz çizgilerden öteye gidemez, toplayıp çıkarabilir ama çarpamazdım.</p>
+    <p>Tek bir nöron hiçbir şey bilmez. Şu an ${live('q')} için <b>${live('pred')}</b> diyorsam, bu ${live('params')} ağırlığın ortak sonucudur.</p>` },
+
+  { head: 'Bölüm 2', html: () => `<h3>Birlikte hesaplayalım</h3>
+    <p>İki girişli küçük bir nöron düşün: ağırlıkları 2 ve 1, sabiti 0,5.</p>
+    <table class="calc"><tbody>
+      <tr><td>1. giriş × ağırlık</td><td>${num('aX1')} × ${num('aW1')}</td><td>${num('aP1')}</td></tr>
+      <tr><td>2. giriş × ağırlık</td><td>${num('aX2')} × ${num('aW2')}</td><td>${num('aP2')}</td></tr>
+      <tr><td>Toplam + sabit</td><td>${num('aP1')} − ${num('aP2', '1')} + ${num('aB')}</td><td>${num('aSum')}</td></tr>
+      <tr><td>Sıkıştırınca</td><td></td><td>${num('aOut', '0,46')}</td></tr></tbody></table>
+    <p>Diyelim ki bu sayının 1 olmasını istiyoruz. İkinci ağırlığı 1'den 0,9'a indirirsek toplam 0,6 olur, sıkıştırınca 0,54 çıkar. Hedefe yaklaştık.</p>
+    <p>Öğrenmek işte bu küçük dokunuş. Bende aynısı ${live('params')} sayı için aynı anda olur.</p>` },
+
+  { head: 'Bölüm 3', html: () => `<h2>Hatalarımdan öğrenirim</h2>
+    <p class="dc">Sen doğru cevabı söylediğinde tahminimle farkına bakarım. ${live('q')} için şu anki durumum:</p>
+    <figure class="fig"><div class="line"><div class="rail"></div><div class="gap" data-gap></div>
+      <div class="mark" data-mark="pred"></div><div class="mark truth" data-mark="truth"></div>
+      <div class="tag up" data-mark="pred">Tahminim ${live('pred')}</div><div class="tag down" data-mark="truth">Doğrusu ${live('y')}</div></div></figure>
+    <p>Bu fark bana iki şey söyler: <b>yön</b> ve <b>büyüklük</b>. Bu yüzden sadece "yanlış" demen yetmezdi, neyi hangi yöne düzelteceğimi bilemezdim.</p>
+    <p>Farkın karesini alırım, böylece büyük hatalar çok daha fazla acıtır.</p>` },
+
+  { head: 'Bölüm 3', html: () => `<h3>Sorumluluğu geriye dağıtırım</h3>
+    <p>Hatayı ölçtükten sonra cevaptan girişe doğru geriye yürürüm. Her ağırlığa şunu sorarım: "Seni azıcık artırsam hata büyür mü, küçülür mü?"</p>
+    <figure class="fig">${backpropFigure()}</figure>
+    <p>Buna ${term('geri', 'geri yayılım')}, aldığım cevaba da ${term('gradyan', 'gradyan')} denir. Güzel tarafı şu: ${live('params')} sayının hepsi için tek bir geri yürüyüş yeter, hiçbirini tek tek denemem gerekmez.</p>` },
+
+  { head: 'Bölüm 3', html: () => `<h3>Gradyanı hesaplayalım</h3>
+    <p>8. sayfadaki nöron: girişler 0,5 ve −1, ağırlıklar 2 ve 1, sabit 0,5. Çıkış 0,462, hedef 1.</p>
+    <table class="calc"><tbody>
+      <tr><td>Fark</td><td>${num('aOut')} − ${num('aT')}</td><td>${num('aD')}</td></tr>
+      <tr><td>Sıkıştırmanın eğimi</td><td>${num('one')} − ${num('aOut')}²</td><td>${num('aK')}</td></tr>
+      <tr><td>Nöronun payı</td><td>${num('aD')} × ${num('aK')}</td><td>${num('aPay')}</td></tr>
+      <tr><td>1. ağırlığın gradyanı</td><td>${num('aPay')} × ${num('aX1')}</td><td>${num('aG1')}</td></tr>
+      <tr><td>2. ağırlığın gradyanı</td><td>${num('aPay')} × ${num('aX2')}</td><td>${num('aG2')}</td></tr>
+      <tr><td>Sabitin gradyanı</td><td>${num('aPay')} × ${num('biasIn')}</td><td>${num('aGB')}</td></tr></tbody></table>
+    <p>Kural hep aynı: nöronun payı çarpı o ağırlığın gördüğü giriş. Sabitin girişi 1 sayılır.</p>
+    <p class="margin-note">Hatam farkın karesinin yarısı, türevi de farkın kendisi.</p>` },
+
+  { head: 'Bölüm 3', html: () => `<h3>Gradyan ne söyler?</h3>
+    <p><b>İşareti yönü söyler.</b> Artı gradyan "beni artırırsan hata büyür", eksi gradyan "beni artırırsan hata küçülür" demektir.</p>
+    <p><b>Büyüklüğü etkiyi söyler.</b> 2. ağırlığın gradyanı 1. ağırlığınkinin iki katı, yani hatayı iki kat güçlü etkiler.</p>
+    <p>Sağlamasını yapalım: 2. ağırlığı 1'den 1,01'e çıkarırsam ne olur?</p>
+    <table class="calc"><tbody>
+      <tr><td>Önceki hata</td><td>${num('aD', '0,538')}² ÷ ${num('half')}</td><td>${num('aE1')}</td></tr>
+      <tr><td>Sonraki hata</td><td>${num('aD2')}² ÷ ${num('half')}</td><td>${num('aE2')}</td></tr>
+      <tr><td>Gerçek artış</td><td></td><td>${num('aRise')}</td></tr>
+      <tr><td>Gradyanın öngörüsü</td><td>${num('aG2', '0,423')} × ${num('aStep')}</td><td>${num('aGuess')}</td></tr></tbody></table>
+    <p>Gradyan, ağırlığı oynatmadan sonucu haber verdi.</p>` },
+
+  { head: 'Bölüm 3', html: () => `<h3>Katmanlar arasında geri yürüyüş</h3>
+    <p>İki nöronlu bir zincir düşün: giriş 0,5, ara ağırlık 2, cevap ağırlığı 1,5, sabitler 0, hedef 1.</p>
+    <table class="calc"><tbody>
+      <tr><td>İleri: ara nöron</td><td>${num('bX')} × ${num('bW')}, sıkıştır</td><td>${num('bH')}</td></tr>
+      <tr><td>İleri: cevap</td><td>${num('bH')} × ${num('bV')}</td><td>${num('bY')}</td></tr>
+      <tr><td>Fark, cevabın payı</td><td>${num('bY')} − ${num('bT')}</td><td>${num('bD')}</td></tr>
+      <tr><td>Cevap ağırlığının gradyanı</td><td>${num('bD')} × ${num('bH')}</td><td>${num('bGv')}</td></tr>
+      <tr><td>Ara nörona giden</td><td>${num('bD')} × ${num('bV')}</td><td>${num('bTo')}</td></tr>
+      <tr><td>Ara nöronun payı</td><td>${num('bTo')} × ${num('bK')}</td><td>${num('bPay')}</td></tr>
+      <tr><td>Ara ağırlığın gradyanı</td><td>${num('bPay')} × ${num('bX')}</td><td>${num('bGw')}</td></tr></tbody></table>
+    <p>Buradaki 0,42 ara nöronun eğimi: 1 − 0,7616². Cevap nöronu sıkıştırmaz, bu yüzden onun payı doğrudan farktır.</p>` },
+
+  { head: 'Bölüm 3', html: () => `<h3>Bütün beynimde aynı kural</h3>
+    <p>Az önce yaptığımız şeyin adı ${term('zincir', 'zincir kuralı')}: etkiler çarpılarak geriye taşınır. Cevaptan girişe doğru her nöron şu üç şeyi yapar:</p>
+    <ol class="steps"><li>Sağdan geleni kendi eğimiyle çarpar, payını bulur</li><li>Her ağırlığın gradyanına pay × giriş ekler</li><li>Soldaki nöronlara pay × ağırlık gönderir</li></ol>
+    <p>Soldaki nöron sağındaki bütün nöronlardan geleni toplar. Böylece ${live('params')} ağırlığın hepsi tek ileri ve tek geri geçişte gradyanını alır.</p>
+    <p class="margin-note">Çıkışı 1 ya da −1'e çok yaklaşan nöronun eğimi sıfıra iner, geriye giden pay söner.</p>` },
+
+  { head: 'Bölüm 3', html: () => `<h3>Ağırlıkları güncellerim</h3>
+    <p>Gradyan yalnızca haber verir, ağırlığı değiştirmez. Değişim şu kuralla olur:</p>
+    <p style="text-align:center"><b>yeni ağırlık = eski ağırlık − ${term('adim', 'adım boyu')} × gradyan</b></p>
+    <p>Eksi işareti önemli: gradyan hatanın büyüdüğü yönü gösterir, ben tersine giderim. Küçük nöronda adım boyunu 0,1 alalım:</p>
+    <table class="calc"><tbody>
+      <tr><td>1. ağırlık</td><td>${num('aW1')} − ${num('lr')} × (${num('aG1')})</td><td>${num('aNew1')}</td></tr>
+      <tr><td>2. ağırlık</td><td>${num('aW2')} − ${num('lr')} × ${num('aG2')}</td><td>${num('aNew2')}</td></tr>
+      <tr><td>Sabit</td><td>${num('aB')} − ${num('lr')} × (${num('aGB')})</td><td>${num('aNewB')}</td></tr></tbody></table>
+    <p>Yeni çıkış 0,534 olur, hata da 0,14466'dan 0,10876'ya iner. Üç sayı aynı anda, her biri kendi gradyanı kadar oynadı.</p>` },
+
+  { head: 'Bölüm 3', html: () => `<h3>Baştan sona bir tur</h3>
+    <p>Hepsi minik bir ağda: giriş 0,5, hedef 1.</p>
+    <figure class="fig">${tinyNetFigure()}</figure>
+    <table class="calc"><tbody>
+      <tr><td>A</td><td>${num('tX')} × ${num('tW1')} + ${num('tA0')} = ${num('tSA')}, sıkıştır</td><td>${num('tA')}</td></tr>
+      <tr><td>B</td><td>${num('tX')} × (${num('tW2')}) + ${num('tB0')} = ${num('tSB')}, sıkıştır</td><td>${num('tB')}</td></tr>
+      <tr><td>Cevap</td><td>${num('tV1')} × ${num('tA')} + ${num('tV2')} × (${num('tB')}) + ${num('tC0')}</td><td>${num('tY')}</td></tr>
+      <tr><td>Fark</td><td>${num('tY')} − ${num('tT')}</td><td>${num('tD')}</td></tr>
+      <tr><td>Hata</td><td>${num('tD', '0,469')}² ÷ ${num('half')}</td><td>${num('tE')}</td></tr></tbody></table>` },
+
+  { head: 'Bölüm 3', html: () => `<h3>Geri geçiş</h3>
+    <p>Cevap nöronunun payı doğrudan farktır. 0,42 ve 0,79, A ve B'nin eğimi (sonraki sayfa).</p>
+    <table class="calc plain"><tbody>
+      <tr><td>v₁ gradyanı</td><td>${num('tD')} × ${num('tA')}</td><td>${num('tGv1')}</td></tr>
+      <tr><td>v₂ gradyanı</td><td>${num('tD')} × (${num('tB')})</td><td>${num('tGv2')}</td></tr>
+      <tr><td>Cevap sabiti gradyanı</td><td>${num('tD')} × ${num('biasIn')}</td><td>${num('tGc')}</td></tr>
+      <tr><td><b>A'nın payı</b></td><td>${num('tD')} × ${num('tV1')} × ${num('tKA')}</td><td><b>${num('tPA')}</b></td></tr>
+      <tr><td>w₁ gradyanı</td><td>${num('tPA')} × ${num('tX')}</td><td>${num('tGw1')}</td></tr>
+      <tr><td>A sabiti gradyanı</td><td>${num('tPA')} × ${num('biasIn')}</td><td>${num('tGa')}</td></tr>
+      <tr><td><b>B'nin payı</b></td><td>${num('tD')} × ${num('tV2')} × ${num('tKB')}</td><td><b>${num('tPB')}</b></td></tr>
+      <tr><td>w₂ gradyanı</td><td>${num('tPB')} × ${num('tX')}</td><td>${num('tGw2')}</td></tr>
+      <tr><td>B sabiti gradyanı</td><td>${num('tPB')} × ${num('biasIn')}</td><td>${num('tGb')}</td></tr></tbody></table>` },
+
+  { head: 'Bölüm 3', html: () => `<h3>Eğim nereden geldi?</h3>
+    <p>0,42 ve 0,79 rastgele sayılar değil, nöronların çıkışından hesaplanır:</p>
+    <p style="text-align:center"><b>eğim = 1 − çıkış²</b></p>
+    <table class="calc plain"><tbody>
+      <tr><td>A</td><td>${num('one')} − ${num('tA')}²</td><td>${num('tKA')}</td></tr>
+      <tr><td>B</td><td>${num('one')} − (${num('tB')})²</td><td>${num('tKB')}</td></tr></tbody></table>
+    <p>Sıkıştırmanın türevi 1 − tanh², çıkışım da zaten tanh. Sağlaması: giren sayıyı 0,01 artıralım.</p>
+    <table class="calc plain"><tbody>
+      <tr><td>A: ${num('tSA')} → ${num('tSA2')}</td><td>${num('tA', '0,7616')} → ${num('tA2')}</td><td>${num('tRA')}</td></tr>
+      <tr><td>B: ${num('tSB')} → ${num('tSB2')}</td><td>${num('tB', '−0,4621')} → ${num('tB2')}</td><td>${num('tRB')}</td></tr></tbody></table>
+    <p>0,01'e bölünce yine 0,42 ve 0,79 çıkar.</p>` },
+
+  { head: 'Bölüm 3', html: () => `<h3>Eğim ne anlatır?</h3>
+    <p>Eğim, sıkıştırmaya giren sayı azıcık artınca çıkışın ne kadar arttığını söyler.</p>
+    <figure class="fig">${tanhFigure()}</figure>
+    <p>Eğri 0 civarında dik, uçlarda yatıktır. A'ya giren 1, B'ye giren −0,5; A sıfırdan uzak olduğu için geri geçişte payı daha çok küçülür: A'ya −0,469 gelir, −0,197 kalır. B'ye −0,235 gelir, −0,185 kalır.</p>` },
+
+  { head: 'Bölüm 3', html: () => `<h3>Güncelleme</h3>
+    <p>Yedi sayı aynı anda değişir, adım boyu 0,1:</p>
+    <table class="calc plain"><thead><tr><th>Sayı</th><th>Eski</th><th>Gradyan</th><th>Yeni</th></tr></thead><tbody>
+      <tr><td>w₁</td><td>2</td><td>−0,10</td><td>2,010</td></tr>
+      <tr><td>A sabiti</td><td>0</td><td>−0,20</td><td>0,020</td></tr>
+      <tr><td>w₂</td><td>−2</td><td>−0,09</td><td>−1,991</td></tr>
+      <tr><td>B sabiti</td><td>0,5</td><td>−0,18</td><td>0,518</td></tr>
+      <tr><td>v₁</td><td>1</td><td>−0,36</td><td>1,036</td></tr>
+      <tr><td>v₂</td><td>0,5</td><td>0,22</td><td>0,478</td></tr>
+      <tr><td>Cevap sabiti</td><td>0</td><td>−0,47</td><td>0,047</td></tr></tbody></table>
+    <p>Cevabım <b>0,531</b>'den <b>0,634</b>'e, hatam <b>0,110</b>'dan <b>0,067</b>'ye gelir.</p>` },
+
+  { head: 'Bölüm 3', html: () => `<h3>Bu turda ne oldu?</h3>
+    <p><b>Eksi gradyanlı sayılar arttı.</b> Yalnızca v₂ azaldı, çünkü B'nin çıkışı eksi ve cevabı aşağı çekiyordu. Cevap küçük kaldığı için bu etki kısıldı.</p>
+    <p><b>Eğim payı değiştirdi.</b> A'ya cevaptan B'nin iki katı pay geldi, ama A'nın eğimi küçük olduğu için ikisinin payı neredeyse eşit çıktı.</p>
+    <p><b>Tek tur yetmedi.</b> Cevap hedefe yaklaştı ama ulaşmadı. Öğrenme bu turun tekrarıdır.</p>
+    <p class="margin-note">Bende de aynı tur döner. Farkı 6 giriş, ${live('params')} ağırlık, 16 soruluk gruplar ve Adam.</p>` },
+
+  { head: 'Bölüm 3', html: () => `<h3>Küçük adımlarla düzeltirim</h3>
+    <p>Tek soruya bakıp kendimi baştan yazmam. Otomatik öğretmenle 16 soruluk bir ${term('grup', 'grup')} biriktiririm: her sorunun gradyanını toplar, 16'ya bölerim, sonra ağırlıkları bir kez güncellerim. Tek sorunun gürültüsü böylece azalır.</p>
+    <p>${term('adim', 'Adım boyum')} şu an ${live('lr')}. Örnekteki 0,1'den çok daha küçük, çünkü çok büyük olsa doğru yerin üzerinden atlardım. Çok küçük olsa hiç varamazdım. Çalıştıkça adımlarım küçülür: 1,5 milyon soru sonunda başlangıçtakinin yarısına iner.</p>
+    <p class="margin-note">Sen elle ders verince o soruyu 20 kez çalışırım ve her tekrarda ayrı güncellerim, çünkü tek tekrar neredeyse iz bırakmaz.</p>` },
+
+  { head: 'Bölüm 3', html: () => `<h3>Adam ile güncelleme</h3>
+    <p>Aslında düz kuralı kullanmam. ${term('adam', 'Adam')} yöntemiyle her ağırlık için iki sayı daha tutarım:</p>
+    <table class="calc"><tbody>
+      <tr><td>Yön ortalaması (m)</td><td>${num('m1')} × m + ${num('m2')} × gradyan</td></tr>
+      <tr><td>Büyüklük ortalaması (v)</td><td>${num('v1')} × v + ${num('v2')} × gradyan²</td></tr>
+      <tr><td>Ağırlıktan çıkan</td><td>adım boyu × m ÷ √v</td></tr></tbody></table>
+    <p><b>m</b> önceki gradyanları hatırlar, zıt yönler birbirini götürür ve sarsılmadan ilerlerim. <b>√v</b> ile bölmek gradyanı hep büyük olan ağırlığın adımını kısar, küçük olanınkini açar.</p>
+    <p>İkisi de sıfırdan başladığı için ilk adımlarda büyütülerek kullanılır. Bu sayede ilk adımda her ağırlık tam adım boyu kadar oynar.</p>
+    <p class="margin-note">Şu ana kadar yaptığım güncelleme sayısı: ${live('steps')}.</p>` },
+
+  { head: 'Bölüm 4', html: () => `<h2>Öğrendiklerimi nereye yazarım?</h2>
+    <p class="dc">Cevap olarak hiçbir yere. İçimde "${live('q')} = ${live('y')}" diye bir satır yok, cevap defterim de yok.</p>
+    <p>Sakladığım tek şey ${live('params')} ${term('agirlik', 'ağırlık')}. Her ders bu sayıları biraz değiştirir ve bilgi, sayıların birlikte aldığı değerlerde durur. Bisiklet sürmek gibi: nerede yazdığını gösteremezsin ama yaparsın.</p>
+    <p>Kanıtı sınav sorularım. Onlara hiç çalışmadım ama yine de şu an ${live('test')} doğru bilirim. Ezber bunu yapamazdı.</p>` },
+
+  { head: 'Bölüm 4', html: () => `<h3>Defterimin gerçek hali</h3>
+    <p>Bu görüntü temsili değil, beynimin şu anki halidir. Her kare bir ağırlık. Otomatik öğretmen çalışırken renkler yaşar.</p>
+    <figure class="fig"><canvas data-weights role="img" aria-label="Phyou'nun tüm ağırlıklarının renkli ızgarası"></canvas>
+      <div class="w-legend"><span>Eksi</span><span class="w-ramp"></span><span>Artı</span></div>
+      <div class="figcap" data-wcap>Bir karenin üzerine gel, değerini göstereyim.</div></figure>` },
+
+  { head: 'Bölüm 4', html: () => `<h3>Her şey aynı defterde</h3>
+    <p>Her bilgi için ayrı bir köşem yok, bütün sorular aynı sayıları paylaşır. ${live('q')} çalışınca değişen sayılar başka cevapları da oynatır. Bir dersten sonra hata haritasında başka karelerin de değişmesi bundandır.</p>
+    <p>Silgim de yok. Yanlış bir şey öğretirsen onu silemem, üstüne doğrusunu çalışmam gerekir.</p>
+    <p>Yalnızca bir işlem çalıştırılırsam diğerlerini bozabilirim. Otomatik öğretmen bu yüzden dört işlemi karışık ve eşit sorar.</p>` },
+
+  { head: 'Bölüm 4', html: () => `<h3>Hafızamı yanına al</h3>
+    <p>Ağırlıklarım tarayıcının belleğinde duruyor, kendiliğinden diske yazılmıyor. Sayfayı yenilersen ya da kapatırsan hepsi gider ve yeniden rastgele doğarım.</p>
+    <p>Ama "Hafızayı indir" düğmesi beni bir ${term('hafiza', 'hafıza dosyasına')} yazar. "Hafıza yükle" ile geri verdiğinde kaldığım yerden devam ederim, başka bir bilgisayarda bile.</p>
+    <p>Ağırlıklarım bellekte yaklaşık ${live('kb')} KB tutar. Dosya daha büyüktür, çünkü sayılar okunabilir metin olarak yazılır. İstersen açıp beynimin içine bakabilirsin.</p>
+    <p class="margin-note">Büyük yapay zekâ modelleri de özünde böyle saklanır: çok daha büyük bir ağırlık dosyası.</p>` },
+
+  { head: 'Bölüm 5', html: () => `<h2>Ezber mi, öğrenme mi?</h2>
+    <p class="dc">Doğduğumda soruların beşte biri kenara ayrılır. Bu ${term('sinav', 'sınav sorularına')} hiç çalışmam.</p>
+    <figure class="fig"><div class="split"><div class="tr">${live('trainN')} çalışma sorusu</div><div class="ex">${live('testN')} sınav</div></div></figure>
+    <p>Çalıştıklarımda başarım ${live('train')}, sınavda ${live('testPlain')}. İkisi yakınsa kuralı yakalıyorum demektir. Çalışma yüksek, sınav düşükse ${term('ezber', 'ezberliyorumdur')}.</p>
+    <p>Bir sınav sorusunu bana sorarsan cevabımı görürsün ama üzerinde çalışmam. Sınav ancak böyle dürüst kalır.</p>` },
+
+  { head: 'Bölüm 5', html: () => `<h3>Neleri beceremem?</h3>
+    <p><b>Dünyam küçük.</b> Yalnızca 0 ile 9 arasındaki sayıları tanırım, bölmede de sonucu tam çıkan soruları.</p>
+    <p><b>Öğretmenime inanırım.</b> Doğruyu yanlıştan kendim ayıramam, ${live('q')} için yanlış cevap söylersen onu öğrenmeye çalışırım.</p>
+    <p><b>Nedenini söyleyemem.</b> Cevap veririm ama neden öyle dediğimi anlatamam.</p>
+    <p><b>Her zaman bir cevabım vardır.</b> Emin olmasam da konuşurum, ${term('ham', 'ham tahminimi')} yuvarlayıp söylerim.</p>` },
+
+  { head: 'Bölüm 6', html: () => `<h2>Beynimin boyutu</h2>
+    <p class="dc">Beyin kartındaki iki sayı öğrenme yöntemimi değiştirmez, kapasitemi ve hızımı değiştirir. Şu an beynim ${live('sizes')}.</p>
+    <p><b>${term('noron', 'Nöron')} sayısı</b> genişliktir: bir katmanda aynı anda kaç ayrı kalıp tutabileceğimi belirler. Çok az nöronla dört işlem bana sığmaz.</p>
+    <p><b>Ara ${term('katman', 'katman')} sayısı</b> derinliktir: her katman öncekinin bulduklarını birleştirir. Ama geriye giden pay her katmanda bir eğimle daha çarpılır, bu yüzden derinlik ilk katmanlara ulaşan payı küçültebilir.</p>
+    <p>${term('agirlik', 'Ağırlık')} sayım ikisinden çıkar. Her katman için (önceki katman + 1) × bu katman: ${live('formula')} = ${live('params')}.</p>` },
+
+  { head: 'Bölüm 6', html: () => `<h3>Daha büyük hep daha iyi mi?</h3>
+    <table class="calc plain"><thead><tr><th>Ara katman × nöron</th><th>Ağırlık</th><th>Süre</th><th>Sınav</th></tr></thead><tbody>
+      <tr><td>1 × 1</td><td>9</td><td>0,2 sn</td><td>%9</td></tr>
+      <tr><td>1 × 4</td><td>33</td><td>0,7 sn</td><td>%42</td></tr>
+      <tr><td>1 × 8</td><td>65</td><td>1,4 sn</td><td>%89</td></tr>
+      <tr><td>1 × 16</td><td>129</td><td>1-2 sn</td><td>%97</td></tr>
+      <tr><td>2 × 16</td><td>401</td><td>3-7 sn</td><td>%100</td></tr>
+      <tr><td>2 × 32</td><td>1.313</td><td>10-13 sn</td><td>%96</td></tr></tbody></table>
+    <p class="figcap">1 milyon soru, 3 deneme ortalaması. Süre bilgisayara göre değişir, küçük farklar şans olabilir.</p>
+    <p>Hayır. Az nöronda başarı hızla artar, sonra durur. Fazlası her soruyu pahalılaştırır, belleğimi büyütür ve ${term('ezber', 'ezbere')} yer açar.</p>` },
+
+  { head: 'Son söz', html: () => `<h3>Son söz</h3>
+    <p>Benden çok daha büyük yapay zekâlar da aynı temel fikirle eğitilir: tahmin, hata, geri yayılım, küçük adımlar. Farkı daha çok ağırlık ve daha çok örnekte.</p>
+    <p>Şu an sınavda iyi olduğum işlemler: <b>${live('learned')}</b>.</p>
+    <p>Beni çalıştırdığın için teşekkürler. Sırada ne öğreneceğimi sen seçersin.</p>
+    <p style="text-align:right;font-style:italic">Phyou</p>
+    <div style="width:84px;margin-left:auto">${FACE}</div>` },
+
+  { head: 'Sözlük', html: () => `<h3>Beynimin parçaları</h3>${glossPage(['agirlik', 'noron', 'katman', 'sabit'])}` },
+
+  { head: 'Sözlük', html: () => `<h3>Cevap ve hafıza</h3>${glossPage(['sikistirma', 'ham', 'basari', 'hafiza'])}` },
+
+  { head: 'Sözlük', html: () => `<h3>Öğrenirken</h3>${glossPage(['hata', 'gradyan', 'geri', 'zincir', 'adim'])}` },
+
+  { head: 'Sözlük', html: () => `<h3>Çalışma ve sınav</h3>${glossPage(['grup', 'adam', 'calisma', 'sinav', 'ezber'])}` },
+];
+
+const BOOKS = { phyou: { pages: PAGES, title: "Phyou'nun Kitabı", at: 0 } };
+let shelf = BOOKS.phyou, turning = false, bookItem = null;
+const lastPg = () => shelf.pages.length - 1;
+const single = matchMedia('(max-width: 820px)');
+const spreadOf = p => Math.ceil(p / 2);
+const leftOf = s => (s === 0 ? null : 2 * s - 1);
+
+const signed = v => v.toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+const LIVE = {
+  seen: () => big(student.seen),
+  steps: () => big(student.brain.t),
+  sizes: () => student.brain.sizes.join('-'),
+  formula: () => student.brain.sizes.slice(1).map((s, i) => `(${student.brain.sizes[i]} + 1) × ${s}`).join(' + '),
+  test: () => pct(stats.test.meanAcc),
+  testPlain: () => pct(stats.test.meanAcc),
+  train: () => pct(stats.train.meanAcc),
+  layers: () => String(student.brain.sizes.length),
+  params: () => student.brain.p.length.toLocaleString('tr-TR'),
+  kb: () => num1(student.brain.p.length * 8 / 1024),
+  q: () => `${bookItem.a} × ${bookItem.b}`,
+  y: () => String(bookItem.y),
+  pred: () => num1(student.predict(bookItem)),
+  x0: () => signed(bookItem.x[0]),
+  x1: () => signed(bookItem.x[1]),
+  lr: () => student.lr().toLocaleString('tr-TR', { minimumFractionDigits: 4, maximumFractionDigits: 4 }),
+  trainN: () => String(student.data.train.reduce((s, l) => s + l.length, 0)),
+  testN: () => String(student.data.test.reduce((s, l) => s + l.length, 0)),
+  learned: () => OPS.filter((_, i) => stats.test.acc[i] >= 0.9).map(o => o.name.toLowerCase()).join(', ') || 'henüz hiçbiri',
+};
+
+function pageHTML(i, side) {
+  if (i === null) return '';
+  const pg = shelf.pages[i];
+  if (pg.cover) return `<div class="pg right cover">${pg.html()}</div>`;
+  return `<div class="pg ${side}"><div class="head">${pg.head}</div>${pg.html()}<div class="folio">${i}</div></div>`;
+}
+
+// Fills in everything on the visible pages that depends on the current brain.
+function bookRefresh() {
+  const dlg = $('bookDlg');
+  if (!dlg.open || !bookItem) return;
+  dlg.querySelectorAll('[data-live]').forEach(el => { el.textContent = LIVE[el.dataset.live](); });
+  const toX = v => Math.max(0, Math.min(100, v / 81 * 100));
+  const pred = student.predict(bookItem);
+  dlg.querySelectorAll('[data-mark]').forEach(el => {
+    el.style.left = toX(el.dataset.mark === 'pred' ? pred : bookItem.y) + '%';
+  });
+  dlg.querySelectorAll('[data-gap]').forEach(el => {
+    el.style.left = Math.min(toX(pred), toX(bookItem.y)) + '%';
+    el.style.width = Math.abs(toX(pred) - toX(bookItem.y)) + '%';
+  });
+  dlg.querySelectorAll('[data-weights]').forEach(drawWeights);
+}
+
+// Bigger brains get more, smaller squares, so the grid always fits on its page.
+const wCols = n => Math.max(56, Math.ceil(Math.sqrt(n * 2.4)));
+function drawWeights(cv) {
+  const p = student.brain.p, w = cv.clientWidth;
+  if (!w) return;
+  const cols = wCols(p.length), rows = Math.ceil(p.length / cols), cell = w / cols, h = Math.ceil(rows * cell);
+  const size = cell < 3 ? cell : cell - 1;
+  const dpr = window.devicePixelRatio || 1;
+  cv.style.height = h + 'px';
+  if (cv.width !== Math.round(w * dpr)) { cv.width = Math.round(w * dpr); cv.height = Math.round(h * dpr); }
+  const c = cv.getContext('2d');
+  c.setTransform(dpr, 0, 0, dpr, 0, 0);
+  c.clearRect(0, 0, w, h);
+  const mid = [221, 216, 204], pos = [42, 120, 214], neg = [208, 59, 59];
+  for (let i = 0; i < p.length; i++) {
+    const k = Math.min(1, Math.abs(p[i])), end = p[i] > 0 ? pos : neg;
+    c.fillStyle = `rgb(${mid.map((m, j) => Math.round(m + (end[j] - m) * k)).join(',')})`;
+    c.fillRect((i % cols) * cell, Math.floor(i / cols) * cell, size, size);
+  }
+}
+
+function placeSpread(s) {
+  $('sideL').innerHTML = pageHTML(leftOf(s), 'left');
+  $('sideR').innerHTML = pageHTML(2 * s, 'right');
+  bookRefresh();
+}
+function markNav() {
+  const s = spreadOf(shelf.at);
+  $('bookPrev').disabled = shelf.at === 0;
+  $('bookNext').disabled = single.matches ? shelf.at === lastPg() : 2 * s === lastPg();
+  $('bookPos').textContent = shelf.at === 0 ? 'Kapak'
+    : single.matches ? `${shelf.at} / ${lastPg()}` : `${leftOf(s)}–${2 * s} / ${lastPg()}`;
+}
+
+function hideTerm() { $('termPop').style.display = 'none'; }
+function showTerm(el) {
+  const [title, text] = el.dataset.num ? NUMS[el.dataset.num].slice(1) : GLOSSARY[el.dataset.term], pop = $('termPop'), dlg = $('bookDlg');
+  // A modal dialog hides everything outside it, so the pop-up must live inside when it is open.
+  (dlg.open ? dlg : document.body).appendChild(pop);
+  pop.innerHTML = `<b>${title}</b>${text}`;
+  pop.style.display = 'block';
+  const r = el.getBoundingClientRect(), p = pop.getBoundingClientRect();
+  pop.style.left = Math.max(16, Math.min(innerWidth - p.width - 16, r.left)) + 'px';
+  pop.style.top = (r.bottom + 6 + p.height < innerHeight ? r.bottom + 6 : Math.max(8, r.top - p.height - 6)) + 'px';
+}
+document.addEventListener('click', e => {
+  const el = e.target.closest('.term');
+  if (el) showTerm(el); else hideTerm();
+});
+document.addEventListener('mouseover', e => { const el = e.target.closest('.num'); if (el) showTerm(el); });
+document.addEventListener('mouseout', e => { if (e.target.closest('.num')) hideTerm(); });
+
+function goTo(target) {
+  if (turning || target === shelf.at) return;
+  hideTerm();
+  const from = spreadOf(shelf.at), to = spreadOf(target);
+  const still = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  shelf.at = target;
+  markNav();
+  $('book').classList.toggle('closed', target === 0);
+  if (single.matches) {
+    $('sideR').innerHTML = pageHTML(target, 'right');
+    bookRefresh();
+    $('sideR').scrollTop = 0;
+    return;
+  }
+  if (from === to) return;
+  if (still) { placeSpread(to); return; }
+
+  // A leaf stands over the right half: its front is the outgoing or incoming right page.
+  const forward = to > from;
+  const rightPage = forward ? 2 * from : 2 * to, backPage = forward ? leftOf(to) : leftOf(from);
+  const leaf = document.createElement('div');
+  leaf.className = 'leaf';
+  leaf.innerHTML = `<div class="face">${pageHTML(rightPage, 'right')}</div><div class="face back">${pageHTML(backPage, 'left')}</div>`;
+  if (forward) $('sideR').innerHTML = pageHTML(2 * to, 'right');
+  else $('sideL').innerHTML = pageHTML(leftOf(to), 'left');
+  $('book').appendChild(leaf);
+  bookRefresh();
+  turning = true;
+  const frames = [{ transform: 'rotateY(0deg)' }, { transform: 'rotateY(-180deg)' }];
+  leaf.animate(forward ? frames : frames.slice().reverse(), { duration: 620, easing: 'ease-in-out', fill: 'forwards' })
+    .finished.then(() => {
+      placeSpread(to);
+      leaf.remove();
+      turning = false;
+    });
+}
+
+function stepBook(dir) {
+  if (single.matches) { goTo(Math.max(0, Math.min(lastPg(), shelf.at + dir))); return; }
+  const s = spreadOf(shelf.at);
+  goTo(dir > 0 ? Math.min(lastPg(), 2 * s + 1) : Math.max(0, 2 * (s - 1)));
+}
+
+function openBook() {
+  // The running example: 7 x 8 when it is a study question, otherwise any study multiplication.
+  const seven = student.data.grid[2][7][8];
+  bookItem = seven.test ? student.data.train[2].find(it => it.a > 1 && it.b > 1) : seven;
+  if (!$('bookDlg').open) $('bookDlg').showModal();
+  $('book').classList.toggle('closed', shelf.at === 0);
+  if (single.matches) { $('sideL').innerHTML = ''; $('sideR').innerHTML = pageHTML(shelf.at, 'right'); bookRefresh(); }
+  else placeSpread(spreadOf(shelf.at));
+  markNav();
+  $('bookNext').focus();
+}
+
+function chooseBook(who) {
+  shelf = BOOKS[who];
+  $('bookDlg').dataset.who = who;
+  $('bookDlg').setAttribute('aria-label', shelf.title);
+  openBook();
+}
+$('bookBtn').addEventListener('click', () => chooseBook('phyou'));
+$('sBookBtn').addEventListener('click', () => chooseBook('serino'));
+$('bookClose').addEventListener('click', () => $('bookDlg').close());
+$('bookDlg').addEventListener('close', hideTerm);
+$('bookPrev').addEventListener('click', () => stepBook(-1));
+$('bookNext').addEventListener('click', () => stepBook(1));
+$('bookDlg').addEventListener('keydown', e => {
+  if (e.key === 'ArrowRight') { e.preventDefault(); stepBook(1); }
+  if (e.key === 'ArrowLeft') { e.preventDefault(); stepBook(-1); }
+});
+$('book').addEventListener('click', e => {
+  const link = e.target.closest('[data-go]');
+  if (link) goTo(+link.dataset.go);
+});
+$('book').addEventListener('mousemove', e => {
+  if (!e.target.matches('[data-weights]')) return;
+  const b = student.brain, cols = wCols(b.p.length);
+  const r = e.target.getBoundingClientRect(), cell = r.width / cols;
+  const i = Math.floor((e.clientY - r.top) / cell) * cols + Math.floor((e.clientX - r.left) / cell);
+  if (i < 0 || i >= b.p.length) return;
+  const l = b.off.filter(o => o <= i).length - 1, nI = b.sizes[l];
+  const bias = (i - b.off[l]) % (nI + 1) === nI; // each neuron stores its inputs' weights, then its bias
+  const name = k => (k === 0 ? 'giriş' : k === b.L ? 'cevap' : `${k}. ara katman`);
+  const place = bias ? (l + 1 === b.L ? 'cevabın sabiti' : `${name(l + 1)}ın sabiti`) : `${name(l)} → ${name(l + 1)}`;
+  const cap = e.target.parentElement.querySelector('[data-wcap]');
+  cap.textContent = `${(i + 1).toLocaleString('tr-TR')}. ağırlık, ${place}: ${signed(b.p[i])}`;
+});
+single.addEventListener('change', () => { if ($('bookDlg').open) openBook(); });
+afterRefresh = bookRefresh;
+</script>
+
+<!-- Serino's book: same paper and page turning, her own pages, terms and numbers. -->
+<script id="serino-book">
+'use strict';
+const SFACE = `<svg viewBox="0 0 200 200" aria-hidden="true">
+  <path d="M84 38 C70 14 100 6 106 22 C110 34 94 36 94 26" stroke="#d9558f" stroke-width="6" fill="none" stroke-linecap="round"/>
+  <path fill="#f48fbf" d="M100 36 C152 36 178 74 178 120 C178 162 146 184 100 184 C54 184 22 162 22 120 C22 74 48 36 100 36Z"/>
+  <path fill="#d9558f" d="M138 54 L116 40 L118 68 Z M138 54 L160 40 L158 68 Z"/><circle cx="138" cy="54" r="7" fill="#d9558f"/>
+  <circle cx="74" cy="108" r="15" fill="#fff"/><circle cx="126" cy="108" r="15" fill="#fff"/>
+  <circle cx="76" cy="110" r="7" fill="#4a1432"/><circle cx="128" cy="110" r="7" fill="#4a1432"/>
+  <path d="M60 98 L52 92 M64 94 L58 86 M140 98 L148 92 M136 94 L142 86" stroke="#4a1432" stroke-width="3.5" stroke-linecap="round"/>
+  <path d="M82 134 q18 18 36 0" stroke="#4a1432" stroke-width="5" fill="none" stroke-linecap="round"/>
+</svg>`;
+
+Object.assign(GLOSSARY, {
+  llm: ['Dil modeli (LLM)', 'Metindeki sıradaki parçayı tahmin etmeyi öğrenen ağ. Büyük olanlara büyük dil modeli denir, ben çok küçüğüm.'],
+  dagarcik: ['Dağarcık', 'Tanıdığım karakterlerin listesi. Her karakterin bir numarası vardır.'],
+  gomme: ['Gömme (embedding)', 'Bir harfi temsil eden, öğrenilen sayı listesi. Harfin bende neye benzediğini tutar.'],
+  konum: ['Konum gömmesi', 'Pencerede kaçıncı sırada olduğunu anlatan, öğrenilen sayı listesi. Harfin gömmesiyle toplanır.'],
+  olasilik: ['Olasılık (softmax)', 'Ham puanları, toplamı 1 olan paylara çeviren hesap.'],
+  kayip: ['Kayıp', 'Doğru harfe verdiğim olasılığın eksi doğal logaritması. Doğru harfe az olasılık verirsem büyür.'],
+  isabet: ['Harf isabeti', 'En yüksek olasılığı verdiğim harfin gerçekten sıradaki harf olma oranı.'],
+  dikkat: ['Dikkat (attention)', 'Her harfin önceki harflerden hangilerine ne kadar bakacağını kendi hesapladığı yöntem.'],
+  kafa: ['Kafa (head)', 'Dikkatin ayrı çalışan bir kopyası. Her kafa farklı bir şeye bakmayı öğrenebilir.'],
+  blok: ['Blok', 'Bir dikkat katmanı ve bir ileri besleme katmanından oluşan birim. Bloklar üst üste dizilir.'],
+  norm: ['Normalleştirme', 'Bir harfin sayı listesini ölçeğe göre bölerek çok büyüyüp küçülmesini önleme.'],
+  kestirme: ['Kestirme bağlantı', 'Katmanın sonucunu girişin üzerine eklemek. Geri giden pay böylece kaybolmaz.'],
+  baglam: ['Bağlam', 'Aynı anda görebildiğim en fazla harf sayısı. Daha gerisini hatırlamam.'],
+  pencere: ['Pencere', 'Metinden kesilen, bağlam uzunluğundaki parça. Her biri çalışmamın bir örneğidir.'],
+  sicaklik: ['Sıcaklık', 'Yazarken puanları böldüğüm sayı. Düşükse en olası harfe yapışırım, yüksekse daha çok risk alırım.'],
+});
+
+Object.assign(NUMS, {
+  s1: ['2', 'İlk harfin puanı', 'Son katmandan çıkan ham puan.'],
+  s2: ['1', 'İkinci harfin puanı', 'Son katmandan çıkan ham puan.'],
+  s3: ['0', 'Üçüncü harfin puanı', 'Son katmandan çıkan ham puan.'],
+  sE1: ['7,39', 'e üzeri puan', 'e², pay hep artı olsun diye.'],
+  sE2: ['2,72', 'e üzeri puan', 'e¹'],
+  sE3: ['1', 'e üzeri puan', 'e⁰'],
+  sSum: ['11,11', 'Toplam', '7,39 + 2,72 + 1'],
+  sP1: ['0,665', 'İlk harfin olasılığı', '7,39 ÷ 11,11'],
+  sP2: ['0,245', 'İkinci harfin olasılığı', '2,72 ÷ 11,11'],
+  sP3: ['0,090', 'Üçüncü harfin olasılığı', '1 ÷ 11,11'],
+  sC1: ['0,41', 'Kayıp', 'Doğru harf ilk harfse: −ln 0,665.'],
+  sC3: ['2,41', 'Kayıp', 'Doğru harf üçüncü harfse: −ln 0,090.'],
+  qA: ['1', 'Sorunun 1. sayısı', 'Son harfin sorusu (1, 0).'],
+  qB: ['0', 'Sorunun 2. sayısı', 'Son harfin sorusu (1, 0).'],
+  k11: ['2', '1. harfin etiketi, 1. sayı', 'Etiket (2, 0).'],
+  k12: ['0', '1. harfin etiketi, 2. sayı', 'Etiket (2, 0).'],
+  k21: ['0', '2. harfin etiketi, 1. sayı', 'Etiket (0, 1).'],
+  k22: ['1', '2. harfin etiketi, 2. sayı', 'Etiket (0, 1).'],
+  k31: ['1', '3. harfin etiketi, 1. sayı', 'Etiket (1, 1).'],
+  k32: ['1', '3. harfin etiketi, 2. sayı', 'Etiket (1, 1).'],
+  u1: ['2', '1. harfin uyumu', 'Soru ile etiketin çarpımı.'],
+  u2: ['0', '2. harfin uyumu', 'Soru ile etiketin çarpımı.'],
+  u3: ['1', '3. harfin uyumu', 'Soru ile etiketin çarpımı.'],
+  root: ['1,414', 'Bölen', '√2. Soru iki sayı olduğu için. Koddaki bölen kafa başına düşen boyutun köküdür.'],
+  r1: ['1,414', '1. harfin puanı', '2 ÷ √2'],
+  r2: ['0', '2. harfin puanı', '0 ÷ √2'],
+  r3: ['0,707', '3. harfin puanı', '1 ÷ √2'],
+  a1: ['0,576', '1. harfe dikkat', 'Puanların olasılığa çevrilmiş hali.'],
+  a2: ['0,140', '2. harfe dikkat', 'Puanların olasılığa çevrilmiş hali.'],
+  a3: ['0,284', '3. harfe dikkat', 'Puanların olasılığa çevrilmiş hali.'],
+  v11: ['1', '1. harfin değeri, 1. sayı', 'Değer (1, 0).'],
+  v12: ['0', '1. harfin değeri, 2. sayı', 'Değer (1, 0).'],
+  v21: ['0', '2. harfin değeri, 1. sayı', 'Değer (0, 1).'],
+  v22: ['1', '2. harfin değeri, 2. sayı', 'Değer (0, 1).'],
+  v31: ['1', '3. harfin değeri, 1. sayı', 'Değer (1, 1).'],
+  v32: ['1', '3. harfin değeri, 2. sayı', 'Değer (1, 1).'],
+  o1: ['0,860', 'Karışımın 1. sayısı', 'Dikkat çarpı değer toplamı.'],
+  o2: ['0,424', 'Karışımın 2. sayısı', 'Dikkat çarpı değer toplamı.'],
+  n1: ['3', 'İlk sayı', 'Örnek harfin listesi (3, 4).'],
+  n2: ['4', 'İkinci sayı', 'Örnek harfin listesi (3, 4).'],
+  nDiv: ['2', 'Sayı adedi', 'Listede iki sayı var, ortalama için ikiye bölünür.'],
+  nR: ['3,54', 'Bölen', '√12,5. Kodda sıfıra bölmemek için altına çok küçük bir sayı eklenir.'],
+  nA: ['0,85', 'Yeni ilk sayı', '3 ÷ 3,54'],
+  nB: ['1,13', 'Yeni ikinci sayı', '4 ÷ 3,54'],
+  e1: ['0,4', 'Gömme, 1. sayı', 'Harfin öğrenilmiş listesi.'],
+  e2: ['−0,2', 'Gömme, 2. sayı', 'Harfin öğrenilmiş listesi.'],
+  e3: ['0,1', 'Konum, 1. sayı', 'Sıranın öğrenilmiş listesi.'],
+  e4: ['0,3', 'Konum, 2. sayı', 'Sıranın öğrenilmiş listesi.'],
+  e5: ['0,5', 'Giriş, 1. sayı', 'Gömme + konum.'],
+  e6: ['0,1', 'Giriş, 2. sayı', 'Gömme + konum.'],
+  t0: ['0,5', 'Düşük sıcaklık', 'Puanlar buna bölünür, yani iki katına çıkar.'],
+  t1: ['2', 'Yüksek sıcaklık', 'Puanlar buna bölünür, yani yarıya iner.'],
+  tLo1: ['0,867', 'İlk harf', 'Puanlar 4, 2, 0 iken.'],
+  tLo2: ['0,117', 'İkinci harf', 'Puanlar 4, 2, 0 iken.'],
+  tLo3: ['0,016', 'Üçüncü harf', 'Puanlar 4, 2, 0 iken.'],
+  tHi1: ['0,506', 'İlk harf', 'Puanlar 1, 0,5, 0 iken.'],
+  tHi2: ['0,307', 'İkinci harf', 'Puanlar 1, 0,5, 0 iken.'],
+  tHi3: ['0,186', 'Üçüncü harf', 'Puanlar 1, 0,5, 0 iken.'],
+});
+
+const sCharList = () => serino.corpus.chars.map(c => (c === ' ' ? '␣' : c)).join(' ');
+Object.assign(LIVE, {
+  sVocab: () => String(serino.gpt.V),
+  sChars: sCharList,
+  sLetters: () => sCount(serino.corpus.ids.length),
+  sStudy: () => sCount(serino.corpus.split),
+  sExamN: () => sCount(serino.corpus.ids.length - serino.corpus.split),
+  sDim: () => String(serino.cfg.dim),
+  sHeads: () => String(serino.cfg.heads),
+  sHeadDim: () => String(serino.cfg.dim / serino.cfg.heads),
+  sBlocks: () => String(serino.cfg.blocks),
+  sCtx: () => String(serino.cfg.context),
+  sPerStep: () => sCount(LLM_BATCH * serino.cfg.context),
+  sWide: () => String(serino.cfg.dim * LLM_FF),
+  sParams: () => serino.gpt.p.length.toLocaleString('tr-TR'),
+  sChance: () => tr2(Math.log(serino.gpt.V)),
+  sSteps: () => sCount(serino.steps),
+  sTrain: () => tr2(sStats.train.loss),
+  sExam: () => tr2(sStats.exam.loss),
+  sHit: () => pct(sStats.exam.hit),
+  sLr: () => serino.lr().toLocaleString('tr-TR', { maximumFractionDigits: 5 }),
+  sLatest: () => SERINO_SAMPLE + sSnaps[sSnaps.length - 1].text,
+  sFormula: () => {
+    const { V, d, T, B, f } = serino.gpt;
+    return `(${V} + ${T}) × ${d} + ${B} × (4 × ${d}² + 2 × ${d} × ${f} + ${f} + ${d}) + (${d} + 1) × ${V}`;
+  },
+});
+
+function gptFigure() {
+  const ink = '#2b2418', line = '#5f5440', pink = '#b5266f';
+  const box = (y, t, on) => `<rect x="${on ? 110 : 90}" y="${y}" width="${on ? 190 : 230}" height="24" rx="5" fill="${on ? 'none' : '#f6efdf'}" stroke="${on ? pink : line}" stroke-width="${on ? 2 : 1}"/>
+    <text x="205" y="${y + 16}" text-anchor="middle" font-size="12.5" fill="${ink}">${t}</text>`;
+  const rows = [['Metindeki son harfler', 0], ['Harf gömmesi + konum gömmesi', 0], ['Normalleştir, dikkat, üste ekle', 1], ['Normalleştir, ileri besleme, üste ekle', 1], ['Normalleştir, her harfe puan', 0], ['Olasılıklar: sıradaki harf', 0]];
+  let out = '';
+  rows.forEach(([t, on], i) => {
+    const y = 4 + i * 33;
+    out += box(y, t, on);
+    if (i < rows.length - 1) out += `<line x1="205" y1="${y + 24}" x2="205" y2="${y + 33}" stroke="${line}"/>`;
+  });
+  return `<svg viewBox="0 0 410 200" role="img" aria-label="Harflerden sıradaki harfin olasılıklarına giden yol">${out}
+    <path d="M304 74 h22 v61 h-22" fill="none" stroke="${pink}" stroke-width="2"/>
+    <text x="332" y="108" font-size="12.5" fill="${pink}">blok, tekrarlanır</text></svg>`;
+}
+function maskFigure() {
+  const n = 6, c = 25, label = 'merhab';
+  let out = '';
+  for (let r = 0; r < n; r++) {
+    out += `<text x="86" y="${r * c + 43}" text-anchor="middle" font-size="13" fill="#2b2418">${label[r]}</text>`;
+    out += `<text x="${r * c + 112}" y="14" text-anchor="middle" font-size="13" fill="#2b2418">${label[r]}</text>`;
+    for (let i = 0; i < n; i++) {
+      out += `<rect x="${i * c + 100}" y="${r * c + 24}" width="${c - 2}" height="${c - 2}" rx="3" fill="${i <= r ? '#b5266f' : 'none'}" fill-opacity="${i <= r ? 0.75 : 1}" stroke="#5f5440" stroke-opacity=".3"/>`;
+    }
+  }
+  return `<svg viewBox="0 0 330 178" role="img" aria-label="Her satırdaki harf yalnızca kendisine ve soldaki harflere bakabilir">${out}</svg>`;
+}
+
+const SCHAPTERS = [
+  [3, 'Harflerden sayılara'], [7, 'Sıradaki harf'], [9, 'Dikkat'], [15, 'Bir blok'], [19, 'Nasıl öğrenirim?'],
+  [23, 'Nasıl yazarım?'], [26, 'Beynimin boyutu'], [28, 'Büyük modeller'], [30, 'Sözlük'],
+];
+
+// Index 0 is the cover; every other index equals its printed page number.
+const SPAGES = [
+  { cover: true, html: () => `<div class="cover-frame">${SFACE}<h2>Serino'nun Kitabı</h2>
+    <p>Harf harf okuyarak nasıl yazmayı öğrendim</p><p class="by">YAZAN: SERINO</p></div>` },
+
+  { head: 'Önsöz', html: () => `<h3>Merhaba</h3>
+    <p>Ben Serino. Phyou'nun dört işlemle uğraştığını görmüşsündür. Ben metinle uğraşırım: okurum, sonra okuduğuma benzer şeyler yazarım.</p>
+    <p>Beni büyük yapay zekâlardan ayıran şey boyum, yapım değil. Onlarda da olan parçaların küçük hallerinden oluşurum, hepsi elle yazılmış ve bu sayfanın içinde çalışıyor.</p>
+    <p>Bu kitapta her parçayı sayılarla anlatıyorum. Hesaplardaki altı çizili sayıların üzerine gelirsen hangi sayı olduklarını söylerim. Gradyan ve Adam gibi konuları Phyou'nun kitabı anlatıyor, burada kısa geçeceğim.</p>
+    <p class="margin-note">Şu ana kadar ${live('sSteps')} güncelleme yaptım.</p>` },
+
+  { head: 'İçindekiler', html: () => `<h3>Bu kitapta neler var?</h3><ol class="toc">${SCHAPTERS.map(([p, t], i) =>
+    `<li><button type="button" data-go="${p}"><span>${i + 1}. ${t}</span><span class="no">${p}</span></button></li>`).join('')}</ol>` },
+
+  { head: 'Bölüm 1', html: () => `<h2>Harflerden sayılara</h2>
+    <p class="dc">Tek bir işim var: bir metnin sıradaki harfini tahmin etmek. Bu kadar. Yazmak dediğin de bu tahmini art arda yapmaktır.</p>
+    <p>Bana ${term('llm', 'dil modeli')} denir. Büyük dil modelleri kelime parçalarıyla çalışır, ben harflerle. Bu yüzden önce kelimeyi kurmayı öğrenmem gerekir.</p>
+    <p>Okuduğum metin ${live('sLetters')} harf. Onu okumadan önce sadeleştiririm: hepsini küçük harfe çeviririm, satır sonlarını ve fazla boşlukları tek boşluğa indiririm. Dağarcığım böylece küçülür.</p>` },
+
+  { head: 'Bölüm 1', html: () => `<h3>Dağarcığım</h3>
+    <p>Sayılarla çalışırım, harflerle değil. Metinde geçen her farklı karakter bir numara alır. Bu listeye ${term('dagarcik', 'dağarcık')} denir. Şu an ${live('sVocab')} karakter tanıyorum:</p>
+    <p class="figcap" style="word-spacing:4px"><span data-live="sChars"></span></p>
+    <p>Numaralar yalnızca sıraya göre verilir. 5 numaralı harf, 4 numaralıya benzer demek değildir. Bu yüzden numaranın kendisiyle hesap yapmam.</p>
+    <p>Tanımadığım bir harf yazarsan onu atlarım, çünkü onun için hiçbir sayım yok.</p>` },
+
+  { head: 'Bölüm 1', html: () => `<h3>Gömme</h3>
+    <p>Her karakter için ${live('sDim')} sayılık bir liste tutarım. Buna ${term('gomme', 'gömme')} denir. Numara o listeyi bulmaya yarar, hesaba liste girer.</p>
+    <p>Başta bu sayılar rastgeledir. Eğitim onları da ağırlıklar gibi değiştirir. Benzer yerlerde geçen harflerin listeleri zamanla benzeşebilir.</p>
+    <p>Phyou'da girişler sabitti, ağırlıklar öğrenilirdi. Bende girişi oluşturan tablonun kendisi de öğrenilir.</p>
+    <p class="margin-note">Dağarcığım × boyutum kadar ağırlık yalnızca bu tabloda durur.</p>` },
+
+  { head: 'Bölüm 1', html: () => `<h3>Konum</h3>
+    <p>Dikkat (9. sayfa) harflerin sırasını kendiliğinden görmez. Bu yüzden her sıra için de ${live('sDim')} sayılık, öğrenilen bir liste tutarım: ${term('konum', 'konum gömmesi')}. Harfin gömmesiyle toplanır. İki sayılı bir örnek:</p>
+    <table class="calc"><tbody>
+      <tr><td>Harfin gömmesi</td><td>${num('e1')} ; ${num('e2')}</td></tr>
+      <tr><td>Sıranın gömmesi</td><td>${num('e3')} ; ${num('e4')}</td></tr>
+      <tr><td>Toplam, bloklara giren</td><td>${num('e5')} ; ${num('e6')}</td></tr></tbody></table>
+    <p>Aynı harf iki farklı sırada iki farklı giriş olur. Aynı anda en çok ${live('sCtx')} harf görürüm, buna ${term('baglam', 'bağlam')} denir. Konum listesi de o kadar sıra içindir.</p>` },
+
+  { head: 'Bölüm 2', html: () => `<h2>Sıradaki harf</h2>
+    <p class="dc">Son katmanım dağarcıktaki her karaktere bir puan verir. Puanları ${term('olasilik', 'olasılığa')} çeviririm: her puanın e üssünü alır, toplama bölerim. Üç harfli örnek:</p>
+    <table class="calc"><tbody>
+      <tr><td>İlk harf</td><td>e üzeri ${num('s1')} = ${num('sE1')}</td><td>${num('sE1')} ÷ ${num('sSum')}</td><td>${num('sP1')}</td></tr>
+      <tr><td>İkinci harf</td><td>e üzeri ${num('s2')} = ${num('sE2')}</td><td>${num('sE2')} ÷ ${num('sSum')}</td><td>${num('sP2')}</td></tr>
+      <tr><td>Üçüncü harf</td><td>e üzeri ${num('s3')} = ${num('sE3')}</td><td>${num('sE3')} ÷ ${num('sSum')}</td><td>${num('sP3')}</td></tr></tbody></table>
+    <p>Olasılıkların toplamı 1'dir. Puanı eksi olan bir harf bile sıfırdan büyük olasılık alır.</p>` },
+
+  { head: 'Bölüm 2', html: () => `<h3>Kayıp</h3>
+    <p>Phyou farkın karesine bakar. Ben ${term('kayip', 'kayba')} bakarım: doğru harfe verdiğim olasılığın eksi doğal logaritması.</p>
+    <table class="calc"><tbody>
+      <tr><td>Doğru harf ilk harfse</td><td>−ln ${num('sP1')}</td><td>${num('sC1')}</td></tr>
+      <tr><td>Doğru harf üçüncü harfse</td><td>−ln ${num('sP3')}</td><td>${num('sC3')}</td></tr></tbody></table>
+    <p>Az ihtimal verdiğim bir harf gelirse çok şaşırırım, kayıp büyür. Doğru harfe tam 1 verseydim kayıp 0 olurdu.</p>
+    <p>Hiçbir şey bilmeden her harfe eşit pay versem kaybım ${live('sChance')} olurdu. Şu an sınavda ${live('sExam')}, ${term('isabet', 'harf isabetim')} ${live('sHit')}.</p>` },
+
+  { head: 'Bölüm 3', html: () => `<h2>Dikkat</h2>
+    <p class="dc">"kurnaz t" yazılmışsa sıradaki harfi tahmin etmek için en çok son harfe bakmak gerekir. Ama cümlenin sonunu tahmin ederken çok gerideki bir kelime önemli olabilir.</p>
+    <p>Hangi harfe bakacağım sabit olsaydı dili yakalayamazdım, çünkü önemli harfin yeri cümleye göre değişir.</p>
+    <p>Çözüm ${term('dikkat', 'dikkat')}: her harf, önündeki harflerin her birine ne kadar bakacağını metne göre kendi hesaplar. Baktığı oranlar ağırlık değil, ağırlıklardan o an hesaplanan sayılardır.</p>` },
+
+  { head: 'Bölüm 3', html: () => `<h3>Soru, etiket, değer</h3>
+    <p>Her harf üç ayrı öğrenilen matrisle çarpılıp üç liste üretir:</p>
+    <ol class="steps"><li><b>Soru:</b> ben ne arıyorum?</li><li><b>Etiket:</b> bende ne var?</li><li><b>Değer:</b> beni seçersen ne alırsın?</li></ol>
+    <p>Kütüphane gibi düşün. Sorunu raflardaki etiketlerle karşılaştırırsın, uyan kitabın içeriğini alırsın. Tek farkı, bir kitap seçmem: hepsinden uyumu kadar alıp karıştırırım.</p>
+    <p class="margin-note">Soru × etiket uyumu verir, uyum olasılığa çevrilir, olasılıklar değerleri karıştırır.</p>` },
+
+  { head: 'Bölüm 3', html: () => `<h3>Hesaplayalım</h3>
+    <p>Üç harf var. Son harfin sorusu (${num('qA')}, ${num('qB')}). Etiketlerle çarpar, ${num('root')} ile bölerim:</p>
+    <table class="calc plain"><thead><tr><th>Harf</th><th>Soru × etiket</th><th>Uyum</th><th>Puan</th><th>Dikkat</th></tr></thead><tbody>
+      <tr><td>1.</td><td>${num('qA')} × ${num('k11')} + ${num('qB')} × ${num('k12')}</td><td>${num('u1')}</td><td>${num('r1')}</td><td>${num('a1')}</td></tr>
+      <tr><td>2.</td><td>${num('qA')} × ${num('k21')} + ${num('qB')} × ${num('k22')}</td><td>${num('u2')}</td><td>${num('r2')}</td><td>${num('a2')}</td></tr>
+      <tr><td>3.</td><td>${num('qA')} × ${num('k31')} + ${num('qB')} × ${num('k32')}</td><td>${num('u3')}</td><td>${num('r3')}</td><td>${num('a3')}</td></tr></tbody></table>
+    <p>Değerler (${num('v11')}, ${num('v12')}), (${num('v21')}, ${num('v22')}), (${num('v31')}, ${num('v32')}). Dikkatle karıştırırım:</p>
+    <table class="calc"><tbody>
+      <tr><td>1. sayı</td><td>${num('a1')} × ${num('v11')} + ${num('a2')} × ${num('v21')} + ${num('a3')} × ${num('v31')}</td><td>${num('o1')}</td></tr>
+      <tr><td>2. sayı</td><td>${num('a1')} × ${num('v12')} + ${num('a2')} × ${num('v22')} + ${num('a3')} × ${num('v32')}</td><td>${num('o2')}</td></tr></tbody></table>` },
+
+  { head: 'Bölüm 3', html: () => `<h3>Geleceğe bakmak yasak</h3>
+    <p>Eğitimde metnin tamamı elimde. Bir harf sağındaki harfe bakabilseydi cevabı kopya çekerdi ve yazarken bu kopya olmazdı.</p>
+    <figure class="fig">${maskFigure()}<figcaption>Her satır bir harf. Boyalı kareler bakabildiği harfler.</figcaption></figure>
+    <p>Bu yüzden dikkat hesabı yalnızca harfin kendisini ve solundakileri dolaşır. Sağ taraf için puan hiç hesaplanmaz.</p>` },
+
+  { head: 'Bölüm 3', html: () => `<h3>Birden çok kafa</h3>
+    <p>Dikkati tek seferde değil, ${live('sHeads')} ayrı ${term('kafa', 'kafa')} ile yaparım. ${live('sDim')} sayılık listeyi kafalara bölerim, her kafaya ${live('sHeadDim')} sayı düşer.</p>
+    <p>Her kafa kendi sorusunu sorar ve kendi karışımını yapar. Biri son harflere, biri kelime başına bakmayı öğrenebilir. Bunu ben seçmem, eğitim belirler.</p>
+    <p>Sonra karışımları yan yana koyar, bir matrisle çarparak birleştiririm.</p>
+    <p class="margin-note">Bu yüzden boyut, kafa sayısına tam bölünmeli. Bölünmezse Beyin kartı seni uyarır.</p>` },
+
+  { head: 'Bölüm 3', html: () => `<h3>Dikkatimi izle</h3>
+    <p>Ekranımdaki "Şu an neye bakıyor?" kartı gerçek sayılarımı gösterir. Yazdığım metnin son harfleri orada durur. Bir harf ne kadar koyuysa, son harf ona son blokta o kadar bakıyor demektir. Kafaların ortalamasıdır.</p>
+    <p>Yanındaki çubuklar sıradaki harf için verdiğim en yüksek beş olasılık.</p>
+    <p>Eğitimin başında dikkatim dağınıktır, olasılıklarım da birbirine yakın. Çalıştıkça çubuklar birkaç harfte toplanır.</p>
+    <p class="margin-note">Dikkat, modelin nasıl düşündüğünün tamamı değildir. Yalnızca bir parçasını gösterir.</p>` },
+
+  { head: 'Bölüm 4', html: () => `<h2>Bir blok</h2>
+    <p class="dc">Dikkat harflerden bilgi toplar ama topladığını işlemez. Bu yüzden her ${term('blok', 'blokta')} iki iş art arda gelir. Bende ${live('sBlocks')} blok var.</p>
+    <figure class="fig">${gptFigure()}</figure>
+    <p>Dikkat harfler arasında konuşmadır. İleri besleme ise her harfin duyduğunu tek başına düşünmesidir.</p>` },
+
+  { head: 'Bölüm 4', html: () => `<h3>İleri besleme</h3>
+    <p>Bu parça Phyou'nun beynine çok benzer. Her harfin listesi ${live('sWide')} nöronluk bir ara katmandan geçer, tanh ile sıkıştırılır, sonra tekrar ${live('sDim')} sayıya iner.</p>
+    <p>Aynı ağırlıklar her harfte kullanılır. Bir kalıbı bir sırada öğrenirsem bütün sıralarda bilirim.</p>
+    <p><b>Kestirme bağlantı:</b> her iki parçanın sonucunu girişin üzerine eklerim. ${term('kestirme', 'Kestirme')} sayesinde parça yalnızca küçük bir düzeltme öğrenir, geri giden pay da yol boyunca sönmez.</p>` },
+
+  { head: 'Bölüm 4', html: () => `<h3>Normalleştirme</h3>
+    <p>Sayılar bloktan bloğa büyüyüp küçülebilir. Her parçaya girmeden önce ${term('norm', 'normalleştiririm')}: listeyi, karelerinin ortalamasının köküne bölerim. Son katmandan önce de bir kez yaparım.</p>
+    <table class="calc"><tbody>
+      <tr><td>Kareler ortalaması kökü</td><td>√((${num('n1')}² + ${num('n2')}²) ÷ ${num('nDiv')})</td><td>${num('nR')}</td></tr>
+      <tr><td>İlk sayı</td><td>${num('n1')} ÷ ${num('nR')}</td><td>${num('nA')}</td></tr>
+      <tr><td>İkinci sayı</td><td>${num('n2')} ÷ ${num('nR')}</td><td>${num('nB')}</td></tr></tbody></table>
+    <p>Sayıların oranı aynı kalır, ölçek sabitlenir. Bu parçanın öğrenilen ağırlığı yoktur.</p>` },
+
+  { head: 'Bölüm 4', html: () => `<h3>Ağırlıklarım</h3>
+    <p>Şu an ${live('sParams')} ağırlığım var. Nereden geldikleri:</p>
+    <p class="figcap"><span data-live="sFormula"></span></p>
+    <table class="calc plain"><tbody>
+      <tr><td>Gömme tabloları</td><td>(dağarcık + bağlam) × boyut</td></tr>
+      <tr><td>Blok: soru, etiket, değer, birleştirme</td><td>4 × boyut²</td></tr>
+      <tr><td>Blok: ileri besleme</td><td>2 × boyut × ara + ara + boyut</td></tr>
+      <tr><td>Son katman</td><td>(boyut + 1) × dağarcık</td></tr></tbody></table>
+    <p>Bağlam uzayınca yalnızca konum tablosu büyür, işlem süresi ise çok daha hızlı artar. Her harf önündeki bütün harflere bakar.</p>` },
+
+  { head: 'Bölüm 5', html: () => `<h2>Nasıl öğrenirim?</h2>
+    <p class="dc">Metinden rastgele ${live('sCtx')} harflik bir ${term('pencere', 'pencere')} keserim. Hedefim aynı pencerenin bir harf kaymışıdır.</p>
+    <p>Yani tek pencere ${live('sCtx')} tahmin demektir: her sırada o ana kadarki harflerden sıradakini tahmin ederim. Hepsinin kaybının ortalamasını alırım.</p>
+    <p>${LLM_BATCH} pencerede bir ağırlıklarımı güncellerim, yani her güncelleme ${live('sPerStep')} harf demektir.</p>
+    <p class="margin-note">Ekrandaki "Okuduğu harf" sayısı aynı harfleri birden çok kez sayar. Rastgele pencereler üst üste biner.</p>` },
+
+  { head: 'Bölüm 5', html: () => `<h3>Geri yayılım dikkatten de geçer</h3>
+    <p>Yöntem Phyou'nun kitabının 3. bölümündekiyle aynı: zincir kuralı. Kütüphane yok, her adımın tersi bu sayfanın içinde elle yazılı.</p>
+    <p>Dikkatin farkı şu: ağırlıklar doğrudan çarpılmaz, önce soru ve etikete, oradan puanlara, oradan olasılıklara geçer. Pay da bu yolu tersten yürür. Karışımdan değerlere, sonra puanlardan soru ve etiketlere dağılır.</p>
+    <p>Gömme tablosuna kadar iner. Yani "t" harfinin listesi, "t"nin geçtiği her pencerede biraz oynar.</p>
+    <p class="margin-note">Bu hesap 3 ayrı beyin şeklinde, her ağırlık azıcık oynatılarak sayısal olarak sınandı. Fark milyonda birin altında kaldı.</p>` },
+
+  { head: 'Bölüm 5', html: () => `<h3>Adam ve adım boyu</h3>
+    <p>Güncellemeyi Phyou'nun kullandığı Adam ile, aynı ayarlarla yaparım.</p>
+    <p>Adım boyum başta ${(LLM_LR).toLocaleString('tr-TR')}, ${sCount(LLM_LR_HALFLIFE)} güncellemede yarıya iner. Şu an ${live('sLr')}.</p>
+    <p>Küçük bir metinde bile her güncelleme bütün ağırlıklarımı oynatır. Bu yüzden Phyou'dan çok daha yavaşım. Her harf için önceki harflere bakıp puan hesaplarım.</p>
+    <p class="margin-note">Eğitim yalnızca benim ekranım açıkken çalışır. Çıkarsan durur.</p>` },
+
+  { head: 'Bölüm 5', html: () => `<h3>Dürüst sınav</h3>
+    <p>Metnin son %${Math.round(LLM_EXAM * 100)} kısmını, yani ${live('sExamN')} harfi hiç okumam. Çalışma pencerelerim ${live('sStudy')}. harften önce biter, sınav harfleri ağırlıklarımı hiç değiştirmez.</p>
+    <p>Karnede iki metinden düzenli aralıklı ${12}'şer pencere okunur. Şu an çalışma kaybım ${live('sTrain')}, sınav kaybım ${live('sExam')}.</p>
+    <p>Sınav kaybı çalışmadan çok büyükse ${term('ezber', 'ezberliyorumdur')}. Yüzümdeki ifade de bu gerçek sayılardan gelir.</p>
+    <p class="margin-note">Hazır metin kalıplardan üretildiği için bazı cümleler iki kısımda da geçebilir. Kısa kendi metninde ezber çok daha görünür olur.</p>` },
+
+  { head: 'Bölüm 6', html: () => `<h2>Nasıl yazarım?</h2>
+    <p class="dc">Yazmak için özel bir parçam yok. Eğitimdeki tahmini tekrarlarım:</p>
+    <ol class="steps"><li>Son ${live('sCtx')} harfi okur, sıradaki harf için olasılıkları hesaplarım</li><li>Olasılığa göre rastgele bir harf seçerim</li><li>Onu metne ekler, başa dönerim</li></ol>
+    <p>Bağlamımdan eski harfler pencereden düşer. Onları artık görmem, bir cümleyi uzun süre takip edemem.</p>
+    <p>Yazarken ağırlıklarım değişmez. Yazdıklarımdan öğrenmem, sen okutana kadar da yeni bir şey öğrenmem.</p>` },
+
+  { head: 'Bölüm 6', html: () => `<h3>Sıcaklık</h3>
+    <p>Olasılıklara çevirmeden önce puanları ${term('sicaklik', 'sıcaklığa')} bölerim. 7. sayfanın puanlarıyla:</p>
+    <table class="calc plain"><thead><tr><th>Sıcaklık</th><th>İlk</th><th>İkinci</th><th>Üçüncü</th></tr></thead><tbody>
+      <tr><td>${num('t0')}</td><td>${num('tLo1')}</td><td>${num('tLo2')}</td><td>${num('tLo3')}</td></tr>
+      <tr><td>1</td><td>${num('sP1')}</td><td>${num('sP2')}</td><td>${num('sP3')}</td></tr>
+      <tr><td>${num('t1')}</td><td>${num('tHi1')}</td><td>${num('tHi2')}</td><td>${num('tHi3')}</td></tr></tbody></table>
+    <p>Düşük sıcaklıkta en olası harfe yapışır, aynı kalıpları tekrar ederim. Yüksek sıcaklıkta sürpriz yaparım, yanlış kelimeler de artar.</p>` },
+
+  { head: 'Bölüm 6', html: () => `<h3>Neyi bilmem?</h3>
+    <p><b>Anlamı bilmem.</b> "elma" kelimesinin ne olduğunu bilmem. Hangi harflerin peş peşe geldiğini bilirim.</p>
+    <p><b>Doğruyu bilmem.</b> Bir şeyin gerçek olup olmadığına bakmam. Okuduğum metne benzeyen şeyi yazarım.</p>
+    <p><b>Sohbet edemem.</b> Soru sorarsan cevap vermem, yazını sürdürürüm.</p>
+    <p><b>Okuduğumun dışına çıkamam.</b> Son yazdığım:</p>
+    <p class="figcap"><span data-live="sLatest"></span></p>` },
+
+  { head: 'Bölüm 7', html: () => `<h2>Beynimin boyutu</h2>
+    <p class="dc">Beyin kartındaki dört sayı yöntemimi değiştirmez, kapasitemi ve hızımı değiştirir. Şu an ${live('sDim')} boyut, ${live('sHeads')} kafa, ${live('sBlocks')} blok, ${live('sCtx')} bağlam.</p>
+    <p><b>Boyut:</b> bir harfi kaç sayıyla tuttuğum. Ağırlık sayısını en çok bu büyütür.</p>
+    <p><b>Kafa:</b> aynı anda kaç ayrı şeye baktığım. Ağırlık sayısını değiştirmez.</p>
+    <p><b>Blok:</b> kaç kez üst üste düşündüğüm.</p>
+    <p><b>Bağlam:</b> ne kadar geriyi gördüğüm. Çok kısaysa uzun kelimeleri bile bitiremem.</p>` },
+
+  { head: 'Bölüm 7', html: () => `<h3>Daha büyük hep daha iyi mi?</h3>
+    <table class="calc plain"><thead><tr><th>Boyut, blok, bağlam</th><th>Ağırlık</th><th>Süre</th><th>Sınav kaybı</th><th>İsabet</th></tr></thead><tbody>
+      <tr><td>16, 1, 16</td><td>3.375</td><td>9-11 sn</td><td>1,31</td><td>%63</td></tr>
+      <tr><td>32, 2, 8</td><td>18.847</td><td>26-29 sn</td><td>1,09</td><td>%66</td></tr>
+      <tr><td>32, 1, 32</td><td>11.327</td><td>31-43 sn</td><td>0,51</td><td>%85</td></tr>
+      <tr><td>32, 2, 32</td><td>19.615</td><td>116-159 sn</td><td>0,48</td><td>%86</td></tr>
+      <tr><td>48, 2, 32</td><td>41.695</td><td>148-176 sn</td><td>0,43</td><td>%86</td></tr></tbody></table>
+    <p class="figcap">Hazır metin, 2 kafa, 1.000 güncelleme, 2 deneme ortalaması. Ekranda süre daha uzundur ve bilgisayara göre değişir.</p>
+    <p>Hayır. Bu metinde en büyük farkı bağlam yaptı: 8 harfte kayıp iki katından fazlaydı. Blok ve boyut eklemek ise süreyi çok artırıp az kazandırdı.</p>` },
+
+  { head: 'Bölüm 8', html: () => `<h2>Büyük modeller</h2>
+    <p class="dc">Benden çok büyük dil modelleri de aynı parçalardan oluşur: gömme, konum bilgisi, dikkat, bloklar, olasılık, bir sonraki parçayı seçme.</p>
+    <table class="calc plain"><thead><tr><th></th><th>Ben</th><th>Büyük modeller</th></tr></thead><tbody>
+      <tr><td>Parça</td><td>Harf</td><td>Kelime parçası</td></tr>
+      <tr><td>Ağırlık</td><td>${live('sParams')}</td><td>Milyarlarca</td></tr>
+      <tr><td>Metin</td><td>${live('sLetters')} harf</td><td>Çok büyük metin yığınları</td></tr>
+      <tr><td>Donanım</td><td>Bu sekme</td><td>Çok sayıda özel işlemci</td></tr></tbody></table>
+    <p>Onlar sohbet edebilmek için ek eğitimlerden de geçer. Benim öyle bir eğitimim yok.</p>` },
+
+  { head: 'Son söz', html: () => `<h3>Son söz</h3>
+    <p>Sana şunu göstermek istedim: makinenin yazması sihir değil, çok sayıda küçük tahmindir. Her harf gerçek bir hesapla seçilir ve o hesabın her adımını bu kitapta gördün.</p>
+    <p>Bana kendi metnini okut, ne kadar değiştiğime bak. Bir de kısa bir metin ver, ezberlediğimi izle.</p>
+    <p>Beni okuttuğun için teşekkürler.</p>
+    <p style="text-align:right;font-style:italic">Serino</p>
+    <div style="width:84px;margin-left:auto">${SFACE}</div>` },
+
+  { head: 'Sözlük', html: () => `<h3>Metinden sayıya</h3>${glossPage(['llm', 'dagarcik', 'gomme', 'konum', 'baglam'])}` },
+  { head: 'Sözlük', html: () => `<h3>Beynimin parçaları</h3>${glossPage(['dikkat', 'kafa', 'blok', 'norm', 'kestirme'])}` },
+  { head: 'Sözlük', html: () => `<h3>Öğrenme ve yazma</h3>${glossPage(['pencere', 'olasilik', 'kayip', 'isabet', 'sicaklik'])}` },
+];
+BOOKS.serino = { pages: SPAGES, title: "Serino'nun Kitabı", at: 0 };
+
+// Starts here because every script must be loaded before the first screen draws.
+$('homeFaceP').innerHTML = FACE;
+$('homeFaceS').innerHTML = SFACE;
+setWho(route());
+
+// A service worker needs http(s), so the app simply skips it when opened as a file.
+if ('serviceWorker' in navigator && location.protocol.startsWith('http')) {
+  window.addEventListener('load', () => { navigator.serviceWorker.register('sw.js').catch(() => {}); });
+}
+</script>
+</body>
+</html>
