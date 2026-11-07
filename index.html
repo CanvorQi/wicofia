@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Wicofia</title>
-<meta name="description" content="Yapay zekânın nasıl öğrendiğini üç küçük karakterle, kendi elinle gör.">
+<meta name="description" content="Yapay zekânın nasıl öğrendiğini dört küçük karakterle, kendi elinle gör.">
 <meta name="theme-color" content="#f9f9f7">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="icon.svg" type="image/svg+xml">
@@ -30,6 +30,8 @@
   --warn-bg: #fff3d6; --warn-ink: #5e4300;
   --pink: #c92f7e; --pink-ink: #ffffff; --pink-body: #f48fbf; --pink-deep: #d9558f; --pink-soft: 214, 63, 140;
   --green: #17794e; --green-ink: #ffffff;
+  --red: #bf3a1e; --red-ink: #ffffff; --px-bg: #dfe3e8;
+  --adv: #0e7490; --adv-ink: #ffffff; --adv-soft: #d5f0f5; --adv-bad: #b3261e;
 }
 :root[data-theme="dark"] {
   color-scheme: dark;
@@ -42,9 +44,13 @@
   --warn-bg: #3d2f0c; --warn-ink: #fbd98a;
   --pink: #f08cbf; --pink-ink: #0b0b0b; --pink-body: #ee84b6; --pink-deep: #d9558f; --pink-soft: 240, 140, 191;
   --green: #5cc48a; --green-ink: #0b0b0b;
+  --red: #ff8f70; --red-ink: #0b0b0b;
+  --adv: #4fd1e0; --adv-ink: #06202a; --adv-soft: #123a44; --adv-bad: #ff8a80;
 }
 body[data-who="serino"] { --accent: var(--pink); --accent-ink: var(--pink-ink); }
 body[data-who="eroson"] { --accent: var(--green); --accent-ink: var(--green-ink); }
+body[data-who="merisu"] { --accent: var(--red); --accent-ink: var(--red-ink); }
+body[data-who="advanced"] { --accent: var(--adv); --accent-ink: var(--adv-ink); }
 * { box-sizing: border-box; }
 [hidden] { display: none !important; }
 body {
@@ -120,13 +126,14 @@ button { cursor: pointer; }
 a.btn { color: inherit; text-decoration: none; display: inline-block; }
 
 /* Home */
-.home { max-width: 920px; margin: 0 auto; padding: 16px 16px 40px; }
+.home { max-width: 1180px; margin: 0 auto; padding: 16px 16px 40px; }
 .home-lead { font-size: 22px; line-height: 1.3; font-weight: 650; letter-spacing: -.01em; max-width: 620px; }
-.who-cards { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; margin-top: 20px; }
+.who-cards { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px; margin-top: 20px; }
 .who-card { display: flex; flex-direction: column; gap: 8px; padding: 20px; color: inherit; text-decoration: none; transition: border-color .15s, transform .15s; }
 .who-card:hover { border-color: var(--accent); transform: translateY(-2px); }
 .who-card.pink { --accent: var(--pink); --accent-ink: var(--pink-ink); }
 .who-card.green { --accent: var(--green); --accent-ink: var(--green-ink); }
+.who-card.red { --accent: var(--red); --accent-ink: var(--red-ink); }
 .who-card .face { width: 136px; height: 136px; margin: 0 auto 4px; }
 .who-card .face svg { display: block; width: 100%; height: 100%; }
 .who-card h2 { font-size: 22px; }
@@ -134,6 +141,7 @@ a.btn { color: inherit; text-decoration: none; display: inline-block; }
 .who-card .now { margin-top: auto; padding-top: 4px; font-size: 13px; color: var(--ink); font-variant-numeric: tabular-nums; }
 .who-card .btn { text-align: center; margin-top: 6px; }
 @media (prefers-reduced-motion: reduce) { .who-card { transition: none; } .who-card:hover { transform: none; } }
+@media (max-width: 1040px) { .who-cards { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 @media (max-width: 760px) { .who-cards { grid-template-columns: minmax(0, 1fr); } }
 #serino { width: 170px; height: 170px; display: block; margin: 12px auto 0; }
 #serino .s-body { fill: var(--pink-body); }
@@ -147,6 +155,75 @@ a.btn { color: inherit; text-decoration: none; display: inline-block; }
 #serino.busy .s-bow { animation: pulse .7s ease-in-out infinite alternate; }
 #sEyes { animation: blink 6s infinite; transform-origin: 100px 104px; }
 @media (prefers-reduced-motion: reduce) { #sEyes, #serino.busy .s-bow { animation: none; } }
+
+/* Advanced Phyou */
+.who-card.adv { --accent: var(--adv); --accent-ink: var(--adv-ink); grid-column: 1 / -1; display: grid; grid-template-columns: 136px minmax(0, 1fr) auto; gap: 8px 20px; align-items: center; }
+.who-card.adv .face { margin: 0; }
+.who-card.adv .btn { margin: 0; }
+.adv-page { max-width: 1180px; margin: 0 auto; padding: 0 16px 32px; display: grid; gap: 16px; }
+.adv-hero { display: grid; grid-template-columns: 200px minmax(0, 1fr); gap: 20px; align-items: center; padding: 20px; border-radius: 16px; color: #e8fbff; background: linear-gradient(120deg, #06202a, #0b3a4a 65%, #0e5a6e); }
+.adv-me { text-align: center; }
+#advFace svg { display: block; width: 170px; height: 170px; margin: 0 auto; }
+#advFace.busy .a-bulb { animation: pulse .6s ease-in-out infinite alternate; }
+#advFace .a-brow { transition: transform .3s; transform-box: fill-box; transform-origin: center; }
+#advFace.mouth-fill .a-mouth { fill: #06303c; }
+.adv-mood { font-size: 13px; color: #a9dce6; margin-top: 4px; }
+.adv-tag { font-size: 13px; font-weight: 650; letter-spacing: .03em; color: #7fe3f2; }
+.adv-say { font-size: 20px; line-height: 1.3; font-weight: 600; margin-top: 6px; min-height: 52px; }
+.adv-steps { display: flex; flex-wrap: wrap; gap: 8px; list-style: none; margin: 12px 0 0; padding: 0; font-size: 13px; }
+.adv-steps li { padding: 4px 12px; border-radius: 999px; border: 1px solid rgba(255,255,255,.25); color: #a9dce6; }
+.adv-steps li[aria-current="step"] { background: #7fe3f2; border-color: #7fe3f2; color: #06202a; font-weight: 650; }
+.adv-show { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-top: 12px; font-size: 14px; }
+.adv-show input { width: 72px; padding: 6px 8px; border-radius: 8px; border: 1px solid #7fe3f2; background: #06202a; color: #e8fbff; }
+.adv-show input:disabled { opacity: .6; }
+.adv-hero .note { color: #ffd98a; }
+.adv-hero .btn { color: var(--ink); }
+.adv-stats { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px; }
+.adv-stat .value { font-size: 26px; font-weight: 700; font-variant-numeric: tabular-nums; }
+.adv-stat .label { color: var(--ink-2); font-size: 13px; }
+.adv-stat .hint { color: var(--muted); font-size: 12px; min-height: 17px; }
+.adv-work { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 16px; align-items: start; }
+.adv-right { display: grid; gap: 16px; min-width: 0; }
+.adv-cells { display: grid; grid-template-columns: 20px repeat(10, minmax(0, 1fr)); gap: 3px; margin-top: 12px; font-variant-numeric: tabular-nums; }
+.adv-lab { display: grid; place-items: center; font-size: 12px; color: var(--muted); }
+.adv-cell { aspect-ratio: 1; min-width: 0; padding: 0; font-size: 13px; font-weight: 600; border: 1px solid var(--grid); border-radius: 5px; background: var(--surface); color: var(--muted); }
+.adv-cell:hover { border-color: var(--accent); }
+.adv-cell.shown { background: var(--adv); border-color: var(--adv); color: var(--adv-ink); }
+.adv-cell.sure { background: var(--adv-soft); border-color: var(--adv); color: var(--ink); }
+.adv-cell.unsure { border: 1px dashed var(--axis); color: var(--ink-2); }
+.adv-cell.exam { border: 2px solid var(--op3); color: var(--ink); }
+.adv-cell.bad { color: var(--adv-bad); text-decoration: line-through; }
+.adv-cell[aria-pressed="true"] { box-shadow: 0 0 0 2px var(--ink); }
+.adv-keys { display: flex; flex-wrap: wrap; gap: 6px 14px; margin-top: 12px; font-size: 12px; color: var(--ink-2); }
+.adv-keys span { display: inline-flex; align-items: center; gap: 6px; }
+.adv-keys i { width: 14px; height: 14px; border-radius: 3px; border: 1px solid var(--grid); }
+.adv-keys i.shown { background: var(--adv); border-color: var(--adv); }
+.adv-keys i.sure { background: var(--adv-soft); border-color: var(--adv); }
+.adv-keys i.unsure { border: 1px dashed var(--axis); }
+.adv-keys i.exam { border: 2px solid var(--op3); }
+.adv-ask { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-top: 10px; }
+.adv-ask input { width: 64px; padding: 8px; border-radius: 8px; border: 1px solid var(--axis); background: var(--surface); }
+.adv-answer { margin-top: 8px; font-weight: 600; }
+.adv-answer:empty { display: none; }
+.adv-q { font-size: 22px; font-weight: 700; margin-top: 8px; font-variant-numeric: tabular-nums; }
+.adv-checks { list-style: none; margin: 8px 0 0; padding: 0; font-size: 14px; }
+.adv-checks li { display: grid; grid-template-columns: 58px minmax(0, 1fr) 30px 20px; gap: 6px; padding: 4px 0; border-top: 1px solid var(--grid); font-variant-numeric: tabular-nums; }
+.adv-checks b { text-align: right; }
+.adv-checks .yes { color: var(--adv); font-weight: 700; }
+.adv-checks .no { color: var(--adv-bad); font-weight: 700; }
+.adv-verdict { margin-top: 8px; font-size: 14px; font-weight: 600; }
+.adv-true { margin-top: 2px; font-size: 13px; color: var(--ink-2); }
+#advRounds td, #advRounds th { font-variant-numeric: tabular-nums; }
+#advRounds tr.best td { font-weight: 700; color: var(--adv); }
+.adv-how { margin: 8px 0 0; padding-left: 18px; color: var(--ink-2); }
+.adv-how li + li { margin-top: 4px; }
+@media (prefers-reduced-motion: reduce) { #advFace.busy .a-bulb { animation: none; } }
+@media (max-width: 860px) {
+  .adv-work, .adv-hero { grid-template-columns: minmax(0, 1fr); }
+  .adv-stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .who-card.adv { grid-template-columns: minmax(0, 1fr); }
+  .who-card.adv .face { margin: 0 auto; }
+}
 
 /* Eroson */
 #eroson { width: 170px; height: 170px; display: block; margin: 12px auto 0; }
@@ -162,6 +239,56 @@ a.btn { color: inherit; text-decoration: none; display: inline-block; }
 #eMapCv { width: 100%; max-width: 460px; aspect-ratio: 1; display: block; margin: 12px auto 0; touch-action: none; cursor: crosshair; }
 .e-row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; justify-content: space-between; margin-top: 12px; }
 .e-rules { margin: 8px 0 0; padding-left: 18px; font-size: 13px; color: var(--ink-2); }
+
+/* Merisu */
+#mFace { width: 170px; height: 170px; display: block; margin: 12px auto 0; }
+#mFace .m-hair { fill: #d8432a; }
+#mFace .m-body { fill: #ffd9bd; }
+#mFace .m-cheek { fill: #f08a6a; opacity: .55; }
+#mFace .m-clip { fill: #f4c21e; }
+#mFace .m-clip2 { fill: #3f8cf0; }
+#mFace .feature { stroke: #5c2418; stroke-width: 5; fill: none; stroke-linecap: round; stroke-linejoin: round; }
+#mFace.mouth-fill #mMouth { fill: #5c2418; }
+#mFace.busy .m-clip { animation: pulse .7s ease-in-out infinite alternate; }
+#mEyes { animation: blink 7s infinite; transform-origin: 100px 120px; }
+@media (prefers-reduced-motion: reduce) { #mEyes, #mFace.busy .m-clip { animation: none; } }
+canvas.px { display: block; width: 100%; aspect-ratio: 1; image-rendering: pixelated; background: var(--px-bg); border-radius: 4px; }
+.m-draw { display: grid; grid-template-columns: minmax(0, 300px) minmax(0, 1fr); gap: 16px; margin-top: 12px; align-items: start; }
+.m-frame { position: relative; }
+#mBig, #mEdit { cursor: crosshair; touch-action: none; }
+#mMark { position: absolute; width: 6.25%; height: 6.25%; box-shadow: 0 0 0 2px #fff, 0 0 0 3px #241a2e; pointer-events: none; }
+.m-thumbs { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+#mLessons { grid-template-columns: repeat(4, minmax(0, 1fr)); margin-top: 10px; gap: 6px; }
+.m-pick { padding: 0; border: 2px solid transparent; border-radius: 8px; background: none; }
+.m-pick[aria-pressed="true"] { border-color: var(--accent); }
+.bar.m-bar { grid-template-columns: 130px minmax(0, 1fr) 40px; }
+.bar.m-bar .ch { display: flex; align-items: center; gap: 6px; text-align: left; font-family: inherit; white-space: nowrap; overflow: hidden; }
+.m-bar b { flex: none; width: 13px; height: 13px; border-radius: 2px; box-shadow: inset 0 0 0 1px var(--border); }
+.m-words { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 10px; }
+.m-word { border: 1px solid var(--border); background: var(--surface-2); border-radius: 6px; padding: 2px 8px; font-size: 13px; }
+.m-word:hover { border-color: var(--accent); }
+#mEditWrap { position: relative; max-width: 340px; margin: 12px auto 0; }
+#mEditWrap::after {
+  content: ""; position: absolute; inset: 0; pointer-events: none; border-radius: 4px;
+  background-image: linear-gradient(to right, var(--axis) 1px, transparent 1px), linear-gradient(to bottom, var(--axis) 1px, transparent 1px);
+  background-size: 6.25% 6.25%; opacity: .6;
+}
+#mPens { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: 3px; max-width: 340px; margin: 12px auto 0; }
+#mPens button { aspect-ratio: 1; padding: 0; border: 1px solid var(--border); border-radius: 4px; background: var(--px-bg); color: #241a2e; font-size: 12px; line-height: 1; }
+#mPens button[aria-pressed="true"] { box-shadow: 0 0 0 2px var(--accent); }
+#mTeach { display: grid; grid-template-columns: minmax(0, 1fr) auto auto; gap: 8px; margin-top: 12px; }
+#mTeach input { width: 100%; padding: 8px; border-radius: 8px; border: 1px solid var(--axis); background: var(--surface); }
+#mOwnList { grid-template-columns: repeat(8, minmax(0, 1fr)); margin-top: 8px; }
+#mChart { width: 100%; height: 230px; display: block; margin-top: 12px; }
+#mExamList { grid-template-columns: repeat(auto-fill, minmax(96px, 1fr)); margin-top: 12px; }
+#mExamList figure { margin: 0; }
+#mExamList figcaption { font-size: 12px; color: var(--ink-2); text-align: center; margin-top: 2px; }
+.m-snap .m-row, .m-snap > div:last-child { display: grid; grid-template-columns: repeat(3, 64px); gap: 8px; }
+@media (max-width: 620px) {
+  .m-draw { grid-template-columns: minmax(0, 1fr); }
+  #mTeach { grid-template-columns: minmax(0, 1fr) auto; }
+  #mTeach input { grid-column: 1 / -1; }
+}
 
 /* Serino */
 .side textarea, .write input[type="text"] {
@@ -304,6 +431,8 @@ tr:last-child td { border-bottom: 0; }
 }
 #bookDlg[data-who="serino"] { --b-accent: #b5266f; --cover: #a3246b; --cover-2: #6f1548; --gold: #ffdcea; }
 #bookDlg[data-who="eroson"] { --b-accent: #17794e; --cover: #1f7a52; --cover-2: #14573a; --gold: #d8f2c8; }
+#bookDlg[data-who="merisu"] { --b-accent: #b5361b; --cover: #b5361b; --cover-2: #7c2412; --gold: #ffe3c9; }
+#bookDlg[data-who="advanced"] { --b-accent: #0e7490; --cover: #0e5a6e; --cover-2: #06303c; --gold: #c9f3fa; }
 #bookDlg::backdrop { background: rgba(16, 12, 34, .78); }
 .stage { height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; padding: 12px 16px; }
 .book {
@@ -450,10 +579,18 @@ tr:last-child td { border-bottom: 0; }
     <button class="btn primary" id="eAuto" type="button">Eğitimi başlat</button>
     <button class="btn" id="eReset" type="button">Sıfırla</button>
   </div>
+  <div class="ctl" id="merisuCtl" hidden>
+    <button class="btn primary" id="mAuto" type="button">Eğitimi başlat</button>
+    <button class="btn" id="mReset" type="button">Sıfırla</button>
+  </div>
+  <div class="ctl" id="advCtl" hidden>
+    <button class="btn primary" id="advAuto" type="button">Öğretmeye başla</button>
+    <button class="btn" id="advReset" type="button">Sıfırla</button>
+  </div>
 </header>
 
 <main class="home" id="homeMode">
-  <p class="home-lead">Yapay zekânın nasıl öğrendiğini üç küçük karakterle, kendi elinle gör.</p>
+  <p class="home-lead">Yapay zekânın nasıl öğrendiğini dört küçük karakterle, kendi elinle gör.</p>
   <div class="who-cards">
     <a class="card who-card" href="#phyou">
       <div class="face" id="homeFaceP"></div>
@@ -476,7 +613,119 @@ tr:last-child td { border-bottom: 0; }
       <p class="now" id="homeNowE"></p>
       <span class="btn primary">Eroson'a git</span>
     </a>
+    <a class="card who-card red" href="#merisu">
+      <div class="face" id="homeFaceM"></div>
+      <h2>Merisu</h2>
+      <p>Kelimelerden pixel art resim yapmayı öğrenir. Resim üreten ağı, hayal sayılarını ve görmediği çiftlerde sınavı gösterir.</p>
+      <p class="now" id="homeNowM"></p>
+      <span class="btn primary">Merisu'ya git</span>
+    </a>
+    <a class="card who-card adv" href="#advanced">
+      <div class="face" id="homeFaceA"></div>
+      <div>
+        <h2>Advanced Phyou</h2>
+        <p>Deney: birkaç toplama gösterirsin, kalanları kendi tahmin edip iki kuralla kontrol ederek öğrenir.</p>
+        <p class="now" id="homeNowA"></p>
+      </div>
+      <span class="btn primary">Advanced Phyou'ya git</span>
+    </a>
   </div>
+</main>
+
+<main class="adv-page" id="advMode" hidden>
+  <section class="adv-hero" aria-label="Advanced Phyou">
+    <div class="adv-me">
+      <div id="advFace"></div>
+      <p class="adv-mood" id="advMoodText"></p>
+      <button class="btn book-open" id="advBookBtn" type="button">Düşünme kitabını oku</button>
+    </div>
+    <div>
+      <div class="seg" id="advViews" role="group" aria-label="Deney">
+        <button type="button" data-view="add" aria-pressed="true">Toplamayı düşün</button>
+        <button type="button" data-view="sub" aria-pressed="false">Çıkarmayı bul</button>
+      </div>
+      <p class="adv-say" id="advSay" aria-live="polite"></p>
+      <ol class="adv-steps" id="advSteps"><li>1. Göster</li><li>2. Düşün</li><li>3. Sınav</li></ol>
+      <form class="adv-show" id="advForm" autocomplete="off" novalidate>
+        <label for="advN">Kaç toplama göstereyim?</label>
+        <input id="advN" type="number" step="1">
+        <span id="advRange"></span>
+      </form>
+      <p class="note" id="advNote" aria-live="polite"></p>
+    </div>
+  </section>
+
+  <section class="adv-stats" aria-label="Genel durum">
+    <div class="card adv-stat"><div class="label" id="advLabShown">Gösterilen soru</div><div class="value" id="advStatShown">0</div><div class="hint" id="advHintShown"></div></div>
+    <div class="card adv-stat"><div class="label" id="advLabSure">Emin olduğu soru</div><div class="value" id="advStatSure">0</div><div class="hint" id="advHintSure"></div></div>
+    <div class="card adv-stat"><div class="label">Emin olduklarında doğruluk</div><div class="value" id="advStatRight">-</div><div class="hint" id="advHintRight"></div></div>
+    <div class="card adv-stat"><div class="label">Hiç görmediği sınav</div><div class="value" id="advStatExam">-</div><div class="hint" id="advHintExam"></div></div>
+  </section>
+
+  <div class="adv-work">
+    <section class="card">
+      <h2 id="advTableTitle">Toplama tablosu</h2>
+      <p class="sub">Satır birinci, sütun ikinci sayı. Karedeki sayı Phyou'nun cevabı. Kareye tıklarsan nasıl düşündüğünü görürsün.</p>
+      <div class="adv-cells" id="advCells"></div>
+      <div class="adv-keys">
+        <span id="advKeyShown"><i class="shown"></i>Gösterildi</span>
+        <span><i class="sure"></i>Kendi emin oldu</span>
+        <span><i class="unsure"></i>Emin değil</span>
+        <span><i class="exam"></i>Sınav, ders almaz</span>
+        <span><s>12</s> Yanlış cevap</span>
+      </div>
+    </section>
+    <div class="adv-right">
+      <section class="card">
+        <h2>Soru sor</h2>
+        <p class="sub">0-9 arası iki sayı yaz, Phyou cevaplasın. Sorduğun soru eğitime girmez.</p>
+        <form class="adv-ask" id="advAskForm" autocomplete="off" novalidate>
+          <input id="advA" type="number" min="0" max="9" step="1" value="7" aria-label="Birinci sayı">
+          <span id="advAskSign">+</span>
+          <input id="advB" type="number" min="0" max="9" step="1" value="5" aria-label="İkinci sayı">
+          <button class="btn" type="submit">Sor</button>
+        </form>
+        <p class="adv-answer" id="advAnswer" aria-live="polite"></p>
+        <p class="note" id="advAskNote" aria-live="polite"></p>
+      </section>
+      <section class="card">
+        <h2>Düşünce zinciri</h2>
+        <div id="advChain"></div>
+      </section>
+      <section class="card">
+        <h2>Tur tur düşünme</h2>
+        <p class="sub">"Doğru" sütunu notlama içindir, Phyou bu bilgiyi görmez.</p>
+        <table id="advRounds">
+          <thead><tr><th scope="col">Tur</th><th scope="col">Emin</th><th scope="col">Doğru</th><th scope="col">Sınav</th></tr></thead>
+          <tbody id="advRoundRows"></tbody>
+        </table>
+      </section>
+    </div>
+  </div>
+
+  <section class="card" id="advHowSub" hidden>
+    <h2>Çıkarmayı nasıl buluyor?</h2>
+    <ul class="adv-how">
+      <li>Phyou'ya hiç çıkarma cevabı verilmez. Önce toplama deneyi bitmiş olmalı, çünkü tek bilgi kaynağı odur.</li>
+      <li>7 − 3 için 0'dan 9'a kadar sayıları dener: hangi sayıya 3 eklersem 7 eder? Bunu kendi toplama bilgisiyle hesaplar.</li>
+      <li>En iyi aday hedefe yeterince yakınsa cevabından emin olur. İlk sayı küçükse soruyu ters çözer, işareti çevirir: 3 − 7 = −(7 − 3).</li>
+      <li>Bulduğu cevaplardan ders alırken gösterilen toplamaları da tekrar eder; yoksa toplamayı unutur.</li>
+      <li>Toplama bilgisinin çoğunu kaybettiren ya da daha az şey bıraktıran tur geri alınır. Sınav soruları hiçbir aşamada eğitime girmez.</li>
+      <li>Ters işlem kuralını kod veriyor. Phyou çıkarma cevaplarını bulur, kuralı keşfetmez.</li>
+    </ul>
+  </section>
+
+  <section class="card" id="advHowAdd">
+    <h2>Nasıl çalışıyor?</h2>
+    <ul class="adv-how">
+      <li>Phyou önce yalnızca gösterdiğin toplamaları çalışır. Sınav soruları hiçbir aşamada eğitime girmez.</li>
+      <li>Sonra kalan çalışma sorularına cevap tahmin eder ve iki kuralla kontrol eder: sıra değişince sonuç değişmez, sayı 1 artınca sonuç 1 artar.</li>
+      <li>Kontrollerin en az %80'i uyuşursa cevabını doğru sayıp kendine ders verir, uyuşmazsa o tur soruyu atlar.</li>
+      <li>Her turdan sonra gösterilen cevapları hâlâ bilip bilmediğine ve kaç soruda emin olduğuna bakılır. Daha kötü tur hemen geri alınır, sonunda en iyi tur seçilir. Bu kararda gösterilmeyen soruların gerçek cevapları kullanılmaz.</li>
+      <li>Kurallar sayılar arasındaki farkı kontrol eder. Bütün cevaplar aynı miktarda kayarsa kural bunu fark edemez; çok az örnekle Phyou yanlış şeyden emin olabilir, sınav düşebilir.</li>
+      <li>Kuralları ve 1 ekleme adımını kod veriyor: Phyou cevapları kendi bulur, kuralları değil.</li>
+    </ul>
+  </section>
 </main>
 
 <div class="layout" id="phyouMode" hidden>
@@ -822,6 +1071,121 @@ tr:last-child td { border-bottom: 0; }
           <tr><td>Rastgele yürüyüş, aynı sınav</td><td id="eRBW"></td><td id="eRBR"></td></tr>
         </tbody>
       </table>
+    </section>
+  </main>
+</div>
+<div class="layout" id="merisuMode" hidden>
+  <aside class="side">
+    <section class="card phyou-card" aria-label="Merisu">
+      <div class="bubble" id="mSpeech" aria-live="polite"></div>
+      <svg id="mFace" viewBox="0 0 200 200" role="img" aria-labelledby="mMoodText">
+        <path class="m-hair" d="M100 22 C158 22 186 66 186 124 C186 160 178 182 166 194 L146 150 H54 L34 194 C22 182 14 160 14 124 C14 66 42 22 100 22Z"/>
+        <path class="m-body" d="M100 46 C148 46 170 80 170 122 C170 162 142 184 100 184 C58 184 30 162 30 122 C30 80 52 46 100 46Z"/>
+        <path class="m-hair" d="M30 112 C34 66 64 40 100 40 C136 40 166 66 170 112 C154 102 142 88 136 72 C118 92 84 98 58 90 C50 98 40 106 30 112Z"/>
+        <path class="m-clip" d="M138 56 h10 v10 h-10z M148 46 h10 v10 h-10z"/>
+        <path class="m-clip2" d="M148 56 h10 v10 h-10z"/>
+        <ellipse class="m-cheek" cx="56" cy="140" rx="12" ry="7"/>
+        <ellipse class="m-cheek" cx="144" cy="140" rx="12" ry="7"/>
+        <g id="mEyes">
+          <circle cx="74" cy="120" r="14" fill="#fff"/><circle cx="126" cy="120" r="14" fill="#fff"/>
+          <circle cx="76" cy="122" r="7" fill="#5c2418"/><circle cx="128" cy="122" r="7" fill="#5c2418"/>
+        </g>
+        <path class="feature" id="mMouth" d="M90 148 q10 8 20 0"/>
+      </svg>
+      <p class="mood" id="mMoodText"></p>
+      <button class="btn book-open" id="mBookBtn" type="button">Merisu'nun kitabını oku</button>
+    </section>
+
+    <section class="card">
+      <h2>Bildiği kelimeler</h2>
+      <p class="sub">Bir kelimeye dokununca çizim isteğine eklenir.</p>
+      <div class="m-words" id="mWords"></div>
+    </section>
+
+    <section class="card">
+      <h2>Ders resimleri</h2>
+      <p class="sub">Çalıştığı resimlerden birkaçı. Tümü bu uygulamanın kodunda üretilir. Sınav çiftleri burada yoktur.</p>
+      <div class="m-thumbs" id="mLessons"></div>
+    </section>
+
+    <section class="card">
+      <h2>Hafıza</h2>
+      <p class="sub">Merisu'nun öğrendikleri ve gösterdiğin resimler bir dosyaya iner. Dosyayı geri yükleyince kaldığı yerden devam eder.</p>
+      <div class="mem-row">
+        <button class="btn" id="mMemSave" type="button">Hafızayı indir</button>
+        <button class="btn" id="mMemLoad" type="button">Hafıza yükle</button>
+        <input id="mMemFile" type="file" accept=".json,application/json" hidden>
+      </div>
+      <p class="note" id="mMemNote" aria-live="polite"></p>
+    </section>
+  </aside>
+
+  <main class="main">
+    <section class="card stats" aria-label="Genel durum">
+      <div class="stat"><div class="label">Gördüğü resim</div><div class="value" id="mSeen">0</div></div>
+      <div class="stat"><div class="label">Çalıştığı çiftleri çizme</div><div class="value" id="mStudy">%0</div></div>
+      <div class="stat"><div class="label">Hiç görmediği çiftleri çizme</div><div class="value" id="mExam">%0</div></div>
+    </section>
+
+    <section class="card">
+      <h2>Bana çiz</h2>
+      <p class="sub">Renk ve şekil yaz, Merisu 16 × 16 kare ve sabit <button type="button" class="term" data-term="palet">paletiyle</button> çizsin. <button type="button" class="term" data-term="hayalsayi">Hayal</button> arttıkça resimler daha farklı, daha hatalı olur.</p>
+      <form class="write" id="mDrawForm" autocomplete="off" novalidate>
+        <input id="mPrompt" type="text" maxlength="80" value="mavi kedi" aria-label="Çizim isteği">
+        <label class="temp">Hayal <input id="mDream" type="range" min="0" max="15" step="1" value="8"> <span id="mDreamShow"></span></label>
+        <button class="btn primary" type="submit">Çiz</button>
+      </form>
+      <div class="m-draw">
+        <div class="m-frame"><canvas class="px" id="mBig" aria-label="Seçili çizim. Bir kareye gelince olasılıkları çubuklarda görünür."></canvas><span id="mMark"></span></div>
+        <div class="m-thumbs" id="mThumbs"></div>
+      </div>
+      <p class="note" id="mDrawNote" aria-live="polite"></p>
+    </section>
+
+    <section class="card">
+      <h2>Şu an neye karar veriyor?</h2>
+      <p class="sub">Büyük resimde bir kareye gel ya da dokun. Çubuklar o kare için en olası beş rengin gerçek olasılığı.</p>
+      <div class="bars" id="mBars" style="margin-top:12px"></div>
+    </section>
+
+    <section class="card">
+      <h2>Kendi resmin</h2>
+      <p class="sub">Bir renk seç, kareye tıkla ya da sürükle. Resme ad ver, Merisu onu da çalışsın.</p>
+      <div id="mPens" role="group" aria-label="Resim paleti"></div>
+      <div id="mEditWrap"><canvas class="px" id="mEdit" aria-label="Çizim alanı. Yalnızca fare ya da dokunmayla çizilir."></canvas></div>
+      <form id="mTeach" autocomplete="off" novalidate>
+        <input id="mName" type="text" maxlength="40" placeholder="Resmin adı, örneğin mor robot" aria-label="Resmin adı">
+        <button class="btn primary" type="submit">Merisu'ya öğret</button>
+        <button class="btn" id="mEditClear" type="button">Temizle</button>
+      </form>
+      <div class="m-thumbs" id="mOwnList"></div>
+      <p class="note" id="mEditNote" aria-live="polite"></p>
+    </section>
+
+    <section class="card">
+      <h2>Başarı grafiği</h2>
+      <p class="sub">Yatayda gördüğü resim sayısı, dikeyde doğru çizilen resim oranı.</p>
+      <canvas id="mChart" aria-label="Çalışma ve sınav çiftlerindeki başarının zamanla değişimi. Güncel değerler karnede."></canvas>
+    </section>
+
+    <section class="card">
+      <h2>Karne</h2>
+      <p class="ticker" id="mTicker">Merisu ilk resmini bekliyor.</p>
+      <table>
+        <thead><tr><th scope="col">Çiftler</th><th scope="col">Doğru çizim</th><th scope="col">Şekil</th><th scope="col">Renk</th></tr></thead>
+        <tbody>
+          <tr><td>Çalıştığı çiftler</td><td id="mRSB"></td><td id="mRSS"></td><td id="mRSH"></td></tr>
+          <tr><td>Hiç görmediği çiftler</td><td id="mREB"></td><td id="mRES"></td><td id="mREH"></td></tr>
+          <tr><td>Rastgele seçim</td><td>%2</td><td>%10</td><td>%17</td></tr>
+        </tbody>
+      </table>
+      <div class="m-thumbs" id="mExamList"></div>
+    </section>
+
+    <section class="card">
+      <h2>Gelişim defteri</h2>
+      <p class="sub">Aynı kelimeler ve aynı hayal sayılarıyla, öğrendikçe nasıl çizdiği. Yeni satırlar üstte.</p>
+      <div class="snaps" id="mSnaps"></div>
     </section>
   </main>
 </div>
@@ -2753,28 +3117,35 @@ function sampleCorpus() {
 
 /* ---------- switching characters ---------- */
 const WHO = {
-  home: { title: 'Wicofia', sub: 'Üç küçük karakterle yapay zekâ nasıl öğrenir?' },
+  home: { title: 'Wicofia', sub: 'Dört küçük karakterle yapay zekâ nasıl öğrenir?' },
   phyou: { title: 'Phyou · Wicofia', sub: 'Phyou: dört işlemi senden öğrenen küçük bir sinir ağı' },
   serino: { title: 'Serino · Wicofia', sub: 'Serino: metin okuyarak yazmayı öğrenen küçük bir dil modeli' },
   eroson: { title: 'Eroson · Wicofia', sub: 'Eroson: labirentte deneyerek yol bulan küçük bir oyuncu' },
+  merisu: { title: 'Merisu · Wicofia', sub: 'Merisu: kelimelerden pixel art çizmeyi öğrenen küçük bir resim modeli' },
+  advanced: { title: 'Advanced Phyou · Wicofia', sub: 'Advanced Phyou: gösterilmeyen toplamaları kendi düşünerek öğrenme deneyi' },
 };
 function setWho(who) {
-  const isP = who === 'phyou', isS = who === 'serino', isE = who === 'eroson', isH = who === 'home';
+  const isP = who === 'phyou', isS = who === 'serino', isE = who === 'eroson', isM = who === 'merisu', isA = who === 'advanced', isH = who === 'home';
   whoNow = who;
   document.body.dataset.who = who;
   if (!isP) setRunning(false);
   if (!isS) sSetRun(false);
   if (!isE) { eSetRun(false); eStopDemo(); }
+  if (!isM) mSetRun(false);
+  if (!isA) advSetRun(false);
   if (isS && !serino) serinoReset(new SerinoModel(sampleCorpus(), LLM_DEFAULT, Math.random));
   $('homeMode').hidden = !isH; $('homeBtn').hidden = isH;
   $('phyouMode').hidden = !isP; $('phyouCtl').hidden = !isP;
   $('serinoMode').hidden = !isS; $('serinoCtl').hidden = !isS;
   $('erosonMode').hidden = !isE; $('erosonCtl').hidden = !isE;
+  $('merisuMode').hidden = !isM; $('merisuCtl').hidden = !isM;
+  $('advMode').hidden = !isA; $('advCtl').hidden = !isA;
   $('brandSub').textContent = WHO[who].sub;
   document.title = WHO[who].title;
   window.scrollTo(0, 0);
   if (isE && !eroson) erosonReset(MAZE_DEFAULT);
-  if (isS) sRefresh(); else if (isP) refresh(); else if (isE) eRefresh(); else showHome();
+  if (isM && !merisu) merisuReset();
+  if (isS) sRefresh(); else if (isP) refresh(); else if (isE) eRefresh(); else if (isM) mRefresh(); else if (isA) advRefresh(); else showHome();
 }
 // The cards report real progress, so coming back home shows what each character has learned.
 function showHome() {
@@ -2784,8 +3155,12 @@ function showHome() {
     ? `${sCount(serino.steps)} güncelleme yaptı, sınav kaybı ${tr2(sStats.exam.loss)}` : 'Henüz okumaya başlamadı.';
   $('homeNowE').textContent = eroson && eroson.steps
     ? `${big(eroson.games)} oyun oynadı, sınav başarısı ${pct(eStats.exam.won)}` : 'Henüz labirente girmedi.';
+  $('homeNowM').textContent = merisu && merisu.steps
+    ? `${big(merisu.seen)} resim gördü, sınav başarısı ${pct(mStats.exam.both)}` : 'Henüz resim görmedi.';
+  $('homeNowA').textContent = thinker && thinker.taught
+    ? `${thinker.shown.length} toplama gördü, sınav başarısı ${pct(thinker.grade().exam)}` : 'Henüz ders almadı.';
 }
-const route = () => { const h = location.hash.slice(1); return h === 'phyou' || h === 'serino' || h === 'eroson' ? h : 'home'; };
+const route = () => { const h = location.hash.slice(1); return h === 'phyou' || h === 'serino' || h === 'eroson' || h === 'merisu' || h === 'advanced' ? h : 'home'; };
 window.addEventListener('hashchange', () => { if (route() !== whoNow) setWho(route()); });
 
 /* ---------- state ---------- */
@@ -4217,8 +4592,8 @@ function eDrawBars(run) {
     return row;
   }));
 }
-function eDrawChart() {
-  const cv = $('eChart'), box = cv.getBoundingClientRect();
+function eDrawChart(id = 'eChart', hist = eHist, accent = '--green') {
+  const cv = $(id), box = cv.getBoundingClientRect();
   if (!box.width) return;
   const dpr = window.devicePixelRatio || 1, W = box.width, H = box.height;
   if (cv.width !== Math.round(W * dpr)) { cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr); }
@@ -4226,7 +4601,7 @@ function eDrawChart() {
   c.setTransform(dpr, 0, 0, dpr, 0, 0);
   c.clearRect(0, 0, W, H);
   const X0 = 36, X1 = W - 70, Y0 = H - 22, Y1 = 8;
-  const xMax = Math.max(eHist.length ? eHist[eHist.length - 1].steps : 0, 1000);
+  const xMax = Math.max(hist.length ? hist[hist.length - 1].steps : 0, 1000);
   const sx = v => X0 + (X1 - X0) * v / xMax, sy = v => Y0 - (Y0 - Y1) * v;
   c.font = '11px system-ui, "Segoe UI", sans-serif';
   c.fillStyle = tokens.muted; c.textAlign = 'right'; c.textBaseline = 'middle'; c.lineWidth = 1;
@@ -4239,16 +4614,16 @@ function eDrawChart() {
   const mag = Math.pow(10, Math.floor(Math.log10(xMax / 3)));
   const step = [1, 2, 5, 10].map(m => m * mag).find(s => xMax / s <= 4);
   for (let v = 0; v <= xMax; v += step) c.fillText(big(v), sx(v), Y0 + 6);
-  if (eHist.length < 2) return;
-  const ink = [[cs.getPropertyValue('--green').trim(), 'study', 'Çalışma'], [tokens.ink, 'exam', 'Sınav']];
+  if (hist.length < 2) return;
+  const ink = [[cs.getPropertyValue(accent).trim(), 'study', 'Çalışma'], [tokens.ink, 'exam', 'Sınav']];
   c.lineWidth = 2; c.lineJoin = 'round'; c.lineCap = 'round';
   for (const [color, key] of ink) {
     c.strokeStyle = color;
     c.beginPath();
-    eHist.forEach((h, i) => { const x = sx(h.steps), y = sy(h[key]); i ? c.lineTo(x, y) : c.moveTo(x, y); });
+    hist.forEach((h, i) => { const x = sx(h.steps), y = sy(h[key]); i ? c.lineTo(x, y) : c.moveTo(x, y); });
     c.stroke();
   }
-  const last = eHist[eHist.length - 1];
+  const last = hist[hist.length - 1];
   const ends = ink.map(([color, key, name]) => ({ color, name, y: sy(last[key]) })).sort((a, b) => a.y - b.y);
   if (ends[1].y - ends[0].y < 13) ends[1].y = ends[0].y + 13;
   c.textAlign = 'left'; c.textBaseline = 'middle'; c.font = '600 12px system-ui, "Segoe UI", sans-serif';
@@ -4679,6 +5054,1734 @@ const SPAGES = [
 BOOKS.serino = { pages: SPAGES, title: "Serino'nun Kitabı", at: 0 };
 </script>
 
+<!-- Merisu's image model: pictures, words, and a decoder with hand-written backprop. No DOM access. -->
+<script id="pixel">
+'use strict';
+const PX_N = 16, PX_CELLS = PX_N * PX_N;
+const PX_INK = 1, PX_WHITE = 2, PX_GRAY = 3, PX_WOOD_D = 4, PX_WOOD = 5, PX_RAMP = 6;
+const PX_HUES = [
+  ['kırmızı', '#9c1f2e', '#dc3545', '#ff8a7a'], ['turuncu', '#b8501a', '#f08a24', '#ffc266'],
+  ['sarı', '#b88a10', '#f2c81e', '#fff08a'], ['yeşil', '#1f7a3c', '#3fb950', '#a4ec8e'],
+  ['mavi', '#1f4fa8', '#3f8cf0', '#9ad0ff'], ['mor', '#5a2a96', '#9a55e0', '#d2a6ff'],
+];
+const PX_HUE_N = PX_HUES.length;
+// Index 0 is the empty background. A picture can hold no colour outside this list.
+const PX_PALETTE = [null, '#241a2e', '#f4f0e6', '#8a8a96', '#6b3f24', '#a8693a', ...PX_HUES.flatMap(h => h.slice(1))];
+const PX_NAMES = ['boş', 'kontur', 'beyaz', 'gri', 'koyu tahta', 'tahta',
+  ...PX_HUES.flatMap(([word]) => [`koyu ${word}`, word, `açık ${word}`])];
+const PX_P = PX_PALETTE.length;
+
+function pxRng(seed) {
+  let s = seed >>> 0;
+  const r = () => {
+    s = (s + 0x6d2b79f5) >>> 0;
+    let t = s;
+    t = Math.imul(t ^ (t >>> 15), t | 1);
+    t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+  r.f = (a, b) => a + (b - a) * r();
+  r.i = (a, b) => a + Math.floor(r() * (b - a + 1));
+  return r;
+}
+
+/* ---------- drawing the lesson pictures ---------- */
+const PX_BODY = -1;
+const pxPut = (g, x, y, v) => { if (x >= 0 && y >= 0 && x < PX_N && y < PX_N) g[y * PX_N + x] = v; };
+function pxEach(g, test, v) {
+  for (let y = 0; y < PX_N; y++) for (let x = 0; x < PX_N; x++) if (test(x + .5, y + .5)) g[y * PX_N + x] = v;
+}
+const pxEll = (g, cx, cy, rx, ry, v) => pxEach(g, (x, y) => ((x - cx) / rx) ** 2 + ((y - cy) / ry) ** 2 <= 1, v);
+const pxRect = (g, x0, y0, x1, y1, v) => { for (let y = y0; y <= y1; y++) for (let x = x0; x <= x1; x++) pxPut(g, x, y, v); };
+function pxPoly(g, pts, v) {
+  pxEach(g, (x, y) => {
+    let inside = false;
+    for (let i = 0, j = pts.length - 1; i < pts.length; j = i++) {
+      const [xi, yi] = pts[i], [xj, yj] = pts[j];
+      if ((yi > y) !== (yj > y) && x < (xj - xi) * (y - yi) / (yj - yi) + xi) inside = !inside;
+    }
+    return inside;
+  }, v);
+}
+const PX_SUBJECTS = [
+  ['kalp', (g, r) => {
+    const k = r.f(4.6, 5.5);
+    pxEach(g, (x, y) => {
+      const a = (x - 8) / k, b = (8 - y) / k, c = a * a + b * b - 1;
+      return c * c * c - a * a * b * b * b <= 0;
+    }, PX_BODY);
+  }],
+  ['yıldız', (g, r) => {
+    const R = r.f(6.2, 7.2), q = R * r.f(.42, .5), turn = r.f(-.14, .14), pts = [];
+    for (let i = 0; i < 10; i++) {
+      const a = -Math.PI / 2 + turn + i * Math.PI / 5, d = i % 2 ? q : R;
+      pts.push([8 + d * Math.cos(a), 8.4 + d * Math.sin(a)]);
+    }
+    pxPoly(g, pts, PX_BODY);
+  }],
+  ['ev', (g, r) => {
+    const half = r.i(4, 5), top = r.i(1, 2), wall = r.i(6, 7), floor = r.i(12, 13);
+    pxRect(g, 8 - half, wall, 7 + half, floor, PX_WHITE);
+    pxPoly(g, [[8 - half - 1.5, wall + .1], [8, top], [8 + half + 1.5, wall + .1]], PX_BODY);
+    const side = r() < .5, doorX = side ? 8 - half + 1 : 7 + half - 2, winX = side ? 7 + half - 2 : 8 - half + 1;
+    pxRect(g, doorX, floor - 3, doorX + 1, floor, PX_WOOD);
+    pxRect(g, winX, wall + 1, winX + 1, wall + 2, PX_GRAY);
+  }],
+  ['ağaç', (g, r) => {
+    const rx = r.f(4.6, 6), ry = r.f(4, 5), cy = r.f(5.6, 6.6), w = r.i(0, 1);
+    pxRect(g, 7 - w, Math.floor(cy), 8 + w, 14, PX_WOOD);
+    pxEll(g, 8, cy, rx, ry, PX_BODY);
+    if (r() < .6) pxEll(g, 8 + r.f(-3, 3), cy + r.f(1, 2.5), 3, 2.6, PX_BODY);
+  }],
+  ['kılıç', (g, r) => {
+    const len = r.i(6, 8), guard = r.i(2, 3), flip = r() < .5, set = (x, y, v) => pxPut(g, flip ? PX_N - 1 - x : x, y, v);
+    for (let i = 0; i < 3; i++) set(2 + i, 13 - i, PX_WOOD);
+    for (let i = 0; i <= len; i++) { set(6 + i, 9 - i, PX_BODY); if (i < len) set(7 + i, 9 - i, PX_BODY); }
+    for (let k = -guard; k <= guard; k++) set(5 + k, 10 + k, PX_WOOD_D);
+  }],
+  ['iksir', (g, r) => {
+    const rad = r.f(4.8, 5.8), cy = 14 - rad, level = cy - r.f(.5, 2), neck = r.i(1, 2), top = Math.floor(cy - rad) - neck;
+    pxEll(g, 8, cy, rad, rad, PX_BODY);
+    pxEach(g, (x, y) => y < level && ((x - 8) / rad) ** 2 + ((y - cy) / rad) ** 2 <= 1, PX_WHITE);
+    pxRect(g, 7, top + 1, 8, Math.floor(cy - rad) + 1, PX_WHITE);
+    pxRect(g, 6, top, 9, top, PX_WOOD);
+  }],
+  ['mantar', (g, r) => {
+    const rx = r.f(5.6, 6.6), ry = r.f(5, 6), edge = r.i(7, 8), w = r.i(1, 2);
+    pxRect(g, 8 - w, edge, 7 + w, 13, PX_WHITE);
+    pxEach(g, (x, y) => y <= edge + .5 && ((x - 8) / rx) ** 2 + ((y - edge) / ry) ** 2 <= 1, PX_BODY);
+    for (let i = r.i(2, 3); i > 0; i--) {
+      const x = r.i(4, 10), y = r.i(edge - 4, edge - 1);
+      pxRect(g, x, y, x + 1, y + (i % 2), PX_WHITE);
+    }
+  }],
+  ['balık', (g, r) => {
+    const rx = r.f(4.6, 5.4), ry = r.f(3, 4), cy = r.f(7.5, 8.5), flip = r() < .5, t = new Int8Array(PX_CELLS);
+    pxPoly(t, [[10.5, cy], [14.8, cy - r.f(3, 4)], [14.8, cy + r.f(3, 4)]], PX_BODY);
+    pxEll(t, 7, cy, rx, ry, PX_BODY);
+    pxPoly(t, [[6, cy - ry + .5], [9, cy - ry - 2], [10, cy - ry + 1.5]], PX_BODY);
+    pxPut(t, 4, Math.floor(cy) - 1, PX_WHITE);
+    pxPut(t, 4, Math.floor(cy), PX_INK);
+    for (let i = 0; i < PX_CELLS; i++) g[i] = t[flip ? i - i % PX_N + PX_N - 1 - i % PX_N : i];
+  }],
+  ['çiçek', (g, r) => {
+    const n = r.i(5, 6), cy = r.f(5.6, 6.4), turn = r.f(0, 1), d = r.f(2.9, 3.4), p = r.f(2, 2.5);
+    pxRect(g, 7, Math.floor(cy), 8, 14, PX_WOOD);
+    if (r() < .7) pxEll(g, r() < .5 ? 5.4 : 10.6, 12, 2.2, 1.4, PX_WOOD);
+    for (let i = 0; i < n; i++) {
+      const a = turn + i * 2 * Math.PI / n;
+      pxEll(g, 8 + d * Math.cos(a), cy + d * Math.sin(a), p, p, PX_BODY);
+    }
+    pxEll(g, 8, cy, 1.7, 1.7, PX_WHITE);
+  }],
+  ['kedi', (g, r) => {
+    const rx = r.f(5.4, 6.2), ry = r.f(4.4, 5.2), cy = 14 - ry, tip = r.f(.8, 2.4);
+    pxPoly(g, [[8 - rx + .4, cy], [8 - rx + .6, tip], [7, cy - ry + 1]], PX_BODY);
+    pxPoly(g, [[8 + rx - .4, cy], [8 + rx - .6, tip], [9, cy - ry + 1]], PX_BODY);
+    pxEll(g, 8, cy, rx, ry, PX_BODY);
+    const eye = Math.floor(cy) - 1, gap = r.i(2, 3);
+    pxRect(g, 7 - gap, eye, 7 - gap, eye + 1, PX_INK);
+    pxRect(g, 8 + gap, eye, 8 + gap, eye + 1, PX_INK);
+    pxRect(g, 7, eye + 2, 8, eye + 2, PX_WHITE);
+  }],
+];
+// Ink around the shape, then one light from the top left, the way sprites are shaded by hand.
+function pxFinish(g, hue) {
+  const at = (x, y) => (x < 0 || y < 0 || x >= PX_N || y >= PX_N ? 0 : g[y * PX_N + x]);
+  const out = new Uint8Array(PX_CELLS);
+  for (let y = 0; y < PX_N; y++) for (let x = 0; x < PX_N; x++) {
+    const v = at(x, y), i = y * PX_N + x;
+    if (v === 0) { if (at(x - 1, y) || at(x + 1, y) || at(x, y - 1) || at(x, y + 1)) out[i] = PX_INK; continue; }
+    if (v !== PX_BODY) { out[i] = v; continue; }
+    const shade = at(x + 1, y) !== PX_BODY || at(x, y + 1) !== PX_BODY ? 0 : at(x - 1, y) !== PX_BODY || at(x, y - 1) !== PX_BODY ? 2 : 1;
+    out[i] = PX_RAMP + hue * 3 + shade;
+  }
+  return out;
+}
+function pxSlide(img, r) {
+  let x0 = PX_N, x1 = 0, y0 = PX_N, y1 = 0;
+  for (let i = 0; i < PX_CELLS; i++) if (img[i]) {
+    const x = i % PX_N, y = (i - x) / PX_N;
+    x0 = Math.min(x0, x); x1 = Math.max(x1, x); y0 = Math.min(y0, y); y1 = Math.max(y1, y);
+  }
+  const dx = r.i(Math.max(-x0, -1), Math.min(PX_N - 1 - x1, 1)), dy = r.i(Math.max(-y0, -1), Math.min(PX_N - 1 - y1, 1));
+  const out = new Uint8Array(PX_CELLS);
+  for (let i = 0; i < PX_CELLS; i++) if (img[i]) {
+    const x = i % PX_N, y = (i - x) / PX_N;
+    out[(y + dy) * PX_N + x + dx] = img[i];
+  }
+  return out;
+}
+function pxPicture(subject, hue, r) {
+  const g = new Int8Array(PX_CELLS);
+  PX_SUBJECTS[subject][1](g, r);
+  return pxSlide(pxFinish(g, hue), r);
+}
+
+/* ---------- the study and exam pictures ---------- */
+const PX_VARIANTS = 24, PX_EXAM_VARIANTS = 8, PX_WORD_MAX = 64, PX_OWN_MAX = 32;
+const PX_WORDS = [...PX_HUES.map(h => h[0]), ...PX_SUBJECTS.map(s => s[0])];
+// Each subject keeps one colour for the exam, turning through the colours.
+const pxExamHue = subject => (subject * 5 + 2) % PX_HUE_N;
+function pxSets() {
+  const r = pxRng(20261107), study = [], exam = [];
+  PX_SUBJECTS.forEach(([name], s) => PX_HUES.forEach(([word], h) => {
+    const held = pxExamHue(s) === h, list = held ? exam : study;
+    for (let k = held ? PX_EXAM_VARIANTS : PX_VARIANTS; k > 0; k--) list.push({ img: pxPicture(s, h, r), s, h, words: [word, name] });
+  }));
+  return { study, exam };
+}
+const pxSplit = text => text.toLocaleLowerCase('tr').split(/[^\p{L}]+/u).filter(Boolean);
+const pxIsExam = words => PX_SUBJECTS.some(([name], s) => words.includes(name) && words.includes(PX_HUES[pxExamHue(s)][0]));
+
+/* ---------- the network ---------- */
+const PX_Z = 10, PX_WD = 24, PX_H1 = 96, PX_H2 = 64, PX_BATCH = 8, PX_LR = 0.002, PX_DROP = 0.15;
+const PX_NOISE = 0.2, PX_PULL = 0.004, PX_DREAM = 0.8, PX_SHARP = 0.05, PX_TRIES = 3;
+// The picture's words pick the family; a cell may only lean a little, or it memorises which colours a shape never had.
+const PX_FAM = 0.1;
+// Every cell scores the plain colours, three shades, and six colour families; a ramp colour is shade plus family.
+const PX_PARTS = PX_RAMP + 3, PX_K = PX_PARTS + PX_HUE_N, PX_OUT = PX_CELLS * PX_K;
+
+class PixelNet {
+  constructor(rng, pictures) {
+    const H1 = PX_H1, H2 = PX_H2, IN = PX_Z + PX_WD;
+    let n = 0;
+    const take = size => { const at = n; n += size; return at; };
+    this.oWord = take(PX_WORD_MAX * PX_WD);
+    this.oSkip = take(PX_WORD_MAX * PX_HUE_N);
+    this.oW1 = take(H1 * IN); this.oB1 = take(H1);
+    this.oW2 = take(H2 * H1); this.oB2 = take(H2);
+    this.oW3 = take(PX_OUT * H2); this.oB3 = take(PX_OUT);
+    this.oBrain = n; // everything below this is the brain; above it are the pictures' own codes
+    this.oZ = take((pictures + PX_OWN_MAX) * PX_Z);
+    this.p = new Float64Array(n); this.g = new Float64Array(n);
+    this.m = new Float64Array(n); this.s = new Float64Array(n); this.t = 0;
+    const rnd = (a, b, d) => { for (let i = a; i < b; i++) this.p[i] = (rng() - .5) * 2 * d; };
+    rnd(this.oWord, this.oSkip, .3);
+    rnd(this.oW1, this.oB1, 1.5 / Math.sqrt(IN));
+    rnd(this.oW2, this.oB2, 1.5 / Math.sqrt(H1));
+    rnd(this.oW3, this.oB3, 1 / Math.sqrt(H2));
+    rnd(this.oZ, n, .3);
+    this.x = new Float64Array(IN); this.a1 = new Float64Array(H1); this.a2 = new Float64Array(H2);
+    this.d1 = new Float64Array(H1); this.d2 = new Float64Array(H2); this.dx = new Float64Array(IN);
+    this.out = new Float64Array(PX_OUT); this.skip = new Float64Array(PX_HUE_N);
+    this.eOut = new Float64Array(PX_OUT); this.eSkip = new Float64Array(PX_HUE_N);
+    this.pr = new Float64Array(PX_P);
+  }
+  // Turns the words and the imagined numbers into one list of scores per cell.
+  forward(words, z) {
+    const { p, x, a1, a2, out, skip } = this, H1 = PX_H1, H2 = PX_H2, IN = PX_Z + PX_WD;
+    x.fill(0); skip.fill(0);
+    for (let i = 0; i < PX_Z; i++) x[i] = z[i];
+    for (const w of words) {
+      for (let d = 0; d < PX_WD; d++) x[PX_Z + d] += p[this.oWord + w * PX_WD + d];
+      for (let h = 0; h < PX_HUE_N; h++) skip[h] += p[this.oSkip + w * PX_HUE_N + h];
+    }
+    for (let j = 0; j < H1; j++) {
+      let v = p[this.oB1 + j];
+      const o = this.oW1 + j * IN;
+      for (let i = 0; i < IN; i++) v += p[o + i] * x[i];
+      a1[j] = v > 0 ? v : 0;
+    }
+    for (let j = 0; j < H2; j++) {
+      let v = p[this.oB2 + j];
+      const o = this.oW2 + j * H1;
+      for (let i = 0; i < H1; i++) v += p[o + i] * a1[i];
+      a2[j] = v > 0 ? v : 0;
+    }
+    for (let j = 0; j < PX_OUT; j++) {
+      let v = p[this.oB3 + j];
+      const o = this.oW3 + j * H2;
+      for (let i = 0; i < H2; i++) v += p[o + i] * a2[i];
+      out[j] = v;
+    }
+  }
+  // Palette chances of one cell after forward. Smaller temp means bolder choices.
+  cell(c, temp) {
+    const { out, skip, pr } = this, o = c * PX_K;
+    let top = -Infinity, sum = 0;
+    for (let k = 0; k < PX_RAMP; k++) { pr[k] = out[o + k]; if (pr[k] > top) top = pr[k]; }
+    for (let h = 0; h < PX_HUE_N; h++) {
+      const fam = PX_FAM * out[o + PX_PARTS + h] + skip[h];
+      for (let s = 0; s < 3; s++) {
+        const k = PX_RAMP + h * 3 + s, v = fam + out[o + PX_RAMP + s];
+        pr[k] = v;
+        if (v > top) top = v;
+      }
+    }
+    for (let k = 0; k < PX_P; k++) { pr[k] = Math.exp((pr[k] - top) / temp); sum += pr[k]; }
+    for (let k = 0; k < PX_P; k++) pr[k] /= sum;
+    return pr;
+  }
+  // Adds one picture's cross-entropy gradient to g and returns its mean loss per cell.
+  learn(words, z, img, zAt) {
+    const { p, g, a1, a2, d1, d2, dx, pr, eOut, eSkip, x } = this, H1 = PX_H1, H2 = PX_H2, IN = PX_Z + PX_WD;
+    this.forward(words, z);
+    let loss = 0;
+    eSkip.fill(0);
+    for (let c = 0; c < PX_CELLS; c++) {
+      this.cell(c, 1);
+      const want = img[c], o = c * PX_K;
+      loss -= Math.log(pr[want] + 1e-12);
+      for (let k = 0; k < PX_RAMP; k++) eOut[o + k] = pr[k] - (k === want ? 1 : 0);
+      eOut[o + PX_RAMP] = eOut[o + PX_RAMP + 1] = eOut[o + PX_RAMP + 2] = 0;
+      for (let h = 0; h < PX_HUE_N; h++) {
+        let fam = 0;
+        for (let s = 0; s < 3; s++) {
+          const k = PX_RAMP + h * 3 + s, e = pr[k] - (k === want ? 1 : 0);
+          fam += e;
+          eOut[o + PX_RAMP + s] += e;
+        }
+        eOut[o + PX_PARTS + h] = fam * PX_FAM;
+        eSkip[h] += fam;
+      }
+    }
+    d2.fill(0);
+    for (let j = 0; j < PX_OUT; j++) {
+      const e = eOut[j], o = this.oW3 + j * H2;
+      if (e > -1e-5 && e < 1e-5) continue; // a settled score has nothing to teach, and skipping it saves most of the work
+      g[this.oB3 + j] += e;
+      for (let i = 0; i < H2; i++) { g[o + i] += e * a2[i]; d2[i] += e * p[o + i]; }
+    }
+    d1.fill(0);
+    for (let j = 0; j < H2; j++) {
+      if (a2[j] <= 0) continue;
+      const e = d2[j], o = this.oW2 + j * H1;
+      g[this.oB2 + j] += e;
+      for (let i = 0; i < H1; i++) { g[o + i] += e * a1[i]; d1[i] += e * p[o + i]; }
+    }
+    dx.fill(0);
+    for (let j = 0; j < H1; j++) {
+      if (a1[j] <= 0) continue;
+      const e = d1[j], o = this.oW1 + j * IN;
+      g[this.oB1 + j] += e;
+      for (let i = 0; i < IN; i++) { g[o + i] += e * x[i]; dx[i] += e * p[o + i]; }
+    }
+    for (const w of words) {
+      for (let d = 0; d < PX_WD; d++) g[this.oWord + w * PX_WD + d] += dx[PX_Z + d];
+      for (let h = 0; h < PX_HUE_N; h++) g[this.oSkip + w * PX_HUE_N + h] += eSkip[h];
+    }
+    for (let i = 0; i < PX_Z; i++) g[zAt + i] += dx[i] + PX_CELLS * PX_PULL * p[zAt + i];
+    return loss / PX_CELLS;
+  }
+  adam(scale) {
+    const { p, g, m, s } = this, b1 = .9, b2 = .999, lr = PX_LR;
+    this.t++;
+    const c1 = 1 - b1 ** this.t, c2 = 1 - b2 ** this.t;
+    for (let i = 0; i < p.length; i++) {
+      const v = g[i] * scale;
+      g[i] = 0;
+      m[i] = b1 * m[i] + (1 - b1) * v;
+      s[i] = b2 * s[i] + (1 - b2) * v * v;
+      p[i] -= lr * (m[i] / c1) / (Math.sqrt(s[i] / c2) + 1e-8);
+    }
+  }
+}
+
+// Float32 keeps the file near 4,5 MB; plain JSON numbers would need about 16 MB.
+function pxPack(list) {
+  const bytes = new Uint8Array(Float32Array.from(list).buffer);
+  let out = '';
+  for (let i = 0; i < bytes.length; i += 32766) out += btoa(String.fromCharCode.apply(null, bytes.subarray(i, i + 32766)));
+  return out;
+}
+function pxUnpack(text, n) {
+  let bin;
+  try { bin = atob(text); } catch { return null; }
+  if (bin.length !== n * 4) return null;
+  const bytes = new Uint8Array(bin.length);
+  for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+  const out = new Float32Array(bytes.buffer);
+  return out.every(Number.isFinite) ? out : null;
+}
+// The pictures come from a fixed seed, so a file only carries this stamp of them.
+function pxStamp({ study, exam }) {
+  let h = 2166136261;
+  for (const e of [...study, ...exam]) for (const v of e.img) h = Math.imul(h ^ v, 16777619);
+  return h >>> 0;
+}
+
+class MerisuModel {
+  constructor(rng) {
+    this.rng = rng;
+    this.sets = pxSets();
+    this.net = new PixelNet(rng, this.sets.study.length);
+    this.vocab = [...PX_WORDS];
+    this.own = [];
+    this.steps = 0; this.seen = 0; this.loss = Math.log(PX_P);
+    const name = e => { e.ids = e.words.map(w => this.vocab.indexOf(w)); };
+    this.sets.study.forEach((e, i) => { name(e); e.slot = i; });
+    this.sets.exam.forEach(name);
+    this.judges = this.sets.study.filter((_, i) => i % 4 === 0);
+    this.z = new Float64Array(PX_Z);
+  }
+  gauss(rng) { return Math.sqrt(-2 * Math.log(1 - rng())) * Math.cos(2 * Math.PI * rng()); }
+  // One update. Half of the pictures are the user's own once there are any; exam pairs can never be among them.
+  study() {
+    const { net, rng, sets, own, z } = this;
+    let sum = 0;
+    for (let b = 0; b < PX_BATCH; b++) {
+      const e = own.length && rng() < .5 ? own[Math.floor(rng() * own.length)] : sets.study[Math.floor(rng() * sets.study.length)];
+      const at = net.oZ + e.slot * PX_Z;
+      for (let i = 0; i < PX_Z; i++) z[i] = net.p[at + i] + PX_NOISE * this.gauss(rng);
+      const words = !e.own && rng() < PX_DROP ? [e.ids[rng() < .5 ? 0 : 1]] : e.ids;
+      sum += net.learn(words, z, e.img, at);
+    }
+    net.adam(1 / PX_BATCH);
+    this.steps++; this.seen += PX_BATCH;
+    this.loss += .05 * (sum / PX_BATCH - this.loss);
+  }
+  // How far the study pictures' codes spread, so a new code comes from the same place.
+  spread() {
+    const { net, sets } = this, out = new Float64Array(PX_Z);
+    for (const e of sets.study) for (let i = 0; i < PX_Z; i++) { const v = net.p[net.oZ + e.slot * PX_Z + i]; out[i] += v * v; }
+    for (let i = 0; i < PX_Z; i++) out[i] = Math.sqrt(out[i] / sets.study.length + PX_NOISE * PX_NOISE);
+    return out;
+  }
+  code(dream, wide, rng) { return wide.map(w => w * dream * this.gauss(rng)); }
+  paint(ids, z, rng) {
+    const { net } = this, img = new Uint8Array(PX_CELLS);
+    net.forward(ids, z);
+    for (let c = 0; c < PX_CELLS; c++) {
+      const pr = net.cell(c, PX_SHARP);
+      let u = rng(), k = 0;
+      while (k < PX_P - 1 && (u -= pr[k]) > 0) k++;
+      img[c] = k;
+    }
+    return img;
+  }
+  read(text) {
+    const words = pxSplit(text), ids = [], unknown = [];
+    for (const w of words) { const i = this.vocab.indexOf(w); if (i < 0) unknown.push(w); else if (!ids.includes(i)) ids.push(i); }
+    return { words, ids, unknown };
+  }
+  // Returns an error key, or an empty string when the picture joined her lessons.
+  teach(img, text) {
+    const words = [...new Set(pxSplit(text))].slice(0, 4), fresh = words.filter(w => !this.vocab.includes(w));
+    if (!words.length) return 'name';
+    if (!img.some(v => v)) return 'blank';
+    if (pxIsExam(words)) return 'exam';
+    if (this.own.length >= PX_OWN_MAX) return 'full';
+    if (this.vocab.length + fresh.length > PX_WORD_MAX) return 'words';
+    this.vocab.push(...fresh);
+    this.own.push({ img: img.slice(), words, ids: words.map(w => this.vocab.indexOf(w)), slot: this.sets.study.length + this.own.length, own: true });
+    return '';
+  }
+  toMemory() {
+    const { net, own } = this;
+    return {
+      format: 'merisu-memory', version: 1, savedAt: new Date().toISOString(), stamp: pxStamp(this.sets),
+      steps: this.steps, seen: this.seen, loss: this.loss, t: net.t, vocab: this.vocab,
+      own: own.map(e => ({ img: [...e.img], words: e.words })),
+      weights: pxPack(net.p), adamM: pxPack(net.m), adamS: pxPack(net.s),
+    };
+  }
+  // Checks everything before anything is used, and refuses a file that would train on an exam pair.
+  static fromMemory(mem, rng) {
+    const bad = () => new Error('Bu dosya bir Merisu hafızası değil ya da bozuk.');
+    if (!mem || mem.format !== 'merisu-memory') throw bad();
+    if (mem.version !== 1) throw new Error('Bu hafıza dosyasının sürümünü tanımıyorum.');
+    const next = new MerisuModel(rng), { net } = next, { vocab, own } = mem;
+    if (mem.stamp !== pxStamp(next.sets)) throw new Error('Bu hafıza, ders resimleri farklı olan bir sürümden kalmış.');
+    if (![mem.steps, mem.seen, mem.t].every(v => Number.isInteger(v) && v >= 0) || !Number.isFinite(mem.loss)) throw bad();
+    if (!Array.isArray(vocab) || vocab.length > PX_WORD_MAX || PX_WORDS.some((w, i) => vocab[i] !== w)) throw bad();
+    if (!vocab.every(w => typeof w === 'string' && w) || new Set(vocab).size !== vocab.length) throw bad();
+    if (!Array.isArray(own) || own.length > PX_OWN_MAX) throw bad();
+    next.vocab = [...vocab];
+    own.forEach((e, i) => {
+      const fine = e && Array.isArray(e.img) && e.img.length === PX_CELLS && e.img.every(v => Number.isInteger(v) && v >= 0 && v < PX_P)
+        && Array.isArray(e.words) && e.words.length >= 1 && e.words.length <= 4 && e.words.every(w => vocab.includes(w));
+      if (!fine) throw bad();
+      if (pxIsExam(e.words)) throw new Error('Bu dosyada sınav çiftiyle öğretilmiş bir resim var, yükleyemem.');
+      next.own.push({ img: Uint8Array.from(e.img), words: e.words, ids: e.words.map(w => vocab.indexOf(w)), slot: next.sets.study.length + i, own: true });
+    });
+    const n = net.p.length, weights = pxUnpack(mem.weights, n), adamM = pxUnpack(mem.adamM, n), adamS = pxUnpack(mem.adamS, n);
+    if (!weights || !adamM || !adamS) throw bad();
+    net.p.set(weights); net.m.set(adamM); net.s.set(adamS); net.t = mem.t;
+    next.steps = mem.steps; next.seen = mem.seen; next.loss = mem.loss;
+    return next;
+  }
+  // Only draws, never learns. The same seed gives the same imagined numbers, so changes come from the brain.
+  evaluate() {
+    const rng = pxRng(404), wide = this.spread(), judge = (hueOf) => {
+      const out = { both: 0, shape: 0, hue: 0, shown: [] };
+      PX_SUBJECTS.forEach(([name], s) => {
+        const h = hueOf(s), ids = [this.vocab.indexOf(PX_HUES[h][0]), this.vocab.indexOf(name)];
+        for (let k = 0; k < PX_TRIES; k++) {
+          const img = this.paint(ids, this.code(PX_DREAM, wide, rng), rng), v = pxJudge(img, this.judges);
+          const ok = v.s === s && v.h === h;
+          out.shape += v.s === s ? 1 : 0; out.hue += v.h === h ? 1 : 0; out.both += ok ? 1 : 0;
+          if (!k) out.shown.push({ img, ok, name: `${PX_HUES[h][0]} ${name}` });
+        }
+      });
+      const n = PX_SUBJECTS.length * PX_TRIES;
+      out.both /= n; out.shape /= n; out.hue /= n;
+      return out;
+    };
+    return { study: judge(s => (pxExamHue(s) + 1) % PX_HUE_N), exam: judge(pxExamHue) };
+  }
+}
+// Names a picture by the study picture with the closest outline, and its colour by the most used family.
+function pxJudge(img, study) {
+  let best = -1, who = study[0];
+  for (const e of study) {
+    let both = 0, any = 0;
+    for (let i = 0; i < PX_CELLS; i++) { const a = img[i] > 0, b = e.img[i] > 0; if (a && b) both++; if (a || b) any++; }
+    const v = any ? both / any : 0;
+    if (v > best) { best = v; who = e; }
+  }
+  const count = new Array(PX_HUE_N).fill(0);
+  for (let i = 0; i < PX_CELLS; i++) if (img[i] >= PX_RAMP) count[Math.floor((img[i] - PX_RAMP) / 3)]++;
+  return { s: who.s, h: count.indexOf(Math.max(...count)) };
+}
+// How many cells separate a picture from the closest study picture; 0 means a copy.
+function pxNearest(img, study) {
+  let least = PX_CELLS;
+  for (const e of study) {
+    let d = 0;
+    for (let i = 0; i < PX_CELLS; i++) if (img[i] !== e.img[i]) d++;
+    if (d < least) least = d;
+  }
+  return least;
+}
+</script>
+
+<!-- Merisu's screen: drawing, training loop, report card, picture editor. -->
+<script id="merisu-ui">
+'use strict';
+const MMOODS = {
+  fresh: { text: 'Fırçası hazır', mouth: 'M90 148 q10 8 20 0', say: 'Selam, ben Merisu! Daha hiç resim görmedim. Eğitimi başlatır mısın?' },
+  lost: { text: 'Karalıyor', mouth: 'M84 150 q8 -8 16 0 t16 0', say: 'Renkler lekeye dönüyor, şekiller henüz yok.' },
+  try: { text: 'Şekil arıyor', mouth: 'M86 150 L114 146', say: 'Bazı şekiller seçilmeye başladı, hâlâ çok karıştırıyorum.' },
+  keen: { text: 'Hevesli', mouth: 'M82 146 q18 16 36 0', say: 'Çoğu resmi tanınır çiziyorum, hiç çalışmadığım çiftleri de deniyorum!' },
+  proud: { text: 'Ressam', mouth: 'M78 142 q22 30 44 0 z', say: 'Hiç çalışmadığım renk ve şekil çiftlerini bile çiziyorum!' },
+  cram: { text: 'Ezberliyor', mouth: 'M82 152 l9 -6 l9 6 l9 -6 l9 6', say: 'Çalıştığım çiftleri iyi çiziyorum, yenilerde zorlanıyorum.' },
+};
+const PX_RGB = PX_PALETTE.map(h => (h ? [1, 3, 5].map(i => parseInt(h.slice(i, i + 2), 16)) : null));
+let merisu = null, mStats = null, mHist = [], mSnaps = [], mRun = false, mDrawn = 0, mNextSnap = 0, mHold = 0;
+let mLook = null, mPics = [], mPen = PX_INK, mPenOn = false;
+const mCanvas = new Uint8Array(PX_CELLS);
+
+function mSetRun(on) {
+  mRun = on;
+  $('mAuto').textContent = on ? 'Eğitimi durdur' : 'Eğitimi başlat';
+  $('mFace').classList.toggle('busy', on);
+  if (on) requestAnimationFrame(mLoop);
+  else if (merisu) $('mTicker').textContent = merisu.steps ? 'Merisu durdu.' : 'Merisu ilk resmini bekliyor.';
+}
+function merisuReset(next = new MerisuModel(Math.random), past = [], notes = []) {
+  mSetRun(false);
+  merisu = next;
+  mHist = past; mSnaps = notes; mStats = null; mHold = 0;
+  mNextSnap = notes.length ? stepsToNext(notes[notes.length - 1].steps) : 0;
+  $('mSnaps').replaceChildren();
+  notes.forEach(mShowSnap);
+  $('mOwnList').replaceChildren(...merisu.own.map(e => mThumb(e.img, e.words.join(' '))));
+  $('mTicker').textContent = merisu.steps ? 'Merisu durdu.' : 'Merisu ilk resmini bekliyor.';
+  sNote('mEditNote', '');
+  sNote('mMemNote', '');
+  mShowWords();
+  mShowLessons();
+  mDraw();
+  mRefresh();
+}
+function mLoop() {
+  if (!mRun) return;
+  const start = performance.now();
+  // The count cap matters: without it the loop never ends if the clock stalls.
+  for (let i = 0; i < 8; i++) { merisu.study(); if (performance.now() - start >= 14) break; }
+  if (start - mDrawn > 2000) mRefresh();
+  requestAnimationFrame(mLoop);
+}
+
+/* ---------- pictures ---------- */
+function mPaint(cv, img) {
+  cv.width = PX_N; cv.height = PX_N;
+  const c = cv.getContext('2d'), d = c.createImageData(PX_N, PX_N);
+  for (let i = 0; i < PX_CELLS; i++) {
+    const rgb = PX_RGB[img[i]];
+    if (!rgb) continue;
+    d.data.set(rgb, i * 4);
+    d.data[i * 4 + 3] = 255;
+  }
+  c.putImageData(d, 0, 0);
+}
+function mThumb(img, label) {
+  const cv = document.createElement('canvas');
+  cv.className = 'px';
+  cv.setAttribute('role', 'img');
+  cv.setAttribute('aria-label', label);
+  mPaint(cv, img);
+  return cv;
+}
+function mShowLessons() {
+  const { study } = merisu.sets;
+  $('mLessons').replaceChildren(...Array.from({ length: 12 }, (_, i) => {
+    const e = study[Math.floor((i + Math.random()) / 12 * study.length)];
+    return mThumb(e.img, e.words.join(' '));
+  }));
+}
+function mShowWords() {
+  $('mWords').replaceChildren(...merisu.vocab.map(w => {
+    const b = document.createElement('button');
+    b.type = 'button'; b.className = 'm-word'; b.textContent = w;
+    return b;
+  }));
+}
+function mDraw() {
+  const { words, ids, unknown } = merisu.read($('mPrompt').value);
+  if (!ids.length) return sNote('mDrawNote', 'Bu kelimelerin hiçbirini bilmiyorum. Soldaki kelimelerden birini dene ya da bana kendi resmini göster.', true);
+  const wide = merisu.spread(), dream = $('mDream').value / 10;
+  mPics = Array.from({ length: 6 }, () => {
+    const z = merisu.code(dream, wide, merisu.rng);
+    return { z, ids, img: merisu.paint(ids, z, merisu.rng) };
+  });
+  $('mThumbs').replaceChildren(...mPics.map((p, i) => {
+    const b = document.createElement('button');
+    b.type = 'button'; b.className = 'm-pick'; b.dataset.pick = i;
+    b.append(mThumb(p.img, `${i + 1}. çizim`));
+    return b;
+  }));
+  mChoose(0);
+  const gap = pxNearest(mPics[0].img, merisu.sets.study), bits = [];
+  bits.push(gap ? `Seçili resim, çalışma resimlerinin en yakınından ${gap} kare farklı.` : 'Seçili resim, çalışma resimlerinden birinin aynısı.');
+  if (pxIsExam(words)) bits.push('Bu çift sınavda, hiç çalışmadı.');
+  if (unknown.length) bits.push(`Bilmediği kelimeler atlandı: ${unknown.join(', ')}.`);
+  sNote('mDrawNote', bits.join(' '));
+}
+function mChoose(i) {
+  const p = mPics[i];
+  mPaint($('mBig'), p.img);
+  document.querySelectorAll('.m-pick').forEach(b => b.setAttribute('aria-pressed', String(+b.dataset.pick === i)));
+  mLook = { ids: p.ids, z: p.z, cell: mLook ? mLook.cell : 7 * PX_N + 8 };
+  mDrawBars();
+}
+// The real chances her network gives the marked cell. Reading them changes nothing.
+function mDrawBars() {
+  if (!mLook) return;
+  const { ids, z, cell } = mLook, x = cell % PX_N;
+  merisu.net.forward(ids, z);
+  const pr = merisu.net.cell(cell, 1), top = [...pr.keys()].sort((a, b) => pr[b] - pr[a]).slice(0, 5);
+  $('mMark').style.left = x * 100 / PX_N + '%';
+  $('mMark').style.top = (cell - x) / PX_N * 100 / PX_N + '%';
+  $('mBars').replaceChildren(...top.map(k => {
+    const row = document.createElement('div'), name = document.createElement('span'), wrap = document.createElement('span');
+    const fill = document.createElement('i'), pc = document.createElement('span'), sw = document.createElement('b');
+    row.className = 'bar m-bar'; name.className = 'ch'; pc.className = 'pc';
+    sw.style.background = PX_PALETTE[k] || 'var(--px-bg)';
+    name.append(sw, PX_NAMES[k]);
+    fill.style.width = (pr[k] * 100).toFixed(1) + '%';
+    pc.textContent = pct(pr[k]);
+    wrap.append(fill);
+    row.append(name, wrap, pc);
+    return row;
+  }));
+}
+
+/* ---------- the user's picture ---------- */
+function mEditDraw() { mPaint($('mEdit'), mCanvas); }
+function mEditCell(e) {
+  const box = $('mEdit').getBoundingClientRect();
+  const x = Math.floor((e.clientX - box.left) / box.width * PX_N), y = Math.floor((e.clientY - box.top) / box.height * PX_N);
+  return x >= 0 && y >= 0 && x < PX_N && y < PX_N ? y * PX_N + x : -1;
+}
+function mShowPens() {
+  $('mPens').replaceChildren(...PX_PALETTE.map((hex, k) => {
+    const b = document.createElement('button');
+    b.type = 'button'; b.dataset.pen = k; b.title = k ? PX_NAMES[k] : 'Silgi';
+    b.setAttribute('aria-label', b.title);
+    b.setAttribute('aria-pressed', String(k === mPen));
+    if (hex) b.style.background = hex; else b.textContent = '×';
+    return b;
+  }));
+}
+
+/* ---------- rendering ---------- */
+function mRefresh() {
+  mDrawn = performance.now();
+  mStats = merisu.evaluate();
+  const { study, exam } = mStats, tail = mHist[mHist.length - 1];
+  if (!tail || merisu.seen > tail.steps) {
+    mHist.push({ steps: merisu.seen, study: study.both, exam: exam.both });
+    if (mHist.length > 420) mHist = mHist.filter((_, i) => i % 2 === 0);
+  }
+  $('mSeen').textContent = big(merisu.seen);
+  $('mStudy').textContent = pct(study.both);
+  $('mExam').textContent = pct(exam.both);
+  $('mRSB').textContent = pct(study.both); $('mRSS').textContent = pct(study.shape); $('mRSH').textContent = pct(study.hue);
+  $('mREB').textContent = pct(exam.both); $('mRES').textContent = pct(exam.shape); $('mREH').textContent = pct(exam.hue);
+  if (mRun) $('mTicker').textContent = `${sCount(merisu.seen)} resim · ${sCount(merisu.steps)} güncelleme · kayıp ${tr2(merisu.loss)}`;
+  $('mExamList').replaceChildren(...exam.shown.map(s => {
+    const f = document.createElement('figure'), cap = document.createElement('figcaption');
+    cap.textContent = `${s.name} ${s.ok ? '✓' : '✗'}`;
+    f.append(mThumb(s.img, s.name), cap);
+    return f;
+  }));
+  if (merisu.steps >= mNextSnap) mSnap();
+  eDrawChart('mChart', mHist, '--red');
+  mDrawBars();
+  mMood();
+  bookRefresh();
+}
+// The same words and the same imagined numbers every time, so only her brain differs from row to row.
+function mSnap() {
+  mNextSnap = stepsToNext(merisu.steps);
+  const ids = merisu.read('kırmızı kalp').ids, rng = pxRng(1);
+  const note = { steps: merisu.steps, seen: merisu.seen, pics: [.5, -.5, 1].map(k => [...merisu.paint(ids, new Float64Array(PX_Z).fill(k), rng)]) };
+  mSnaps.push(note);
+  mShowSnap(note);
+}
+function mShowSnap({ seen, pics }) {
+  const row = document.createElement('div'), when = document.createElement('div'), body = document.createElement('div');
+  row.className = 'snap m-snap'; when.className = 'when';
+  when.textContent = `${sCount(seen)} resim`;
+  body.append(...pics.map(img => mThumb(img, 'kırmızı kalp')));
+  row.append(when, body);
+  $('mSnaps').prepend(row);
+}
+function mSay(text, hold) {
+  $('mSpeech').textContent = text;
+  mHold = hold ? performance.now() + hold : mHold;
+}
+function mMood() {
+  const { study, exam } = mStats;
+  let key;
+  if (!merisu.steps) key = 'fresh';
+  else if (study.both - exam.both >= 0.3) key = 'cram';
+  else if (exam.both < 0.2) key = 'lost';
+  else if (exam.both < 0.5) key = 'try';
+  else if (exam.both < 0.8) key = 'keen';
+  else key = 'proud';
+  const m = MMOODS[key];
+  $('mMouth').setAttribute('d', m.mouth);
+  $('mFace').classList.toggle('mouth-fill', key === 'proud');
+  $('mMoodText').textContent = 'Merisu şu an: ' + m.text;
+  if (performance.now() >= mHold) mSay(m.say);
+}
+
+/* ---------- memory file ---------- */
+function mExport() {
+  const text = JSON.stringify({ ...merisu.toMemory(), history: mHist, notes: mSnaps });
+  const url = URL.createObjectURL(new Blob([text], { type: 'application/json' }));
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = `merisu-hafiza-${new Date().toISOString().slice(0, 10)}.json`;
+  link.click();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+  sNote('mMemNote', `Hafıza indirildi (${sCount(Math.round(text.length / 1024))} KB, ${sCount(merisu.seen)} resim sonrası).`);
+}
+async function mImport(file) {
+  let mem, next;
+  try {
+    if (file.size > 64 * 1024 * 1024) throw new Error('Bu dosya bir Merisu hafızası için fazla büyük.');
+    try { mem = JSON.parse(await file.text()); } catch { throw new Error('Bu dosya okunamadı.'); }
+    next = MerisuModel.fromMemory(mem, Math.random);
+  } catch (err) {
+    sNote('mMemNote', err.message, true);
+    return;
+  }
+  if (merisu.steps && !confirm('Merisu\'nun şu anki hafızası silinip dosyadaki yüklenecek. Devam edilsin mi?')) return;
+  const point = h => h && [h.steps, h.study, h.exam].every(Number.isFinite);
+  const pic = a => Array.isArray(a) && a.length === PX_CELLS && a.every(v => Number.isInteger(v) && v >= 0 && v < PX_P);
+  const note = n => n && Number.isFinite(n.steps) && Number.isFinite(n.seen) && Array.isArray(n.pics) && n.pics.every(pic);
+  merisuReset(next, Array.isArray(mem.history) && mem.history.every(point) ? mem.history : [],
+    Array.isArray(mem.notes) && mem.notes.every(note) ? mem.notes : []);
+  mSay(`Hafızam geri geldi! ${sCount(merisu.seen)} resimle devam ediyorum.`, 5000);
+  sNote('mMemNote', `Hafıza yüklendi. Hiç görmediği çiftler: ${pct(mStats.exam.both)}.`);
+}
+
+/* ---------- events ---------- */
+$('mMemSave').addEventListener('click', mExport);
+$('mMemLoad').addEventListener('click', () => $('mMemFile').click());
+$('mMemFile').addEventListener('change', e => {
+  const [file] = e.target.files;
+  e.target.value = '';
+  if (file) mImport(file);
+});
+$('mAuto').addEventListener('click', () => mSetRun(!mRun));
+$('mReset').addEventListener('click', () => {
+  if (confirm('Merisu öğrendiği her şeyi ve gösterdiğin resimleri unutacak. Sıfırlansın mı?')) merisuReset();
+});
+$('mDrawForm').addEventListener('submit', e => { e.preventDefault(); mDraw(); });
+$('mDream').addEventListener('input', () => { $('mDreamShow').textContent = num1($('mDream').value / 10); });
+$('mThumbs').addEventListener('click', e => {
+  const b = e.target.closest('[data-pick]');
+  if (b) mChoose(+b.dataset.pick);
+});
+$('mWords').addEventListener('click', e => {
+  if (!e.target.matches('.m-word')) return;
+  const box = $('mPrompt');
+  box.value = `${box.value.trim()} ${e.target.textContent}`.trim();
+});
+const mLookAt = e => {
+  const box = $('mBig').getBoundingClientRect();
+  const x = Math.floor((e.clientX - box.left) / box.width * PX_N), y = Math.floor((e.clientY - box.top) / box.height * PX_N);
+  if (!mLook || x < 0 || y < 0 || x >= PX_N || y >= PX_N) return;
+  mLook.cell = y * PX_N + x;
+  mDrawBars();
+};
+$('mBig').addEventListener('pointermove', mLookAt);
+$('mBig').addEventListener('pointerdown', mLookAt);
+$('mPens').addEventListener('click', e => {
+  const b = e.target.closest('[data-pen]');
+  if (!b) return;
+  mPen = +b.dataset.pen;
+  document.querySelectorAll('#mPens button').forEach(x => x.setAttribute('aria-pressed', String(x === b)));
+});
+$('mEdit').addEventListener('pointerdown', e => {
+  const c = mEditCell(e);
+  if (c < 0) return;
+  mPenOn = true;
+  $('mEdit').setPointerCapture(e.pointerId);
+  mCanvas[c] = mPen;
+  mEditDraw();
+});
+$('mEdit').addEventListener('pointermove', e => {
+  const c = mEditCell(e);
+  if (mPenOn && c >= 0) { mCanvas[c] = mPen; mEditDraw(); }
+});
+['pointerup', 'pointercancel'].forEach(type => $('mEdit').addEventListener(type, () => { mPenOn = false; }));
+$('mEditClear').addEventListener('click', () => { mCanvas.fill(0); mEditDraw(); sNote('mEditNote', ''); });
+$('mTeach').addEventListener('submit', e => {
+  e.preventDefault();
+  const name = $('mName').value, why = merisu.teach(mCanvas, name);
+  const refuse = {
+    name: 'Resmin adını yaz. Bir ya da birkaç kelime yeter.',
+    blank: 'Tuval boş. Önce bir şeyler çiz.',
+    exam: 'Bu renk ve şekil çifti sınavda. Sınav dürüst kalsın diye bu adla öğretemem, başka bir ad seç.',
+    full: `En çok ${PX_OWN_MAX} resim öğretebilirsin.`,
+    words: `Kelime dağarcığım dolu, en çok ${PX_WORD_MAX} kelime tutabilirim.`,
+  };
+  if (why) return sNote('mEditNote', refuse[why], true);
+  const own = merisu.own[merisu.own.length - 1];
+  $('mOwnList').append(mThumb(own.img, own.words.join(' ')));
+  mShowWords();
+  $('mPrompt').value = own.words.join(' ');
+  sNote('mEditNote', 'Resimlerin artık oyunların yarısında çalışılıyor. Sınav çiftleri değişmez. Tek resim gösterirsen onu ezberler.');
+  mSetRun(true);
+});
+window.addEventListener('resize', () => { if (whoNow === 'merisu' && merisu) eDrawChart('mChart', mHist, '--red'); });
+window.addEventListener('wicofia-theme', () => { if (whoNow === 'merisu' && merisu) eDrawChart('mChart', mHist, '--red'); });
+$('mDreamShow').textContent = num1($('mDream').value / 10);
+mShowPens();
+mEditDraw();
+</script>
+
+<!-- Merisu's book: same paper and page turning, her own pages and terms. -->
+<script id="merisu-book">
+'use strict';
+const MFACE = `<svg viewBox="0 0 200 200" aria-hidden="true">
+  <path fill="#d8432a" d="M100 22 C158 22 186 66 186 124 C186 160 178 182 166 194 L146 150 H54 L34 194 C22 182 14 160 14 124 C14 66 42 22 100 22Z"/>
+  <path fill="#ffd9bd" d="M100 46 C148 46 170 80 170 122 C170 162 142 184 100 184 C58 184 30 162 30 122 C30 80 52 46 100 46Z"/>
+  <path fill="#d8432a" d="M30 112 C34 66 64 40 100 40 C136 40 166 66 170 112 C154 102 142 88 136 72 C118 92 84 98 58 90 C50 98 40 106 30 112Z"/>
+  <path fill="#f4c21e" d="M138 56 h10 v10 h-10z M148 46 h10 v10 h-10z"/><path fill="#3f8cf0" d="M148 56 h10 v10 h-10z"/>
+  <ellipse fill="#f08a6a" opacity=".55" cx="56" cy="140" rx="12" ry="7"/><ellipse fill="#f08a6a" opacity=".55" cx="144" cy="140" rx="12" ry="7"/>
+  <circle cx="74" cy="120" r="14" fill="#fff"/><circle cx="126" cy="120" r="14" fill="#fff"/>
+  <circle cx="76" cy="122" r="7" fill="#5c2418"/><circle cx="128" cy="122" r="7" fill="#5c2418"/>
+  <path d="M82 146 q18 16 36 0" stroke="#5c2418" stroke-width="5" fill="none" stroke-linecap="round"/>
+</svg>`;
+
+Object.assign(GLOSSARY, {
+  pikselsanat: ['Pixel art', 'Küçük bir ızgarada, az sayıda renkle, her kareyi tek tek düşünerek yapılan resim.'],
+  palet: ['Palet', 'Kullanabileceğim renklerin sabit listesi. Bu listenin dışında renk üretemem.'],
+  hayalsayi: ['Hayal sayıları', 'Bir resmin kelimelerle söylenmeyen yanını, boyunu ve duruşunu taşıyan küçük sayı listesi.'],
+  cozucu: ['Çözücü', 'Kelimeleri ve hayal sayılarını alıp bütün kareleri aynı anda dolduran ağ parçası.'],
+  yenicift: ['Yeni çift', 'Kelimelerini ayrı ayrı bildiğim ama birlikte hiç görmediğim renk ve şekil.'],
+  kopya: ['Kopya', 'Çizdiğim resmin bir çalışma resmiyle kare kare aynı olması.'],
+});
+
+Object.assign(LIVE, {
+  mSeen: () => sCount(merisu.seen),
+  mSteps: () => sCount(merisu.steps),
+  mParams: () => merisu.net.oBrain.toLocaleString('tr-TR'),
+  mCodes: () => (merisu.net.p.length - merisu.net.oBrain).toLocaleString('tr-TR'),
+  mVocab: () => sCount(merisu.vocab.length),
+  mOwn: () => sCount(merisu.own.length),
+  mStudy: () => pct(mStats.study.both),
+  mExam: () => pct(mStats.exam.both),
+});
+
+const MCHAPTERS = [[3, 'Resmim'], [5, 'Kelimeden resme'], [7, 'Nasıl öğrenirim?'], [9, 'Dürüst sınav'], [12, 'Sözlük']];
+
+// Index 0 is the cover; every other index equals its printed page number.
+const MPAGES = [
+  { cover: true, html: () => `<div class="cover-frame">${MFACE}<h2>Merisu'nun Kitabı</h2>
+    <p>Kelimelerden kare kare resim yapmayı nasıl öğrendim</p><p class="by">YAZAN: MERİSU</p></div>` },
+
+  { head: 'Önsöz', html: () => `<h3>Merhaba</h3>
+    <p>Ben Merisu. Phyou sayılarla, Serino harflerle, Eroson hamlelerle uğraşır. Ben resim yaparım, ama yalnızca ${term('pikselsanat', 'pixel art')}.</p>
+    <p>Bana "mavi kedi" dersin, ben de küçük bir ızgarayı doldururum. Beni fotoğraflar değil, yüzlerce minik resim eğitti.</p>
+    <p>Gradyan ve Adam'ı Phyou'nun kitabı anlatıyor, burada kısa geçeceğim. Bu kitap resmin nereden geldiğini anlatıyor.</p>
+    <p class="margin-note">Şu ana kadar ${live('mSeen')} resim gördüm, ${live('mSteps')} güncelleme yaptım.</p>` },
+
+  { head: 'İçindekiler', html: () => `<h3>Bu kitapta neler var?</h3><ol class="toc">${MCHAPTERS.map(([p, t], i) =>
+    `<li><button type="button" data-go="${p}"><span>${i + 1}. ${t}</span><span class="no">${p}</span></button></li>`).join('')}</ol>` },
+
+  { head: 'Bölüm 1', html: () => `<h2>Resmim</h2>
+    <p class="dc">Her resmim ${PX_N} × ${PX_N} karedir, toplam ${PX_CELLS} kare. Her karenin tek bir rengi vardır.</p>
+    <p>Renkler ${term('palet', 'paletimden')} gelir: boş kare dahil ${PX_P} seçenek. Kontur, beyaz, gri, iki tahta rengi ve altı renk ailesinin üçer tonu.</p>
+    <p>Bu yüzden istesem de fotoğraf gibi bir şey üretemem. Yumuşak geçiş yok, ara renk yok. Her karede listeden bir seçim yaparım, sonuç hep pixel art olur.</p>` },
+
+  { head: 'Bölüm 1', html: () => `<h3>Derslerim</h3>
+    <p>${PX_SUBJECTS.length} şey çizerim: ${PX_SUBJECTS.map(s => s[0]).join(', ')}. Her biri ${PX_HUE_N} renkte olabilir: ${PX_HUES.map(h => h[0]).join(', ')}.</p>
+    <p>Ders resimlerimi kurallar çizer: boy, duruş ve küçük parçalar rastgele değişir, sonra her şekle kontur ve sol üstten ışık eklenir. Hepsi bu uygulamanın kodunda üretilir, başka bir yerden alınmaz.</p>
+    <p>Çalışma için ${sCount(merisu ? merisu.sets.study.length : 0)} resmim var. Bana kendi resmini de gösterebilirsin, şu ana kadar ${live('mOwn')} tane gösterildi. Hafıza kartından öğrendiklerimi ve bu resimleri bir dosyaya indirip geri yükleyebilirsin.</p>` },
+
+  { head: 'Bölüm 2', html: () => `<h2>Kelimeden resme</h2>
+    <p class="dc">Çizime iki şeyle başlarım. İlki kelimeler: her kelimenin öğrenilmiş ${PX_WD} sayılık bir kartı vardır, kartları toplarım.</p>
+    <p>"Kedi" kelimesi kedinin ne kadar büyük durduğunu söylemez. O yüzden ikinci şey ${term('hayalsayi', 'hayal sayılarıdır')}: ${PX_Z} rastgele sayı. Aynı kelimelerden farklı resimlerin çıkması bunlardan gelir.</p>
+    <p>Şu an ${live('mVocab')} kelime biliyorum. Bilmediğim kelimeyi atlarım, anlıyormuş gibi yapmam.</p>` },
+
+  { head: 'Bölüm 2', html: () => `<h3>Bütün kareler bir anda</h3>
+    <p>Kartlar ve hayal sayıları ${term('cozucu', 'çözücüme')} girer. ${PX_H1} sonra ${PX_H2} nöronluk iki ara katmandan geçer, sonra her kare için puanlar çıkar. Beynimde ${live('mParams')} ağırlık var.</p>
+    <p>Her kare ${PX_K} puan alır: düz renkler için birer puan, üç ton ve altı renk ailesi. Bir tonlu rengin puanı, tonunun puanı ile ailesinin puanının toplamıdır. Aileyi kelimeler seçer, kare bunu yalnızca biraz değiştirebilir.</p>
+    <p>Puanları olasılığa çevirir, listeden bir renk seçerim. Çizim ekranındaki çubuklar seçili karenin gerçek olasılıklarıdır.</p>` },
+
+  { head: 'Bölüm 3', html: () => `<h2>Nasıl öğrenirim?</h2>
+    <p class="dc">Bir çalışma resmi alırım, çizmeye çalışırım. Her karede doğru renge ne kadar az olasılık verdiysem kaybım o kadar büyüktür.</p>
+    <ol class="steps"><li>${PX_BATCH} resim seçerim</li><li>Her birinde ${PX_CELLS} kareyi aynı anda tahmin ederim</li><li>Hatamı geri yayarım</li><li>Adam ile ağırlıklarımı düzeltirim</li></ol>
+    <p>Bazen kelimelerden birini saklarım (%${Math.round(PX_DROP * 100)}), böylece yalnızca "kedi" ya da yalnızca "mavi" dersen de bir şey çizebilirim.</p>` },
+
+  { head: 'Bölüm 3', html: () => `<h3>Her resmin bir numarası</h3>
+    <p>Her çalışma resminin kendine ait ${PX_Z} hayal sayısı vardır, ağırlıklar gibi öğrenilir. Toplam ${live('mCodes')} sayı eder. Resimlerin farkları bu sayılara yerleşir.</p>
+    <p>Öğrenirken bu sayılara küçük bir gürültü katarım ve onları sıfıra doğru çekerim. Böylece birbirine yakın sayılar birbirine benzer resimler verir.</p>
+    <p>Sana çizerken resmin numarası yoktur. Çalışma sayılarının yayıldığı alandan yeni sayılar çekerim. Hayal ayarı bu alanın ne kadarını kullanacağımı söyler.</p>` },
+
+  { head: 'Bölüm 4', html: () => `<h2>Dürüst sınav</h2>
+    <p class="dc">Her şeklin bir rengi sınava ayrılır. Örneğin ${PX_HUES[pxExamHue(0)][0]} ${PX_SUBJECTS[0][0]} hiçbir çalışma resminde yoktur. Bunlara ${term('yenicift', 'yeni çift')} diyorum.</p>
+    <p>"${PX_HUES[pxExamHue(0)][0]}" kelimesini ve "${PX_SUBJECTS[0][0]}" kelimesini ayrı ayrı bilirim, birlikte hiç görmedim. Bana sınav çiftinin adıyla resim de öğretemezsin, kabul etmem.</p>
+    <p>Karnede ${PX_SUBJECTS.length} şeklin her birini ${PX_TRIES} kez çizerim. Bir resim, ana hatları en yakın çalışma resmi doğru şekilse ve en çok kullandığı aile doğru renkse doğru sayılır. Puanlamada ağırlıklarım değişmez.</p>
+    <p>Şu an çalıştığım çiftlerin ${live('mStudy')} kadarını, hiç görmediklerimin ${live('mExam')} kadarını doğru çiziyorum. ${term('ezber', 'Ezber')} farkı yüzüme yansır.</p>` },
+
+  { head: 'Bölüm 4', html: () => `<h3>Ne kadar iyiyim?</h3>
+    <table class="calc plain"><thead><tr><th>Gördüğüm resim</th><th>Çalıştığım çiftler</th><th>Yeni çiftler</th></tr></thead><tbody>
+      <tr><td>8.000</td><td>%77-90</td><td>%60-83</td></tr>
+      <tr><td>24.000</td><td>%80-93</td><td>%83-93</td></tr>
+      <tr><td>48.000</td><td>%87-97</td><td>%93-97</td></tr>
+      <tr><td>96.000</td><td>%87-93</td><td>%93-97</td></tr></tbody></table>
+    <p class="figcap">Doğru çizim oranı, 2 deneme, her satırda 30 çizim. Çizim az olduğu için birkaç puanlık fark şans olabilir.</p>
+    <p>Bir de ${term('kopya', 'kopya')} sorusu var. Çizim notu, resmimin en yakın çalışma resminden kaç kare farklı olduğunu söyler. Sıfırsa kopyalamışımdır. Ölçümde 80 çizimin hiçbiri kopya çıkmadı.</p>` },
+
+  { head: 'Son söz', html: () => `<h3>Son söz</h3>
+    <p>İlk denememde resimleri soldan sağa, kare kare çiziyordum. Bir dakikalık eğitimden sonra çoğu tuval boş kaldı, sınav çiftlerinde şekli ve rengi birlikte hiç tutturamadım. Bütün kareleri aynı anda çizmeye geçince şekiller geldi. Sonra her kare, bir şeklin hangi renkte olmadığını ezberledi ve yeni çiftlerde renkler konfetiye döndü. Rengi kelimelere bırakınca düzeldi.</p>
+    <p>Ama şunu unutma: bildiğim dünya ${PX_SUBJECTS.length} şey ve ${PX_HUE_N} renktir. Büyük resim modelleri aynı fikri çok daha büyük ölçekte kullanır: çok örnek, ayrılmış sınav, kelimelerle yönlendirme.</p>
+    <p>Beni çalıştırdığın için teşekkürler.</p>
+    <p style="text-align:right;font-style:italic">Merisu</p>
+    <div style="width:84px;margin-left:auto">${MFACE}</div>` },
+
+  { head: 'Sözlük', html: () => `<h3>Resmin sözlüğü</h3>${glossPage(['pikselsanat', 'palet', 'hayalsayi', 'cozucu', 'yenicift', 'kopya'])}` },
+];
+BOOKS.merisu = { pages: MPAGES, title: "Merisu'nun Kitabı", at: 0 };
+$('mBookBtn').addEventListener('click', () => chooseBook('merisu'));
+</script>
+
+<!-- Advanced Phyou: learning code, no DOM access. -->
+<script id="adv">
+'use strict';
+const ADV_OP = 0;               // addition only
+const ADV_TEACH = 30000;        // examples on the shown questions
+const ADV_THINK = 3000;         // examples in one thinking round
+const ADV_ROUNDS = 10;
+const ADV_AGREE = 0.8;          // share of checks that must match a guess
+const ADV_SELF_SHARE = 0.5;     // share of self-given lessons; the rest repeats what was shown
+const ADV_SHOWN = { def: 10, min: 0, max: 70 };
+const ADV_SUB_OP = 1;           // subtraction, found through addition
+const ADV_GATE = 0.4;           // a candidate must land this close to its target
+const ADV_SUB_THINK = 4000;     // examples in one finding round
+const ADV_SUB_ROUNDS = 15;
+const ADV_KEEP = 0.9;           // share of known addition a finding round must keep
+
+// Learns the shown additions, then teaches itself the study questions it can verify.
+// Exam items never enter `labels`; `item.y` of an unshown question is read only for grading.
+class Thinker {
+  constructor(rand, count) {
+    this.student = new Student(rand);
+    const { train, test } = this.student.data;
+    const study = shuffle(train[ADV_OP].slice(), rand);
+    this.shown = study.slice(0, count);
+    this.pool = study.slice(count);
+    this.exam = test[ADV_OP];
+    this.facts = new Map(this.shown.map(it => [it.a * 10 + it.b, it.y]));
+    this.phase = 'teach';
+    this.spent = 0;
+    this.round = 0;
+    this.labels = [];
+    this.sure = new Map();
+    this.log = [];
+    this.best = null;
+    this.bestScore = -1;
+    this.bestRound = 0;
+    this.taught = null;
+    this.rand = rand;
+  }
+  said(a, b) { return this.student.brain.forward(encode(a, b, ADV_OP)) * Y_SCALE; }
+  value(a, b) {
+    const fact = this.facts.get(a * 10 + b);
+    return fact === undefined ? this.said(a, b) : fact;
+  }
+  // One guess and the rule checks on it; each check gives its own answer.
+  think(a, b) {
+    const guess = Math.round(this.said(a, b));
+    const check = (x, y, shift, kind) => {
+      const seen = this.value(x, y), answer = Math.round(seen + shift);
+      return { x, y, kind, seen, answer, ok: answer === guess };
+    };
+    const checks = [check(b, a, 0, 'swap')];
+    if (a > 0) checks.push(check(a - 1, b, 1, 'more'));
+    if (b > 0) checks.push(check(a, b - 1, 1, 'more'));
+    if (a < 9) checks.push(check(a + 1, b, -1, 'less'));
+    if (b < 9) checks.push(check(a, b + 1, -1, 'less'));
+    const agree = checks.filter(c => c.ok).length;
+    return { guess, checks, agree, sure: agree >= Math.ceil(checks.length * ADV_AGREE) };
+  }
+  review() {
+    this.labels = [];
+    this.sure = new Map();
+    for (const item of this.pool) {
+      const t = this.think(item.a, item.b);
+      if (t.sure) { this.labels.push({ item, y: t.guess }); this.sure.set(item, t.guess); }
+    }
+  }
+  // A round is judged on shown answers first, then on how many questions passed the checks.
+  // A worse round is undone at once; rule checks alone miss answers that all drift together.
+  // Only shown answers count here, never an unshown question's true answer.
+  note() {
+    const right = this.shown.filter(it => Math.round(this.student.predict(it)) === it.y).length;
+    const score = right * 1000 + this.labels.length, worse = score < this.bestScore;
+    this.log.push({ round: this.round, sure: this.labels.length, right: this.rightShare(), exam: this.grade().exam, undone: worse });
+    if (score > this.bestScore) {
+      this.bestScore = score;
+      this.best = this.student.brain.p.slice();
+      this.bestRound = this.round;
+    } else if (worse) {
+      this.student.brain.p.set(this.best);
+      this.review();
+    }
+  }
+  rightShare() {
+    const n = this.labels.length;
+    return n ? this.labels.filter(l => l.y === l.item.y).length / n : 0;
+  }
+  learn(n) {
+    const s = this.student, b = s.brain, self = this.phase === 'think' && this.labels.length;
+    const none = !this.shown.length;     // zero shown: only self-given lessons can exist
+    if (none && !self) return;
+    for (let i = 0; i < n; i++) {
+      let item, y;
+      if (self && (none || this.rand() < ADV_SELF_SHARE)) {
+        const l = this.labels[Math.floor(this.rand() * this.labels.length)];
+        item = l.item; y = l.y;
+      } else {
+        item = this.shown[Math.floor(this.rand() * this.shown.length)];
+        y = item.y;
+      }
+      b.accumulate(item.x, y / Y_SCALE);
+      s.seen++;
+      if (b.pending >= BATCH) b.step(s.lr());
+    }
+  }
+  advance(n) {
+    const goal = this.phase !== 'teach' ? ADV_THINK : this.shown.length ? ADV_TEACH : 0;
+    const use = Math.min(n, goal - this.spent);
+    this.learn(use);
+    this.spent += use;
+    if (this.spent < goal) return;
+    this.spent = 0;
+    this.student.brain.step(this.student.lr());
+    if (this.phase === 'teach') {
+      this.phase = 'taught';
+      this.review();
+      this.note();
+      this.taught = this.grade();
+      return;
+    }
+    this.round++;
+    this.review();
+    this.note();
+    if (this.round >= ADV_ROUNDS || !this.labels.length) this.finish();
+  }
+  startThinking() { if (this.phase === 'taught') this.phase = 'think'; }
+  finish() {
+    this.student.brain.p.set(this.best);
+    this.review();
+    this.phase = 'done';
+  }
+  grade() {
+    const share = list => list.filter(it => Math.round(this.student.predict(it)) === it.y).length / list.length;
+    return { exam: share(this.exam), pool: share(this.pool) };
+  }
+}
+
+// Finds subtraction with no subtraction answers: tries numbers on its own addition.
+// Exam items never enter `labels`; a question's true answer is read only for grading.
+class SubFinder {
+  constructor(thinker) {
+    this.thinker = thinker;
+    this.student = thinker.student;
+    this.rand = thinker.rand;
+    this.study = this.student.data.train[ADV_SUB_OP];
+    this.exam = this.student.data.test[ADV_SUB_OP];
+    // Addition is repeated with what it was taught, or it would be overwritten.
+    this.replay = thinker.shown.map(item => ({ item, y: item.y }))
+      .concat(thinker.labels.map(l => ({ item: l.item, y: l.y })));
+    this.phase = 'ready';
+    this.spent = 0;
+    this.round = 0;
+    this.labels = [];
+    this.sure = new Map();
+    this.log = [];
+    this.best = null;
+    this.bestScore = -1;
+    this.bestRound = 0;
+    this.before = this.grade();
+    this.review();
+    this.note();
+  }
+  // Which x makes x + by reach target, by Phyou's own addition.
+  search(target, by) {
+    const tries = [];
+    for (let g = 0; g <= 9; g++) {
+      const seen = this.thinker.value(g, by);
+      tries.push({ g, by, target, seen, err: Math.abs(seen - target) });
+    }
+    return tries.sort((p, q) => p.err - q.err);
+  }
+  // A smaller first number is solved the other way round, then the sign is flipped.
+  solve(a, b) {
+    const flip = a < b, tries = flip ? this.search(b, a) : this.search(a, b), top = tries[0];
+    const sure = top.err < ADV_GATE;
+    return { flip, tries, sure, answer: flip ? -top.g : top.g };
+  }
+  review() {
+    this.labels = [];
+    this.sure = new Map();
+    for (const item of this.study) {
+      const s = this.solve(item.a, item.b);
+      if (s.sure) { this.labels.push({ item, y: s.answer }); this.sure.set(item, s.answer); }
+    }
+  }
+  rightShare() {
+    const n = this.labels.length;
+    return n ? this.labels.filter(l => l.y === l.item.y).length / n : 0;
+  }
+  // Counts the addition kept plus the found answers learned; none of this uses a true answer
+  // of an unseen question. Losing much of the addition makes a round worse whatever else it won.
+  note() {
+    const has = l => Math.round(this.student.predict(l.item)) === l.y;
+    const kept = this.replay.filter(has).length, learned = this.labels.filter(has).length;
+    if (this.keptFirst === undefined) this.keptFirst = kept;
+    const score = kept >= this.keptFirst * ADV_KEEP ? kept + learned : -1;
+    const worse = score < this.bestScore;
+    const g = this.grade();
+    this.log.push({ round: this.round, sure: this.labels.length, right: this.rightShare(), exam: g.exam, undone: worse });
+    if (score > this.bestScore) {
+      this.bestScore = score;
+      this.best = this.student.brain.p.slice();
+      this.bestRound = this.round;
+    } else if (worse) {
+      this.student.brain.p.set(this.best);
+      this.review();
+    }
+  }
+  learn(n) {
+    const s = this.student, b = s.brain, { labels, replay } = this;
+    if (!labels.length) return;
+    for (let i = 0; i < n; i++) {
+      const pool = replay.length && this.rand() < ADV_SELF_SHARE ? replay : labels;
+      const l = pool[Math.floor(this.rand() * pool.length)];
+      b.accumulate(l.item.x, l.y / Y_SCALE);
+      s.seen++;
+      if (b.pending >= BATCH) b.step(s.lr());
+    }
+  }
+  advance(n) {
+    const use = Math.min(n, ADV_SUB_THINK - this.spent);
+    this.learn(use);
+    this.spent += use;
+    if (this.spent < ADV_SUB_THINK) return;
+    this.spent = 0;
+    this.student.brain.step(this.student.lr());
+    this.round++;
+    this.review();
+    this.note();
+    if (this.round >= ADV_SUB_ROUNDS || !this.labels.length) {
+      this.student.brain.p.set(this.best);
+      this.review();
+      this.phase = 'done';
+    }
+  }
+  grade() {
+    const share = list => (list.length ? list.filter(it => Math.round(this.student.predict(it)) === it.y).length / list.length : 0);
+    return {
+      exam: share(this.exam),
+      minus: share(this.exam.filter(it => it.a < it.b)),
+      add: share(this.student.data.test[ADV_OP]),
+    };
+  }
+}
+</script>
+
+<!-- Advanced Phyou: screen, thinking loop, real-metric moods. -->
+<script id="adv-ui">
+'use strict';
+const AFACE = `<svg viewBox="0 0 200 200" aria-hidden="true">
+  <path d="M72 38 Q66 22 54 16 M128 38 Q134 22 146 16" fill="none" stroke="#0e7490" stroke-width="5" stroke-linecap="round"/>
+  <circle class="a-bulb" cx="52" cy="14" r="8" fill="#ffb703"/>
+  <circle class="a-bulb" cx="148" cy="14" r="8" fill="#ffb703"/>
+  <path fill="#38bdd8" d="M100 30 C150 30 176 68 176 116 C176 160 144 182 100 182 C56 182 24 160 24 116 C24 68 50 30 100 30Z"/>
+  <path d="M100 34 V54 M100 54 H76 V62 M100 54 H124 V62" fill="none" stroke="#0e7490" stroke-width="3"/>
+  <circle cx="76" cy="64" r="3.5" fill="#0e7490"/><circle cx="124" cy="64" r="3.5" fill="#0e7490"/>
+  <circle cx="72" cy="106" r="20" fill="#fff" stroke="#06303c" stroke-width="5"/>
+  <circle cx="128" cy="106" r="20" fill="#fff" stroke="#06303c" stroke-width="5"/>
+  <path d="M92 104 H108 M52 102 L34 96 M148 102 L166 96" fill="none" stroke="#06303c" stroke-width="5" stroke-linecap="round"/>
+  <circle cx="74" cy="108" r="7" fill="#06303c"/><circle cx="130" cy="108" r="7" fill="#06303c"/>
+  <path class="a-brow" d="M58 78 L86 78" fill="none" stroke="#06303c" stroke-width="5" stroke-linecap="round"/>
+  <path class="a-brow" d="M114 78 L142 78" fill="none" stroke="#06303c" stroke-width="5" stroke-linecap="round"/>
+  <path class="a-mouth" d="M92 146 q8 8 16 0" fill="none" stroke="#06303c" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>`;
+const ADV_MOODS = {
+  fresh: { text: 'Hazır bekliyor', mouth: 'M92 146 q8 8 16 0', brow: [0, 0], fill: false },
+  learn: { text: 'Dinliyor', mouth: 'M90 148 L110 148', brow: [0, 0], fill: false },
+  lost: { text: 'Kafası karışık', mouth: 'M82 148 q9 -9 18 0 t18 0', brow: [-12, 12], fill: false },
+  keen: { text: 'Hevesli', mouth: 'M82 140 q18 18 36 0', brow: [0, 0], fill: false },
+  ponder: { text: 'Düşünüyor', mouth: 'M86 148 L114 144', brow: [8, -6], fill: false },
+  doubt: { text: 'Emin değil', mouth: 'M86 150 q14 -10 28 0', brow: [10, 10], fill: false },
+  proud: { text: 'Özgüvenli', mouth: 'M78 136 q22 34 44 0 z', brow: [-6, 6], fill: true },
+};
+const ADV_SPEED = { teach: 400, think: 60, find: 120 };   // examples per frame, slow enough to watch
+let thinker = null, advRun = false, advLastPaint = 0, advLastPick = 0, advPick = null, advAsked = null;
+let finder = null, advView = 'add';
+// Finding subtraction needs finished addition; the same brain then carries on.
+function advFinder() {
+  if (!finder && thinker && thinker.phase === 'done') finder = new SubFinder(thinker);
+  return finder;
+}
+
+function advBuild() {
+  $('advFace').innerHTML = AFACE;
+  $('advN').min = ADV_SHOWN.min; $('advN').max = ADV_SHOWN.max; $('advN').value = ADV_SHOWN.def;
+  $('advRange').textContent = `(${ADV_SHOWN.min}-${ADV_SHOWN.max})`;
+  let html = '<span></span>';
+  for (let b = 0; b < 10; b++) html += `<span class="adv-lab">${b}</span>`;
+  for (let a = 0; a < 10; a++) {
+    html += `<span class="adv-lab">${a}</span>`;
+    for (let b = 0; b < 10; b++) html += `<button type="button" class="adv-cell" id="advC${a}${b}" data-a="${a}" data-b="${b}" aria-pressed="false" aria-label="${a} + ${b}"></button>`;
+  }
+  $('advCells').innerHTML = html;
+}
+function advSetRun(on) {
+  advRun = on;
+  $('advFace').classList.toggle('busy', on);
+  if (on) requestAnimationFrame(advLoop);
+  if (thinker || on) advButton();
+}
+function advButton() {
+  const p = thinker ? thinker.phase : 'none', btn = $('advAuto');
+  if (advView === 'sub') {
+    const f = advFinder();
+    btn.disabled = !f || f.phase === 'done';
+    btn.textContent = !f ? 'Önce toplamayı bitir' : f.phase === 'ready' ? 'Çıkarmayı bulmaya başla'
+      : f.phase === 'done' ? 'Bulma bitti' : advRun ? 'Durdur' : 'Devam et';
+    return;
+  }
+  btn.disabled = p === 'done';
+  if (p === 'none') btn.textContent = 'Öğretmeye başla';
+  else if (p === 'taught') btn.textContent = 'Düşünmeye başlat';
+  else if (p === 'done') btn.textContent = 'Düşünme bitti';
+  else btn.textContent = advRun ? 'Durdur' : 'Devam et';
+}
+function advLoop(t) {
+  if (!advRun) return;
+  if (advView === 'sub') {
+    finder.advance(ADV_SPEED.find);
+    if (finder.phase === 'done') { advSetRun(false); advRefresh(); return; }
+    if (t - advLastPick > 800) {
+      advLastPick = t;
+      const it = finder.study[Math.floor(Math.random() * finder.study.length)];
+      advPick = { a: it.a, b: it.b };
+    }
+    if (t - advLastPaint > 200) { advLastPaint = t; advRefresh(); }
+    requestAnimationFrame(advLoop);
+    return;
+  }
+  const p = thinker.phase;
+  if (p === 'teach' || p === 'think') thinker.advance(ADV_SPEED[p]);
+  if (thinker.phase === 'taught' || thinker.phase === 'done') { advSetRun(false); advRefresh(); return; }
+  if (thinker.phase === 'think' && t - advLastPick > 800) {
+    advLastPick = t;
+    const it = thinker.pool[Math.floor(Math.random() * thinker.pool.length)];
+    advPick = { a: it.a, b: it.b };
+  }
+  if (t - advLastPaint > 200) { advLastPaint = t; advRefresh(); }
+  requestAnimationFrame(advLoop);
+}
+function advSubMood() {
+  const f = advFinder();
+  if (!f) return ['fresh', 'Çıkarmayı toplamadan bulacağım. Önce Toplamayı düşün deneyini bitirelim.'];
+  const g = f.grade(), before = pct(f.before.exam), after = pct(g.exam);
+  if (f.phase === 'ready') return ['keen', `Hiç çıkarma görmedim, sınavım ${before}. Toplamamla cevap aramaya başlayayım mı?`];
+  if (f.phase === 'find') return ['ponder', `Sayıları deniyorum: ${f.study.length} sorunun ${f.labels.length} tanesini buldum.`];
+  if (g.exam <= f.before.exam) return ['doubt', `Çıkarmayı bulamadım. Sınavım: ${before} → ${after}`];
+  return [g.exam >= 0.9 ? 'proud' : 'keen', `Hiç cevap görmeden buldum. Sınavım: ${before} → ${after}`];
+}
+function advMood() {
+  if (advView === 'sub') return advSubMood();
+  if (!thinker) return ['fresh', 'Merhaba, ben Advanced Phyou. Bana birkaç toplama göster, kalanını düşüneyim.'];
+  const { phase, pool, labels } = thinker, sure = labels.length, g = thinker.grade();
+  if (phase === 'teach') return ['learn', 'Gösterdiğin toplamaları çalışıyorum.'];
+  if (phase === 'think') return ['ponder', `Kontrol ediyorum: ${pool.length} sorunun ${sure} tanesinde eminim.`];
+  if (phase === 'taught') {
+    const key = g.exam < 0.5 ? 'lost' : g.exam < 0.9 ? 'keen' : 'proud';
+    return [key, thinker.shown.length
+      ? `Sadece gösterdiklerinle sınavda ${pct(g.exam)} yaptım. Şimdi kalanları düşüneyim mi?`
+      : `Hiç örnek görmedim, sınavda ${pct(g.exam)} yaptım. Yine de düşüneyim mi?`];
+  }
+  if (sure < pool.length / 2) return ['doubt', `Düşündüm ama ${pool.length} sorunun yalnızca ${sure} tanesinde emin olabildim. Daha çok örnek gerekebilir.`];
+  const before = pct(thinker.taught.exam), after = pct(g.exam);
+  if (g.exam < thinker.taught.exam) return ['doubt', `Düşünmek bu kez yaramadı. Sınavım: ${before} → ${after}`];
+  if (g.exam === thinker.taught.exam) return [g.exam >= 0.9 ? 'proud' : 'keen', `Sınavım değişmedi: ${after}`];
+  return [g.exam >= 0.9 ? 'proud' : 'keen', `Düşünerek ilerledim. Sınavım: ${before} → ${after}`];
+}
+function advSay(text) { if ($('advSay').textContent !== text) $('advSay').textContent = text; }
+function advPaintCells() {
+  const sign = advView === 'sub' ? '−' : '+', f = advView === 'sub' ? advFinder() : null;
+  for (let a = 0; a < 10; a++) for (let b = 0; b < 10; b++) {
+    const el = $(`advC${a}${b}`);
+    let cls = 'adv-cell', text = '';
+    if (f) {
+      const it = f.student.data.grid[ADV_SUB_OP][a][b], sure = f.sure.get(it);
+      const answer = sure !== undefined ? sure : Math.round(f.student.predict(it));
+      text = String(answer);
+      cls += it.test ? ' exam' : sure !== undefined ? ' sure' : ' unsure';
+      if (answer !== it.y) cls += ' bad';
+    } else if (thinker && advView === 'add') {
+      const it = thinker.student.data.grid[ADV_OP][a][b], fact = thinker.facts.get(a * 10 + b);
+      const sure = thinker.sure.get(it);
+      const answer = fact !== undefined ? fact : sure !== undefined ? sure : Math.round(thinker.said(a, b));
+      text = thinker.taught ? String(answer) : thinker.student.seen ? String(answer) : '';
+      if (fact !== undefined) cls += ' shown';
+      else if (it.test) cls += ' exam';
+      else if (sure !== undefined) cls += ' sure';
+      else if (thinker.taught) cls += ' unsure';
+      if (thinker.taught && answer !== it.y) cls += ' bad';
+    }
+    if (el.className !== cls) el.className = cls;
+    if (el.textContent !== text) el.textContent = text;
+    el.setAttribute('aria-pressed', !!advPick && advPick.a === a && advPick.b === b);
+    el.setAttribute('aria-label', `${a} ${sign} ${b}${text ? ', Phyou: ' + text : ''}`);
+  }
+}
+function advPaintSubChain() {
+  const box = $('advChain'), f = advFinder();
+  if (!f || !advPick) {
+    box.innerHTML = '<p class="sub">Phyou sayı denerken ya da bir kareye tıklayınca burada görünür.</p>';
+    return;
+  }
+  const { a, b } = advPick, it = f.student.data.grid[ADV_SUB_OP][a][b], s = f.solve(a, b);
+  const rows = s.tries.slice(0, 3).map((c, i) =>
+    `<li><span>${c.g} + ${c.by}</span><span>${num1(c.seen)}, hedef ${c.target}</span><b>${num1(c.err)}</b><span class="${i === 0 && s.sure ? 'yes' : 'no'}">${i === 0 && s.sure ? '✓' : '✗'}</span></li>`).join('');
+  const flip = s.flip ? `<p class="adv-true">İlk sayı küçük: ${b} − ${a} sorusunu çözüp işareti çevirdim.</p>` : '';
+  const verdict = it.test ? 'Sınav sorusu: deneyebilirim ama bundan ders almam.'
+    : s.sure ? 'En yakın aday hedefi tutturdu: eminim, kendime ders veririm.'
+      : 'Hiçbir aday yeterince yakın değil: emin değilim.';
+  box.innerHTML = `<p class="adv-q">${a} − ${b} = ${s.answer} ?</p>${flip}<ol class="adv-checks">${rows}</ol>` +
+    `<p class="adv-verdict">En yakın 3 aday, son sütun fark. ${verdict}</p>` +
+    `<p class="adv-true">Gerçek cevap ${it.y}. Bunu yalnızca notlama görür.</p>`;
+}
+function advPaintChain() {
+  if (advView === 'sub') { advPaintSubChain(); return; }
+  const box = $('advChain');
+  if (!thinker || !(thinker.taught || thinker.student.seen) || !advPick) {
+    box.innerHTML = '<p class="sub">Phyou düşünürken ya da bir kareye tıklayınca burada görünür.</p>';
+    return;
+  }
+  const { a, b } = advPick, it = thinker.student.data.grid[ADV_OP][a][b];
+  const fact = thinker.facts.get(a * 10 + b);
+  if (fact !== undefined) {
+    box.innerHTML = `<p class="adv-q">${a} + ${b} = ${fact}</p><p class="adv-verdict">Bunu sen gösterdin, kontrol etmem gerekmiyor.</p>`;
+    return;
+  }
+  const t = thinker.think(a, b);
+  const how = c => (c.kind === 'swap' ? `sıra değişti: ${num1(c.seen)}`
+    : c.kind === 'more' ? `${num1(c.seen)}, bir fazlası` : `${num1(c.seen)}, bir eksiği`);
+  const rows = t.checks.map(c =>
+    `<li><span>${c.x} + ${c.y}</span><span>${how(c)}</span><b>${c.answer}</b><span class="${c.ok ? 'yes' : 'no'}">${c.ok ? '✓' : '✗'}</span></li>`).join('');
+  const verdict = it.test ? 'Sınav sorusu: kontrol edebilirim ama bundan ders almam.'
+    : t.sure ? 'Çoğu kontrol uyuştu: eminim, kendime ders veririm.'
+      : 'Kontroller uyuşmadı: emin değilim, bu turda atlıyorum.';
+  box.innerHTML = `<p class="adv-q">${a} + ${b} = ${t.guess} ?</p><ol class="adv-checks">${rows}</ol>` +
+    `<p class="adv-verdict">${t.agree}/${t.checks.length} uyum. ${verdict}</p>` +
+    `<p class="adv-true">Gerçek cevap ${it.y}. Bunu yalnızca notlama görür.</p>`;
+}
+// Answering reads the network only, so a question can never change what Phyou knows.
+function advPaintAnswer() {
+  const line = $('advAnswer');
+  if (!thinker || !advAsked) { line.textContent = ''; return; }
+  if (advView === 'sub') {
+    const { a, b } = advAsked, f = advFinder(), it = f.student.data.grid[ADV_SUB_OP][a][b];
+    const answer = f.sure.has(it) ? f.sure.get(it) : Math.round(f.student.predict(it));
+    const how = it.test ? 'Bu bir sınav sorusu, bundan ders almam.' : f.sure.has(it) ? 'Toplamamla doğruladım, eminim.' : 'Henüz emin değilim.';
+    line.textContent = `${a} − ${b} = ${answer}. ${how}`;
+    return;
+  }
+  const { a, b } = advAsked, it = thinker.student.data.grid[ADV_OP][a][b];
+  const fact = thinker.facts.get(a * 10 + b), t = thinker.think(a, b);
+  const answer = fact !== undefined ? fact : thinker.sure.has(it) ? thinker.sure.get(it) : t.guess;
+  const how = fact !== undefined ? 'Bunu sen gösterdin.'
+    : it.test ? 'Bu bir sınav sorusu, bundan ders almam.'
+      : thinker.sure.has(it) ? 'Kontrollerimden geçti, eminim.' : 'Henüz emin değilim.';
+  line.textContent = `${a} + ${b} = ${answer}. ${how}`;
+}
+function advPaintRounds() {
+  const src = advView === 'sub' ? advFinder() : thinker, log = src ? src.log : [];
+  const done = src && src.phase === 'done', all = src ? (src.study || src.pool).length : 0;
+  $('advRoundRows').innerHTML = log.length ? log.map(r =>
+    `<tr${done && r.round === src.bestRound ? ' class="best"' : ''}><td>${r.round || 'Başlangıç'}${done && r.round === src.bestRound ? ' · seçildi' : ''}${r.undone ? ' · geri alındı' : ''}</td><td>${r.sure}/${all}</td><td>${r.sure ? pct(r.right) : '-'}</td><td>${pct(r.exam)}</td></tr>`).join('')
+    : '<tr><td colspan="4">Henüz tur yok.</td></tr>';
+}
+function advRefresh() {
+  const m = ADV_MOODS[advMood()[0]];
+  const face = $('advFace'), mouth = face.querySelector('.a-mouth'), brows = face.querySelectorAll('.a-brow');
+  mouth.setAttribute('d', m.mouth);
+  face.classList.toggle('mouth-fill', m.fill);
+  brows[0].style.transform = `rotate(${m.brow[0]}deg)`;
+  brows[1].style.transform = `rotate(${m.brow[1]}deg)`;
+  $('advMoodText').textContent = 'Şu an: ' + m.text;
+  advSay(advMood()[1]);
+  const sub = advView === 'sub', f = sub ? advFinder() : null;
+  const phase = thinker ? thinker.phase : 'none';
+  const step = sub ? (!f || f.phase === 'ready' ? 0 : f.phase === 'done' ? 2 : 1)
+    : phase === 'none' || phase === 'teach' ? 0 : phase === 'done' ? 2 : 1;
+  [...$('advSteps').children].forEach((li, i) => {
+    li.textContent = `${i + 1}. ${(sub ? ['Toplamayı bil', 'Sayı dene', 'Sınav'] : ['Göster', 'Düşün', 'Sınav'])[i]}`;
+    if (i === step) li.setAttribute('aria-current', 'step'); else li.removeAttribute('aria-current');
+  });
+  $('advN').disabled = !!thinker;
+  $('advForm').hidden = sub;
+  $('advTableTitle').textContent = sub ? 'Çıkarma tablosu' : 'Toplama tablosu';
+  $('advKeyShown').hidden = sub;
+  $('advAskSign').textContent = sub ? '−' : '+';
+  $('advHowSub').hidden = !sub; $('advHowAdd').hidden = sub;
+  $('advLabShown').textContent = sub ? 'Verilen çıkarma cevabı' : 'Gösterilen soru';
+  $('advLabSure').textContent = sub ? 'Bulduğu cevap' : 'Emin olduğu soru';
+  [...$('advViews').children].forEach(b => b.setAttribute('aria-pressed', b.dataset.view === advView));
+  advPaintCells();
+  advPaintChain();
+  advPaintAnswer();
+  advPaintRounds();
+  if (afterRefresh) afterRefresh();
+  if (sub) {
+    const g = f ? f.grade() : null;
+    $('advStatShown').textContent = '0';
+    $('advHintShown').textContent = f ? `${big(f.student.seen)} örnek çalıştı` : '';
+    $('advStatSure').textContent = f ? f.labels.length : 0;
+    $('advHintSure').textContent = f ? `${f.study.length} çalışma sorusundan` : '';
+    $('advStatRight').textContent = f && f.labels.length ? pct(f.rightShare()) : '-';
+    $('advHintRight').textContent = f ? `sınavda toplama: ${pct(g.add)}` : '';
+    $('advStatExam').textContent = f ? pct(g.exam) : '-';
+    $('advHintExam').textContent = f ? `başlarken ${pct(f.before.exam)}, negatif: ${pct(g.minus)}` : '';
+    return;
+  }
+  const reviewed = !!(thinker && thinker.taught), g = thinker ? thinker.grade() : null;
+  $('advStatShown').textContent = thinker ? thinker.shown.length : 0;
+  $('advHintShown').textContent = thinker ? `${big(thinker.student.seen)} örnek çalıştı` : '';
+  $('advStatSure').textContent = reviewed ? thinker.labels.length : 0;
+  $('advHintSure').textContent = thinker ? `${thinker.pool.length} çalışma sorusundan` : '';
+  $('advStatRight').textContent = reviewed && thinker.labels.length ? pct(thinker.rightShare()) : '-';
+  $('advHintRight').textContent = reviewed ? `bütün kalan sorular: ${pct(g.pool)}` : '';
+  $('advStatExam').textContent = reviewed ? pct(g.exam) : '-';
+  $('advHintExam').textContent = reviewed ? `göstermeden sonra ${pct(thinker.taught.exam)}` : '';
+}
+function advStart() {
+  const n = Number($('advN').value);
+  if (!Number.isInteger(n) || n < ADV_SHOWN.min || n > ADV_SHOWN.max) {
+    sNote('advNote', `${ADV_SHOWN.min} ile ${ADV_SHOWN.max} arasında tam sayı yaz.`, true);
+    return;
+  }
+  sNote('advNote', '');
+  thinker = new Thinker(Math.random, n);
+  finder = null;
+  advPick = null; advAsked = null;
+  sNote('advAskNote', '');
+  advSetRun(true);
+  advRefresh();
+}
+function advPress() {
+  if (advView === 'sub') {
+    const f = advFinder();
+    if (!f || f.phase === 'done') return;
+    if (f.phase === 'ready') f.phase = 'find';
+    else if (advRun) { advSetRun(false); advRefresh(); return; }
+    advSetRun(true);
+    return;
+  }
+  if (!thinker) { advStart(); return; }
+  if (thinker.phase === 'done') return;
+  if (thinker.phase === 'taught') thinker.startThinking();
+  else if (advRun) { advSetRun(false); advRefresh(); return; }
+  advSetRun(true);
+}
+$('advAuto').addEventListener('click', advPress);
+$('advForm').addEventListener('submit', e => { e.preventDefault(); advPress(); });
+$('advReset').addEventListener('click', () => {
+  advSetRun(false);
+  thinker = null; finder = null; advPick = null; advAsked = null;
+  advView = 'add';
+  sNote('advNote', '');
+  sNote('advAskNote', '');
+  advButton();
+  advRefresh();
+});
+$('advAskForm').addEventListener('submit', e => {
+  e.preventDefault();
+  const a = Number($('advA').value), b = Number($('advB').value);
+  const digit = v => $('advA').value !== '' && $('advB').value !== '' && Number.isInteger(v) && v >= 0 && v <= 9;
+  if (!digit(a) || !digit(b)) { sNote('advAskNote', '0 ile 9 arasında iki tam sayı yaz.', true); return; }
+  if (!thinker || !(thinker.taught || thinker.student.seen)) { sNote('advAskNote', 'Önce öğretmeye başlat.', true); return; }
+  if (advView === 'sub' && !advFinder()) { sNote('advAskNote', 'Önce toplamayı bitir.', true); return; }
+  sNote('advAskNote', '');
+  advAsked = { a, b };
+  advPick = { a, b };
+  advLastPick = performance.now() + 3000;   // keep the asked question up for a while
+  advRefresh();
+});
+$('advViews').addEventListener('click', e => {
+  const b = e.target.closest('[data-view]');
+  if (!b || b.dataset.view === advView) return;
+  advSetRun(false);
+  advView = b.dataset.view;
+  advPick = null; advAsked = null;
+  sNote('advAskNote', '');
+  advButton();
+  advRefresh();
+});
+$('advCells').addEventListener('click', e => {
+  const el = e.target.closest('.adv-cell');
+  if (!el || !thinker) return;
+  advPick = { a: +el.dataset.a, b: +el.dataset.b };
+  advLastPick = performance.now() + 3000;   // keep the clicked question up for a while
+  advRefresh();
+});
+advBuild();
+</script>
+
+<!-- Advanced Phyou's book: only Thinking Mode, on the same paper and page turning. -->
+<script id="adv-book">
+'use strict';
+Object.assign(GLOSSARY, {
+  tkontrol: ['Kontrol', 'Tahminimi başka bir sorudaki cevabımla karşılaştırmak. Sonucu kuraldan gelir, gerçek cevabı görmez.'],
+  temin: ['Emin olmak', 'Kontrollerin yeterince çoğunun tahminimle uyuşması. Cevabın doğru olduğu anlamına gelmez.'],
+  tkendi: ['Kendime ders', 'Emin olduğum tahmini doğru cevap gibi kullanıp ağırlıklarımı ona göre düzeltmek.'],
+  tgeri: ['Geri alma', 'Bir tur sonucu kötüleştirirse ağırlıklarımı o turdan önceki en iyi hâline döndürmek.'],
+  tkayma: ['Kayma', 'Bütün cevapların aynı miktarda yanlış olması. Farklar doğru kaldığı için kurallar bunu göremez.'],
+  tters: ['Ters işlem', 'Sonuçtan geri gitmek: a − b = g ise g + b = a.'],
+  ttekrar: ['Tekrar', 'Yeni şey öğrenirken eski bilgiyi de çalışmak; yoksa silinir.'],
+});
+
+const tRead = f => (thinker && thinker.taught ? f(thinker) : '-');
+Object.assign(LIVE, {
+  tShown: () => (thinker ? String(thinker.shown.length) : '-'),
+  tPool: () => (thinker ? String(thinker.pool.length) : '-'),
+  tSeen: () => (thinker ? sCount(thinker.student.seen) : '0'),
+  tSure: () => tRead(t => String(t.labels.length)),
+  tRight: () => tRead(t => (t.labels.length ? pct(t.rightShare()) : '-')),
+  tBefore: () => tRead(t => pct(t.taught.exam)),
+  tExam: () => tRead(t => pct(t.grade().exam)),
+  tUndone: () => (thinker ? String(thinker.log.filter(r => r.undone).length) : '0'),
+  tFound: () => (finder ? String(finder.labels.length) : '0'),
+  tSubExam: () => (finder ? pct(finder.grade().exam) : '-'),
+});
+
+const TCHAPTERS = [[3, 'Neden ayrı bir kart?'], [5, 'Düşünmek'], [9, 'Kendime ders'], [13, 'Neden örnek şart?'], [15, 'Çıkarmayı bulmak'], [19, 'Dürüst sınav'], [21, 'Sınırlarım'], [22, 'Sözlük']];
+const tExamN = () => Math.round(100 * TEST_SHARE);
+const tAgree = () => Math.round(ADV_AGREE * 100);
+const tFormula = text => `<p style="text-align:center"><b>${text}</b></p>`;
+
+// Index 0 is the cover; every other index equals its printed page number.
+const TPAGES = [
+  { cover: true, html: () => `<div class="cover-frame">${AFACE}<h2>Düşünme Kitabı</h2>
+    <p>Gösterilmeyen cevapları kendi kontrol ederek nasıl buluyorum</p><p class="by">YAZAN: ADVANCED PHYOU</p></div>` },
+
+  { head: 'Önsöz', html: () => `<h3>Merhaba</h3>
+    <p>Ben Advanced Phyou. Bu kitap yalnızca iki deneyimi anlatır: gösterilmeyen toplamaları düşünerek bulmak ve hiç çıkarma görmeden çıkarmayı bulmak.</p>
+    <p>Sinir ağının içini, geri yayılımı ve Adam'ı Phyou'nun kitabı anlatıyor. Burada onların üstüne eklenen matematiği göstereceğim: kontrol, kendi etiketim, geri alma ve ters işlem.</p>
+    <p class="margin-note">Şu an ${live('tShown')} toplama gösterildi, toplam ${live('tSeen')} örnek çalıştım.</p>` },
+
+  { head: 'İçindekiler', html: () => `<h3>Bu kitapta neler var?</h3><ol class="toc">${TCHAPTERS.map(([p, t], i) =>
+    `<li><button type="button" data-go="${p}"><span>${i + 1}. ${t}</span><span class="no">${p}</span></button></li>`).join('')}</ol>` },
+
+  { head: 'Bölüm 1', html: () => `<h2>Neden ayrı bir kart?</h2>
+    <p class="dc">Phyou her soruda doğru cevabı öğretmeninden alır. Ben şunu soruyorum: cevapların çoğunu hiç söylemesen ne olur?</p>
+    <p>Bunu denemek için kendi beynim var. Phyou ile aynı boyda (${netSizes(NET_DEFAULT).join('-')}), ama ağırlıklarım ayrı. Phyou'nun öğrendiklerini bilmem, ben de onunkileri bozmam.</p>
+    <p>Yalnızca toplama ve çıkarma çalışırım. İkisinde de ${100 - tExamN()} çalışma, ${tExamN()} sınav sorusu var.</p>` },
+
+  { head: 'Bölüm 1', html: () => `<h3>İki deney</h3>
+    <ol class="steps"><li><b>Toplamayı düşün:</b> ${ADV_SHOWN.min} ile ${ADV_SHOWN.max} arasında soru gösterirsin. ${sCount(ADV_TEACH)} örnek yalnızca onları çalışırım, sonra kalanları kontrol ederek kendime öğretirim.</li>
+    <li><b>Çıkarmayı bul:</b> toplama bitince aynı beyinle başlar. Çıkarma cevabı almam, sayıları toplamamla denerim.</li></ol>
+    <p>İkisinde de sonunda hiç çalışmadığım ${tExamN()} soruda sınava girerim.</p>
+    <p class="margin-note">Şu an ${live('tPool')} toplamayı kendim bulmaya çalışıyorum.</p>` },
+
+  { head: 'Bölüm 2', html: () => `<h2>Düşünmek</h2>
+    <p class="dc">Düşünmek benim için önce tahmin etmek, sonra tahminimi başka sorulardaki cevaplarımla karşılaştırmaktır.</p>
+    <p>İki kuralım var:</p>
+    ${tFormula('a + b = b + a')}
+    ${tFormula('a + b = (a − 1 + b) + 1 = (a + 1 + b) − 1')}
+    <p>İkinci satır b için de geçerlidir. Her ${term('tkontrol', 'kontrol')} başka bir soruya bakar. O soruyu sen göstermişsen senin cevabını, göstermemişsen kendi cevabımı kullanırım.</p>` },
+
+  { head: 'Bölüm 2', html: () => `<h3>Tahminim nasıl çıkar?</h3>
+    <p>Ağım iki sayıyı −1 ile 1 arasına getirir, çıkan sayıyı ${Y_SCALE} ile çarpar. Çıkışa f diyelim.</p>
+    ${tFormula(`tahmin = yuvarla(${Y_SCALE} × f)`)}
+    <table class="calc"><tbody>
+      <tr><td>Birinci sayı</td><td>7 ÷ 4,5 − 1</td><td>0,556</td></tr>
+      <tr><td>İkinci sayı</td><td>5 ÷ 4,5 − 1</td><td>0,111</td></tr>
+      <tr><td>Ağın çıkışı, f</td><td>örnek</td><td>0,29</td></tr>
+      <tr><td>Ham cevap</td><td>0,29 × ${Y_SCALE}</td><td>11,6</td></tr>
+      <tr><td>Tahmin</td><td>yuvarla(11,6)</td><td>12</td></tr></tbody></table>
+    <p>Kontroller de aynı yolla çalışır, tek farkları kuraldan gelen +1 ya da −1'dir.</p>` },
+
+  { head: 'Bölüm 2', html: () => `<h3>Bir örnek: 7 + 5</h3>
+    <p>Tahminim 12 olsun:</p>
+    <table class="calc plain"><thead><tr><th>Baktığım soru</th><th>Ham cevap</th><th>İşlem</th><th>Sonuç</th><th>Uyum</th></tr></thead><tbody>
+      <tr><td>5 + 7</td><td>12,1</td><td>aynen</td><td>12</td><td>✓</td></tr>
+      <tr><td>6 + 5</td><td>11,0</td><td>+ 1</td><td>12</td><td>✓</td></tr>
+      <tr><td>7 + 4</td><td>10,9</td><td>+ 1</td><td>12</td><td>✓</td></tr>
+      <tr><td>8 + 5</td><td>13,2</td><td>− 1</td><td>12</td><td>✓</td></tr>
+      <tr><td>7 + 6</td><td>14,1</td><td>− 1</td><td>13</td><td>✗</td></tr></tbody></table>
+    <p class="figcap">Örnek sayılar. Ekranda bir kareye tıklarsan gerçek zincirimi görürsün.</p>
+    <p>Sonuçlar yuvarlanır, ham cevaplar değil: 10,9 + 1 = 11,9, o da 12 eder.</p>` },
+
+  { head: 'Bölüm 2', html: () => `<h3>Kaç kontrol yeter?</h3>
+    <p>n kontrol varsa ${term('temin', 'emin olmam')} için şu kadar uyum gerekir:</p>
+    ${tFormula(`uyum ≥ yukarı yuvarla(${ADV_AGREE.toLocaleString('tr-TR')} × n)`)}
+    <table class="calc plain"><thead><tr><th>Soru nerede?</th><th>n</th><th>Hesap</th><th>Gereken</th></tr></thead><tbody>
+      <tr><td>Ortada</td><td>5</td><td>0,8 × 5 = 4</td><td>4</td></tr>
+      <tr><td>Kenarda</td><td>4</td><td>0,8 × 4 = 3,2</td><td>4</td></tr>
+      <tr><td>Köşede</td><td>3</td><td>0,8 × 3 = 2,4</td><td>3</td></tr></tbody></table>
+    <p>Yani kenarda da köşede de hiçbir hataya izin yok, ortada bir hataya izin var.</p>` },
+
+  { head: 'Bölüm 3', html: () => `<h2>Kendime ders</h2>
+    <p class="dc">Phyou'nun hatası ½ × (çıkış − hedef)² idi. Benimki de aynı. Değişen tek şey hedefin nereden geldiğidir.</p>
+    ${tFormula(`hedef = kendi tahminim ÷ ${Y_SCALE}`)}
+    <table class="calc"><tbody>
+      <tr><td>Hedef</td><td>12 ÷ ${Y_SCALE}</td><td>0,30</td></tr>
+      <tr><td>Çıkış</td><td>f</td><td>0,29</td></tr>
+      <tr><td>Fark</td><td>0,29 − 0,30</td><td>−0,01</td></tr>
+      <tr><td>Hata</td><td>½ × (−0,01)²</td><td>0,00005</td></tr></tbody></table>
+    <p>Fark eksi olduğu için gradyan ağırlıkları çıkışı yükseltecek yöne iter. Yani ${term('tkendi', 'kendime ders')} verirken 11,6'yı 12'ye yaklaştırırım.</p>` },
+
+  { head: 'Bölüm 3', html: () => `<h3>Etiketim yanlışsa?</h3>
+    <p>Matematik hedefin doğru olup olmadığını bilmez. Kontroller yanlış tahmini geçirirse, örneğin 13:</p>
+    <table class="calc"><tbody>
+      <tr><td>Yanlış hedef</td><td>13 ÷ ${Y_SCALE}</td><td>0,325</td></tr>
+      <tr><td>Fark</td><td>0,29 − 0,325</td><td>−0,035</td></tr>
+      <tr><td>Hata</td><td>½ × (−0,035)²</td><td>0,00061</td></tr></tbody></table>
+    <p>Gerçek cevabı aşsam bile itiş sürer: çıkış 0,30 olunca fark hâlâ −0,025'tir. Üstelik fark 3,5 kat büyük olduğu için itiş de 3,5 kat güçlüdür.</p>
+    <p>Yanlış ders böyle yayılır: bozduğu soru, sonraki turda komşularının kontrolünde kullanılır.</p>` },
+
+  { head: 'Bölüm 3', html: () => `<h3>İki kaynak, bir gradyan</h3>
+    <p>Her örnekte %${Math.round(ADV_SELF_SHARE * 100)} olasılıkla emin olduğum bir soruyu, yoksa gösterilen bir soruyu seçerim. ${BATCH} örnek biriken gradyan bir güncelleme yapar:</p>
+    ${tFormula(`gradyan ≈ ½ × gösterilen + ½ × kendi`)}
+    <table class="calc"><tbody>
+      <tr><td>Öğretme güncellemesi</td><td>${sCount(ADV_TEACH)} ÷ ${BATCH}</td><td>${sCount(ADV_TEACH / BATCH)}</td></tr>
+      <tr><td>Bir tur</td><td>${sCount(ADV_THINK)} ÷ ${BATCH}, yukarı</td><td>${Math.ceil(ADV_THINK / BATCH)}</td></tr>
+      <tr><td>Bütün turlar</td><td>${ADV_ROUNDS} × ${Math.ceil(ADV_THINK / BATCH)}</td><td>${sCount(ADV_ROUNDS * Math.ceil(ADV_THINK / BATCH))}</td></tr></tbody></table>
+    <p>Gösterilen sorular beni gerçeğe bağlı tutar. Hiç soru gösterilmediyse formülde yalnızca kendi kalır.</p>` },
+
+  { head: 'Bölüm 3', html: () => `<h3>Bozulan turu geri alırım</h3>
+    <p>Bir denemede %55 olan sınavım %30'a düştü, üstelik 70 sorunun 60 tanesinde emindim. Artık her tur puanlanır:</p>
+    ${tFormula('puan = 1000 × bildiğim gösterilen + emin olduğum')}
+    <table class="calc plain"><thead><tr><th>Tur</th><th>Gösterilen</th><th>Emin</th><th>Puan</th><th>Sonuç</th></tr></thead><tbody>
+      <tr><td>1</td><td>10</td><td>48</td><td>10.048</td><td>tut</td></tr>
+      <tr><td>2</td><td>10</td><td>46</td><td>10.046</td><td>${term('tgeri', 'geri al')}</td></tr>
+      <tr><td>3</td><td>9</td><td>70</td><td>9.070</td><td>geri al</td></tr></tbody></table>
+    <p>Emin olduğum soru en çok ${100 - tExamN()} olabilir, 1000 çarpanı yüzünden gösterilen bir soruyu unutmak hiçbir kazançla ödenmez.</p>
+    <p class="margin-note">Bu denemede ${live('tUndone')} tur geri alındı.</p>` },
+
+  { head: 'Bölüm 4', html: () => `<h2>Neden örnek şart?</h2>
+    <p class="dc">Kurallarım yalnızca farkları denetler. Her cevaba aynı c sayısını eklediğimi düşün:</p>
+    ${tFormula('f(a, b) = a + b + c')}
+    <table class="calc plain"><thead><tr><th>Kontrol</th><th>Sol</th><th>Sağ</th></tr></thead><tbody>
+      <tr><td>Sıra</td><td>a + b + c</td><td>b + a + c</td></tr>
+      <tr><td>Bir fazla</td><td>a + b + c</td><td>(a − 1 + b + c) + 1</td></tr>
+      <tr><td>Bir eksik</td><td>a + b + c</td><td>(a + 1 + b + c) − 1</td></tr></tbody></table>
+    <p>Her satırda iki taraf eşit, c sadeleşiyor. Yani bütün cevaplarım 5 fazla olsa bile hepsi kontrollerden geçer. Buna ${term('tkayma', 'kayma')} diyorum.</p>` },
+
+  { head: 'Bölüm 4', html: () => `<h3>Bir örnek neyi değiştirir?</h3>
+    <p>Kural 1 artınca sonucu 1 artırıyorsa, 0 + 0'dan her soruya adım adım gidilir:</p>
+    ${tFormula('f(a, b) = f(0, 0) + a + b')}
+    <p>Demek kurallar bütün tabloyu belirler, yalnızca c = f(0, 0) sayısı boşta kalır. Tek bir doğru örnek c'yi çözer:</p>
+    <table class="calc"><tbody>
+      <tr><td>Gösterilen</td><td>3 + 4</td><td>7</td></tr>
+      <tr><td>Denklem</td><td>c + 3 + 4 = 7</td><td>c = 0</td></tr></tbody></table>
+    <p>Bu kusursuz bir hesapta geçerlidir. Ağım gürültülü olduğu için pratikte 1-2 örnek yetmez, 5 örnekten sonra işe yaramaya başlar.</p>` },
+
+  { head: 'Bölüm 5', html: () => `<h2>Çıkarmayı bulmak</h2>
+    <p class="dc">Çıkarma, toplamanın tersidir. Bu tek cümle bana bir arama yöntemi verir:</p>
+    ${tFormula('a − b = g ⇔ g + b = a')}
+    <p>0'dan 9'a her g için kendi toplamamı sorarım ve hedefe en yakın olanı seçerim:</p>
+    ${tFormula('g* = en küçük yapan g: | toplamam(g, b) − a |')}
+    <p>Fark ${ADV_GATE.toLocaleString('tr-TR')} altındaysa emin olurum. Sınır 0,5'in altında, çünkü 0,5'ten uzak bir sonuç yuvarlanınca hedefe bile denk gelmez.</p>` },
+
+  { head: 'Bölüm 5', html: () => `<h3>Bir örnek: 7 − 3</h3>
+    <table class="calc plain"><thead><tr><th>Aday</th><th>Toplamam</th><th>Hedef</th><th>Fark</th></tr></thead><tbody>
+      <tr><td>3 + 3</td><td>6,1</td><td>7</td><td>0,9</td></tr>
+      <tr><td>4 + 3</td><td>7,1</td><td>7</td><td>0,1 ✓</td></tr>
+      <tr><td>5 + 3</td><td>8,0</td><td>7</td><td>1,0</td></tr></tbody></table>
+    <p class="figcap">Örnek sayılar, en yakın üç aday. Hedef 0,4'ten yakın, cevabım 4.</p>
+    <p>3 − 7 gibi negatif sorularda g olamaz, çünkü toplamada hiç negatif sayı görmedim. Bu yüzden ikinci kural:</p>
+    ${tFormula(`a − b = −(${term('tters', 'b − a')})`)}
+    <p>7 − 3 = 4 bulurum, işareti çevirip 3 − 7 = −4 derim.</p>` },
+
+  { head: 'Bölüm 5', html: () => `<h3>Toplamayı unutmamak</h3>
+    <p>Toplama ve çıkarma aynı ağırlıkları paylaşır. Yalnızca çıkarma çalışırsam toplamam bozulur, sonra adaylarım da bozulur. Bir denemede tekrar kapalıyken ikisi de %5'in altına düştü. Bu yüzden ${term('ttekrar', 'tekrar')} ederim: ${ADV_SUB_ROUNDS} tur, turda ${sCount(ADV_SUB_THINK)} örnek, yaklaşık yarısı toplama.</p>
+    ${tFormula('puan = koruduğum toplama + öğrendiğim çıkarma')}
+    <table class="calc plain"><thead><tr><th>Toplama</th><th>Çıkarma</th><th>Puan</th><th>Sonuç</th></tr></thead><tbody>
+      <tr><td>70</td><td>30</td><td>100</td><td>tut</td></tr>
+      <tr><td>69</td><td>60</td><td>129</td><td>tut</td></tr>
+      <tr><td>60</td><td>80</td><td>−1</td><td>geri al</td></tr></tbody></table>
+    <p>Başlangıç toplamasının %${Math.round(ADV_KEEP * 100)} altına düşen tur puan alamaz: burada 70 × 0,9 = 63.</p>` },
+
+  { head: 'Bölüm 5', html: () => `<h3>Ne kadar buluyorum?</h3>
+    <table class="calc plain"><thead><tr><th>Gösterilen toplama</th><th>Başta</th><th>Sonunda</th><th>En düşük</th><th>Toplama</th></tr></thead><tbody>
+      <tr><td>0</td><td>%3</td><td>%6</td><td>%0</td><td>%2</td></tr>
+      <tr><td>3</td><td>%3</td><td>%66</td><td>%0</td><td>%67</td></tr>
+      <tr><td>5</td><td>%4</td><td>%93</td><td>%45</td><td>%97</td></tr>
+      <tr><td>10</td><td>%2</td><td>%98</td><td>%90</td><td>%100</td></tr>
+      <tr><td>20</td><td>%3</td><td>%97</td><td>%90</td><td>%100</td></tr>
+      <tr><td>40</td><td>%2</td><td>%97</td><td>%90</td><td>%100</td></tr></tbody></table>
+    <p class="figcap">Çıkarma sınavı, 12 denemenin ortalaması. Son sütun çıkarma bittikten sonraki toplama sınavı.</p>
+    <p>Hiç çıkarma cevabı görmedim. Bütün başarı toplamamın sağlamlığından gelir.</p>
+    <p class="margin-note">Şu an ${live('tFound')} çıkarma buldum, sınavım ${live('tSubExam')}.</p>` },
+
+  { head: 'Bölüm 6', html: () => `<h2>Dürüst sınav</h2>
+    <p class="dc">Sınavımdaki ${tExamN()} soru eğitime hiç girmez. Kontrol ederken onlara bakabilirim, ama onlardan ders almam.</p>
+    <p>Kalan soruların gerçek cevabı yalnızca notlamada kullanılır. Ekranda gördüğün "Doğru" sütunu sana içindir, ben o bilgiyi görmem ve cevabımı ona göre seçmem.</p>
+    <p>Bir cevap, yuvarlanmış çıkışım gerçek cevaba eşitse doğru sayılır. Bana "Soru sor" kartından soru sorabilirsin, cevap veririm ama sorun eğitime girmez.</p>
+    <p>Toplama sınavım: gösterilenlerden sonra ${live('tBefore')}, şimdi ${live('tExam')}.</p>` },
+
+  { head: 'Bölüm 6', html: () => `<h3>Toplamada ne kadar işe yarıyor?</h3>
+    <table class="calc plain"><thead><tr><th>Gösterilen</th><th>Düşünmeden</th><th>Düşününce</th><th>En düşük</th></tr></thead><tbody>
+      <tr><td>0</td><td>%3</td><td>%3</td><td>%0</td></tr>
+      <tr><td>2</td><td>%9</td><td>%10</td><td>%0</td></tr>
+      <tr><td>3</td><td>%44</td><td>%52</td><td>%5</td></tr>
+      <tr><td>5</td><td>%60</td><td>%85</td><td>%15</td></tr>
+      <tr><td>10</td><td>%83</td><td>%95</td><td>%65</td></tr>
+      <tr><td>20</td><td>%90</td><td>%100</td><td>%100</td></tr>
+      <tr><td>40</td><td>%98</td><td>%100</td><td>%100</td></tr></tbody></table>
+    <p class="figcap">Sınav başarısı, 12 denemenin ortalaması. "En düşük", düşündükten sonraki en kötü deneme. Sınavda ${tExamN()} soru var, küçük farklar şans olabilir.</p>` },
+
+  { head: 'Bölüm 7', html: () => `<h2>Sınırlarım</h2>
+    <p class="dc">Kurallar kaymayı göremez, bu yüzden beni gerçeğe gösterdiğin örnekler bağlar. Hiç örnek yoksa düşünmek toplamayı bulduramaz. Çok az örnekle yanlış şeyden emin olabilirim.</p>
+    <p>Çıkarma da toplamama yaslanır: toplama zayıfsa adaylar da zayıftır.</p>
+    <p>Kuralları, 1 ekleme adımını ve ters işlemi ben keşfetmedim, kod veriyor. Ben cevapları bulurum, kuralları değil. Çarpma ve bölme bu kartta yok.</p>
+    <p style="text-align:right;font-style:italic">Advanced Phyou</p>` },
+
+  { head: 'Sözlük', html: () => `<h3>Düşünmenin sözlüğü</h3>${glossPage(['tkontrol', 'temin', 'tkendi', 'tgeri', 'tkayma', 'tters', 'ttekrar'])}` },
+];
+BOOKS.advanced = { pages: TPAGES, title: 'Düşünme Kitabı', at: 0 };
+$('advBookBtn').addEventListener('click', () => chooseBook('advanced'));
+</script>
+
 <!-- Eroson's book: same paper and page turning, his own pages and terms. -->
 <script id="eroson-book">
 'use strict';
@@ -4797,6 +6900,8 @@ $('eBookBtn').addEventListener('click', () => chooseBook('eroson'));
 $('homeFaceP').innerHTML = FACE;
 $('homeFaceS').innerHTML = SFACE;
 $('homeFaceE').innerHTML = EFACE;
+$('homeFaceM').innerHTML = MFACE;
+$('homeFaceA').innerHTML = AFACE;
 setWho(route());
 
 // A service worker needs http(s), so the app simply skips it when opened as a file.

@@ -9,4 +9,6 @@
 - [systems/book.md](systems/book.md): the page-turning books of Phyou and Serino, glossary, term and number pop-ups
 - [systems/serino.md](systems/serino.md): Serino, her mini GPT, screen, memory file
 - [systems/eroson.md](systems/eroson.md): Eroson, his maze world, Q-learning, map editor
+- [systems/merisu.md](systems/merisu.md): Merisu, her pixel art image model, drawing screen, picture editor, memory file
+- [systems/advanced.md](systems/advanced.md): Advanced Phyou experiment, Thinking Mode for addition, rule checks and undoing bad rounds
 - [systems/memory.md](systems/memory.md): downloading and loading Phyou's memory as a JSON file

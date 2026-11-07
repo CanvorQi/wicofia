@@ -15,8 +15,14 @@
 
 - Serino's default lesson: sample text and 126 questions in `samples/`, on by default through a checkbox
 - Eroson: maze character with deep Q-learning, game board, watching on unseen mazes, report card with two yardsticks, own map editor, his own book
+- Merisu: pixel art image model with words and imagined numbers, drawing screen, cell chances, picture editor, exam on unseen colour and shape pairs, memory file, her own book
+- Advanced Phyou: separate experiment card with Thinking Mode for addition only, rule checks, undoing bad rounds, real-metric moods, a question card, a second view that finds subtraction through its own addition, and its own 22-page book with worked math
 
 ## Unfinished
+- Advanced Phyou has no memory file, and multiplication and division are not added
+- With few shown additions Advanced Phyou can still end low or get worse, since the rules miss answers that all drift together
+- `icon.svg` and the PNGs still show three characters; Merisu is not on the app icon
+- Serino's sample answer to "arkadaşların kim" does not name Merisu; changing it changes the sample text and stops old memory files being recognised as the ready text
 - Eroson has no memory file, and his drawn map is lost on reload
 - Maps cannot be saved or shared as files yet
 - Serino cannot read PDF files: a dependency-free parser would be unreliable for Turkish letters, so they are refused with a message

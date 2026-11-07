@@ -1,7 +1,7 @@
 {
   "name": "Wicofia",
   "short_name": "Wicofia",
-  "description": "Yapay zekânın nasıl öğrendiğini üç küçük karakterle, kendi elinle gör.",
+  "description": "Yapay zekânın nasıl öğrendiğini dört küçük karakterle, kendi elinle gör.",
   "lang": "tr",
   "start_url": "./",
   "scope": "./",
